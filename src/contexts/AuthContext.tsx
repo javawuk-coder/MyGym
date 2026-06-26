@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import {
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
 } from 'firebase/auth'
 import type { User } from 'firebase/auth'
@@ -61,6 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    getRedirectResult(auth).catch(() => {})
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u)
       if (u) {
@@ -75,7 +79,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider)
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch (e: unknown) {
+      if (e instanceof Error && 'code' in e && (e as { code: string }).code === 'auth/popup-blocked') {
+        await signInWithRedirect(auth, googleProvider)
+      } else {
+        throw e
+      }
+    }
   }
 
   const logout = async () => {
