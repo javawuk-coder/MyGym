@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   onAuthStateChanged,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
 } from 'firebase/auth'
 import type { User } from 'firebase/auth'
@@ -32,39 +33,42 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+async function syncProfile(u: User) {
+  const ref = doc(db, 'users', u.uid)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) {
+    const newProfile: UserProfile = {
+      uid: u.uid,
+      email: u.email ?? '',
+      displayName: u.displayName ?? '',
+      photoURL: u.photoURL ?? '',
+      role: 'user',
+      unit: 'kg',
+      createdAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp(),
+      disabled: false,
+    }
+    await setDoc(ref, newProfile)
+    return newProfile
+  } else {
+    await setDoc(ref, { lastLoginAt: serverTimestamp() }, { merge: true })
+    return snap.data() as UserProfile
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    getRedirectResult(auth).catch(() => {})
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u)
       if (u) {
-        // Firestore에서 프로필 가져오기 (없으면 최초 생성)
-        const ref = doc(db, 'users', u.uid)
-        const snap = await getDoc(ref)
-
-        if (!snap.exists()) {
-          // 첫 로그인 → 프로필 생성
-          const newProfile: UserProfile = {
-            uid: u.uid,
-            email: u.email ?? '',
-            displayName: u.displayName ?? '',
-            photoURL: u.photoURL ?? '',
-            role: 'user',
-            unit: 'kg',
-            createdAt: serverTimestamp(),
-            lastLoginAt: serverTimestamp(),
-            disabled: false,
-          }
-          await setDoc(ref, newProfile)
-          setProfile(newProfile)
-        } else {
-          // 기존 유저 → lastLoginAt 업데이트
-          await setDoc(ref, { lastLoginAt: serverTimestamp() }, { merge: true })
-          setProfile(snap.data() as UserProfile)
-        }
+        const p = await syncProfile(u)
+        setProfile(p)
       } else {
         setProfile(null)
       }
@@ -74,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider)
+    await signInWithRedirect(auth, googleProvider)
   }
 
   const logout = async () => {
