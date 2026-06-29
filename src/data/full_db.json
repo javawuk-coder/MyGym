@@ -2466,6 +2466,51 @@
         "log_type":  "cardio"
     },
     {
+        "id":  "cardio_12",
+        "name":  "Row Calorie",
+        "ko":  "로잉 칼로리",
+        "muscle":  "cardio",
+        "equipment":  "machine",
+        "type":  "compound",
+        "log_type":  "cardio"
+    },
+    {
+        "id":  "cardio_13",
+        "name":  "Ski Erg Calorie",
+        "ko":  "스키 에르그 칼로리",
+        "muscle":  "cardio",
+        "equipment":  "machine",
+        "type":  "compound",
+        "log_type":  "cardio"
+    },
+    {
+        "id":  "cardio_14",
+        "name":  "Assault Bike Calorie",
+        "ko":  "어설트 바이크 칼로리",
+        "muscle":  "cardio",
+        "equipment":  "machine",
+        "type":  "compound",
+        "log_type":  "cardio"
+    },
+    {
+        "id":  "cardio_15",
+        "name":  "Run Calorie",
+        "ko":  "런 칼로리",
+        "muscle":  "cardio",
+        "equipment":  "bodyweight",
+        "type":  "compound",
+        "log_type":  "cardio"
+    },
+    {
+        "id":  "cardio_16",
+        "name":  "Echo Bike Calorie",
+        "ko":  "에코 바이크 칼로리",
+        "muscle":  "cardio",
+        "equipment":  "machine",
+        "type":  "compound",
+        "log_type":  "cardio"
+    },
+    {
         "id":  "hiit_29",
         "name":  "Box Jump",
         "ko":  "박스 점프",

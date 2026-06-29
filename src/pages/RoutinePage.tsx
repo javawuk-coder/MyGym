@@ -522,10 +522,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                                   onChange={e => updateSetsReps(s.exId, 'sets', e.target.value)}
                                   style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }} />
                           )}
-                          {isCardio
-                            ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
-                            : s.maxReps
-                              ? <div style={{ textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#E24B4A' }}>MAX</div>
+                          {s.maxReps
+                            ? <div style={{ textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#E24B4A' }}>MAX</div>
+                            : isCardio
+                              ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
                               : <input type="number" min="1" value={s.reps}
                                   onChange={e => updateSetsReps(s.exId, 'reps', e.target.value)}
                                   style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }}
@@ -548,23 +548,21 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               }}>{ROUND_TYPE_LABELS[v]}</button>
                             ))}
                             {/* MAX 토글 */}
-                            {!isCardio && (
-                              <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
-                                padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
-                                border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
-                                background: s.maxReps ? '#E24B4A22' : 'transparent',
-                                color: s.maxReps ? '#E24B4A' : 'var(--tm)',
-                                fontWeight: s.maxReps ? 700 : 400,
-                              }}>MAX</button>
-                            )}
+                            <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
+                              padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
+                              border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
+                              background: s.maxReps ? '#E24B4A22' : 'transparent',
+                              color: s.maxReps ? '#E24B4A' : 'var(--tm)',
+                              fontWeight: s.maxReps ? 700 : 400,
+                            }}>MAX</button>
                             {/* 메모 (@ weight 등) */}
                             <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
                               placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
-                        {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM 등) */}
-                        {!isInterval && !isCardio && (format.type === 'amrap' || format.type === 'emom' || format.type === 'tabata') && (
-                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px' }}>
+                        {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM, Tabata, For Time) */}
+                        {!isInterval && (format.type === 'amrap' || format.type === 'emom' || format.type === 'tabata' || format.type === 'for_time') && (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px', flexWrap: 'wrap' }}>
                             <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
                               padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
                               border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
@@ -573,7 +571,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               fontWeight: s.maxReps ? 700 : 400,
                             }}>MAX</button>
                             <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
-                              placeholder="메모" style={{ flex: 1, minWidth: '100px', fontSize: '12px', padding: '3px 8px' }} />
+                              placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
                       </div>
