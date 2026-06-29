@@ -1,0 +1,2729 @@
+[
+  {
+    "id": "chest_01",
+    "name": "Barbell Bench Press",
+    "ko": "바벨 벤치 프레스",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_02",
+    "name": "Incline Barbell Bench Press",
+    "ko": "인클라인 바벨 벤치 프레스",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_03",
+    "name": "Decline Barbell Bench Press",
+    "ko": "디클라인 바벨 벤치 프레스",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_04",
+    "name": "Smith Machine Bench Press",
+    "ko": "스미스 머신 벤치 프레스",
+    "muscle": "chest",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_05",
+    "name": "Smith Machine Incline Press",
+    "ko": "스미스 머신 인클라인 프레스",
+    "muscle": "chest",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_06",
+    "name": "Smith Machine Decline Press",
+    "ko": "스미스 머신 디클라인 프레스",
+    "muscle": "chest",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_07",
+    "name": "Dumbbell Bench Press",
+    "ko": "덤벨 벤치 프레스",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_08",
+    "name": "Incline Dumbbell Press",
+    "ko": "인클라인 덤벨 프레스",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_09",
+    "name": "Decline Dumbbell Press",
+    "ko": "디클라인 덤벨 프레스",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_10",
+    "name": "Dumbbell Fly",
+    "ko": "덤벨 플라이",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_11",
+    "name": "Incline Dumbbell Fly",
+    "ko": "인클라인 덤벨 플라이",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_12",
+    "name": "Decline Dumbbell Fly",
+    "ko": "디클라인 덤벨 플라이",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_13",
+    "name": "Cable Crossover",
+    "ko": "케이블 크로스오버",
+    "muscle": "chest",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_14",
+    "name": "Low-to-High Cable Fly",
+    "ko": "로우-하이 케이블 플라이",
+    "muscle": "chest",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_15",
+    "name": "High-to-Low Cable Fly",
+    "ko": "하이-로우 케이블 플라이",
+    "muscle": "chest",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_16",
+    "name": "Single-Arm Cable Fly",
+    "ko": "단팔 케이블 플라이",
+    "muscle": "chest",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_17",
+    "name": "Chest Press Machine",
+    "ko": "체스트 프레스 머신",
+    "muscle": "chest",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_18",
+    "name": "Incline Chest Press Machine",
+    "ko": "인클라인 체스트 프레스 머신",
+    "muscle": "chest",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_19",
+    "name": "Pec Deck Machine",
+    "ko": "펙 덱 머신",
+    "muscle": "chest",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_20",
+    "name": "Converging Chest Press Machine",
+    "ko": "컨버징 체스트 프레스 머신",
+    "muscle": "chest",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_21",
+    "name": "Push-Up",
+    "ko": "푸시업",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_22",
+    "name": "Wide-Grip Push-Up",
+    "ko": "와이드 그립 푸시업",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_23",
+    "name": "Diamond Push-Up",
+    "ko": "다이아몬드 푸시업",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_24",
+    "name": "Incline Push-Up",
+    "ko": "인클라인 푸시업",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_25",
+    "name": "Decline Push-Up",
+    "ko": "디클라인 푸시업",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_26",
+    "name": "Dips (Chest)",
+    "ko": "딥스 (가슴)",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "chest_27",
+    "name": "Weighted Dips",
+    "ko": "웨이티드 딥스",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_28",
+    "name": "Machine-Assisted Dips",
+    "ko": "머신 어시스티드 딥스",
+    "muscle": "chest",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_29",
+    "name": "Landmine Press",
+    "ko": "랜드마인 프레스",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "chest_30",
+    "name": "Svend Press",
+    "ko": "스벤드 프레스",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_01",
+    "name": "Conventional Deadlift",
+    "ko": "컨벤셔널 데드리프트",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_02",
+    "name": "Sumo Deadlift",
+    "ko": "스모 데드리프트",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_03",
+    "name": "Romanian Deadlift",
+    "ko": "루마니안 데드리프트",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_04",
+    "name": "Stiff-Leg Deadlift",
+    "ko": "스티프 레그 데드리프트",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_05",
+    "name": "Trap Bar Deadlift",
+    "ko": "트랩바 데드리프트",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_06",
+    "name": "Pull-Up",
+    "ko": "풀업",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "back_07",
+    "name": "Wide-Grip Pull-Up",
+    "ko": "와이드 그립 풀업",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "back_08",
+    "name": "Chin-Up",
+    "ko": "친업",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "back_09",
+    "name": "Neutral-Grip Pull-Up",
+    "ko": "뉴트럴 그립 풀업",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "back_10",
+    "name": "Weighted Pull-Up",
+    "ko": "웨이티드 풀업",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_11",
+    "name": "Machine-Assisted Pull-Up",
+    "ko": "머신 어시스티드 풀업",
+    "muscle": "back",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_12",
+    "name": "Lat Pulldown (Wide Grip)",
+    "ko": "랫 풀다운 (와이드 그립)",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_13",
+    "name": "Lat Pulldown (Close Grip)",
+    "ko": "랫 풀다운 (클로즈 그립)",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_14",
+    "name": "Lat Pulldown (Neutral Grip)",
+    "ko": "랫 풀다운 (뉴트럴 그립)",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_15",
+    "name": "Single-Arm Lat Pulldown",
+    "ko": "단팔 랫 풀다운",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_16",
+    "name": "Reverse-Grip Lat Pulldown",
+    "ko": "리버스 그립 랫 풀다운",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_17",
+    "name": "Barbell Row",
+    "ko": "바벨 로우",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_18",
+    "name": "Pendlay Row",
+    "ko": "펜들레이 로우",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_19",
+    "name": "T-Bar Row",
+    "ko": "티바 로우",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_20",
+    "name": "Meadows Row",
+    "ko": "메도우스 로우",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_21",
+    "name": "Single-Arm Dumbbell Row",
+    "ko": "단팔 덤벨 로우",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_22",
+    "name": "Chest-Supported Dumbbell Row",
+    "ko": "체스트 서포티드 덤벨 로우",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_23",
+    "name": "Incline Dumbbell Row",
+    "ko": "인클라인 덤벨 로우",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_24",
+    "name": "Seated Cable Row",
+    "ko": "시티드 케이블 로우",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_25",
+    "name": "Standing Cable Row",
+    "ko": "스탠딩 케이블 로우",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_26",
+    "name": "Single-Arm Cable Row",
+    "ko": "단팔 케이블 로우",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_27",
+    "name": "Rope Cable Row",
+    "ko": "로프 케이블 로우",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_28",
+    "name": "Machine Row",
+    "ko": "머신 로우",
+    "muscle": "back",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_29",
+    "name": "Chest-Supported Machine Row",
+    "ko": "체스트 서포티드 머신 로우",
+    "muscle": "back",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_30",
+    "name": "Dumbbell Pullover",
+    "ko": "덤벨 풀오버",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_31",
+    "name": "Cable Pullover",
+    "ko": "케이블 풀오버",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_32",
+    "name": "Machine Pullover",
+    "ko": "머신 풀오버",
+    "muscle": "back",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_33",
+    "name": "Straight-Arm Pulldown",
+    "ko": "스트레이트 암 풀다운",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_34",
+    "name": "Face Pull",
+    "ko": "페이스 풀",
+    "muscle": "back",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_35",
+    "name": "Hyperextension",
+    "ko": "하이퍼익스텐션",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "back_36",
+    "name": "Weighted Hyperextension",
+    "ko": "웨이티드 하이퍼익스텐션",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_37",
+    "name": "Good Morning",
+    "ko": "굿모닝",
+    "muscle": "back",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "back_38",
+    "name": "Smith Machine Good Morning",
+    "ko": "스미스 머신 굿모닝",
+    "muscle": "back",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_01",
+    "name": "Back Squat",
+    "ko": "백 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_02",
+    "name": "Front Squat",
+    "ko": "프론트 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_03",
+    "name": "Pause Squat",
+    "ko": "포즈 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_04",
+    "name": "Box Squat",
+    "ko": "박스 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_05",
+    "name": "Zercher Squat",
+    "ko": "저처 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_06",
+    "name": "Smith Machine Squat",
+    "ko": "스미스 머신 스쿼트",
+    "muscle": "legs",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_07",
+    "name": "Goblet Squat",
+    "ko": "고블릿 스쿼트",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_08",
+    "name": "Hack Squat Machine",
+    "ko": "핵 스쿼트 머신",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_09",
+    "name": "Leg Press",
+    "ko": "레그 프레스",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_10",
+    "name": "Narrow Stance Leg Press",
+    "ko": "내로우 레그 프레스",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_11",
+    "name": "Wide Stance Leg Press",
+    "ko": "와이드 레그 프레스",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_12",
+    "name": "Single-Leg Press",
+    "ko": "단다리 레그 프레스",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_13",
+    "name": "Romanian Deadlift",
+    "ko": "루마니안 데드리프트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_14",
+    "name": "Dumbbell Romanian Deadlift",
+    "ko": "덤벨 루마니안 데드리프트",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_15",
+    "name": "Single-Leg Romanian Deadlift",
+    "ko": "단다리 루마니안 데드리프트",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_16",
+    "name": "Bulgarian Split Squat",
+    "ko": "불가리안 스플릿 스쿼트",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_17",
+    "name": "Barbell Bulgarian Split Squat",
+    "ko": "바벨 불가리안 스플릿 스쿼트",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_18",
+    "name": "Lunge",
+    "ko": "런지",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_19",
+    "name": "Walking Lunge",
+    "ko": "워킹 런지",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_20",
+    "name": "Reverse Lunge",
+    "ko": "리버스 런지",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_21",
+    "name": "Lateral Lunge",
+    "ko": "레터럴 런지",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_22",
+    "name": "Barbell Lunge",
+    "ko": "바벨 런지",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_23",
+    "name": "Step-Up",
+    "ko": "스텝업",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_24",
+    "name": "Leg Curl (Lying)",
+    "ko": "레그 컬 (라잉)",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_25",
+    "name": "Leg Curl (Seated)",
+    "ko": "레그 컬 (시티드)",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_26",
+    "name": "Leg Curl (Standing)",
+    "ko": "레그 컬 (스탠딩)",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_27",
+    "name": "Single-Leg Curl",
+    "ko": "단다리 레그 컬",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_28",
+    "name": "Leg Extension",
+    "ko": "레그 익스텐션",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_29",
+    "name": "Single-Leg Extension",
+    "ko": "단다리 레그 익스텐션",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_30",
+    "name": "Standing Calf Raise",
+    "ko": "스탠딩 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_31",
+    "name": "Seated Calf Raise",
+    "ko": "시티드 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_32",
+    "name": "Donkey Calf Raise",
+    "ko": "당키 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "legs_33",
+    "name": "Single-Leg Calf Raise",
+    "ko": "단다리 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "legs_34",
+    "name": "Smith Machine Calf Raise",
+    "ko": "스미스 머신 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "smith",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_35",
+    "name": "Leg Press Calf Raise",
+    "ko": "레그 프레스 카프 레이즈",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_36",
+    "name": "Adductor Machine",
+    "ko": "어덕터 머신",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_37",
+    "name": "Abductor Machine",
+    "ko": "어브덕터 머신",
+    "muscle": "legs",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_38",
+    "name": "Cable Leg Curl",
+    "ko": "케이블 레그 컬",
+    "muscle": "legs",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_01",
+    "name": "Barbell Overhead Press (Standing)",
+    "ko": "바벨 오버헤드 프레스 (스탠딩)",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_02",
+    "name": "Barbell Overhead Press (Seated)",
+    "ko": "바벨 오버헤드 프레스 (시티드)",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_03",
+    "name": "Push Press",
+    "ko": "푸시 프레스",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_04",
+    "name": "Bradford Press",
+    "ko": "브래드포드 프레스",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_05",
+    "name": "Dumbbell Shoulder Press (Seated)",
+    "ko": "덤벨 숄더 프레스 (시티드)",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_06",
+    "name": "Dumbbell Shoulder Press (Standing)",
+    "ko": "덤벨 숄더 프레스 (스탠딩)",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_07",
+    "name": "Arnold Press",
+    "ko": "아놀드 프레스",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_08",
+    "name": "Smith Machine Shoulder Press",
+    "ko": "스미스 머신 숄더 프레스",
+    "muscle": "shoulder",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_09",
+    "name": "Machine Shoulder Press",
+    "ko": "머신 숄더 프레스",
+    "muscle": "shoulder",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_10",
+    "name": "Lateral Raise",
+    "ko": "레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_11",
+    "name": "Cable Lateral Raise",
+    "ko": "케이블 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_12",
+    "name": "Bilateral Cable Lateral Raise",
+    "ko": "바이래터럴 케이블 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_13",
+    "name": "Machine Lateral Raise",
+    "ko": "머신 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_14",
+    "name": "Leaning Lateral Raise",
+    "ko": "리닝 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_15",
+    "name": "Lying Lateral Raise",
+    "ko": "라잉 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_16",
+    "name": "Landmine Lateral Raise",
+    "ko": "랜드마인 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_17",
+    "name": "Dumbbell Front Raise",
+    "ko": "덤벨 프론트 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_18",
+    "name": "Barbell Front Raise",
+    "ko": "바벨 프론트 레이즈",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_19",
+    "name": "Cable Front Raise",
+    "ko": "케이블 프론트 레이즈",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_20",
+    "name": "Plate Front Raise",
+    "ko": "플레이트 프론트 레이즈",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_21",
+    "name": "Rear Delt Dumbbell Fly",
+    "ko": "리어 델트 덤벨 플라이",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_22",
+    "name": "Rear Delt Cable Fly",
+    "ko": "리어 델트 케이블 플라이",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_23",
+    "name": "Pec Deck Rear Delt",
+    "ko": "펙 덱 리어 델트",
+    "muscle": "shoulder",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_24",
+    "name": "Face Pull (Rope)",
+    "ko": "페이스 풀 (로프)",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_25",
+    "name": "Bent-Over Lateral Raise",
+    "ko": "벤트오버 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_26",
+    "name": "Barbell Upright Row",
+    "ko": "바벨 업라이트 로우",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_27",
+    "name": "Cable Upright Row",
+    "ko": "케이블 업라이트 로우",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_28",
+    "name": "Barbell Shrug",
+    "ko": "바벨 슈러그",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_29",
+    "name": "Dumbbell Shrug",
+    "ko": "덤벨 슈러그",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_30",
+    "name": "Smith Machine Shrug",
+    "ko": "스미스 머신 슈러그",
+    "muscle": "shoulder",
+    "equipment": "smith",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_31",
+    "name": "Cable Shrug",
+    "ko": "케이블 슈러그",
+    "muscle": "shoulder",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "shoulder_32",
+    "name": "Trap Bar Shrug",
+    "ko": "트랩바 슈러그",
+    "muscle": "shoulder",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_01",
+    "name": "Barbell Curl",
+    "ko": "바벨 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_02",
+    "name": "EZ-Bar Curl",
+    "ko": "EZ바 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_03",
+    "name": "Barbell Preacher Curl",
+    "ko": "바벨 프리처 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_04",
+    "name": "EZ-Bar Preacher Curl",
+    "ko": "EZ바 프리처 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_05",
+    "name": "Barbell Drag Curl",
+    "ko": "바벨 드래그 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_06",
+    "name": "Reverse Barbell Curl",
+    "ko": "리버스 바벨 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_07",
+    "name": "Dumbbell Curl",
+    "ko": "덤벨 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_08",
+    "name": "Alternating Dumbbell Curl",
+    "ko": "얼터네이팅 덤벨 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_09",
+    "name": "Incline Dumbbell Curl",
+    "ko": "인클라인 덤벨 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_10",
+    "name": "Concentration Curl",
+    "ko": "컨센트레이션 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_11",
+    "name": "Spider Curl",
+    "ko": "스파이더 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_12",
+    "name": "Cross-Body Hammer Curl",
+    "ko": "크로스바디 해머 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_13",
+    "name": "Hammer Curl",
+    "ko": "해머 컬",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_14",
+    "name": "Cable Curl (Bar)",
+    "ko": "케이블 컬 (바)",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_15",
+    "name": "Cable Curl (Rope)",
+    "ko": "케이블 컬 (로프)",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_16",
+    "name": "Single-Arm Cable Curl",
+    "ko": "단팔 케이블 컬",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_17",
+    "name": "High Cable Curl",
+    "ko": "하이 케이블 컬",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_18",
+    "name": "Machine Curl",
+    "ko": "머신 컬",
+    "muscle": "arm",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_19",
+    "name": "Tricep Pushdown (Bar)",
+    "ko": "트라이셉 푸시다운 (바)",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_20",
+    "name": "Tricep Pushdown (Rope)",
+    "ko": "트라이셉 푸시다운 (로프)",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_21",
+    "name": "Tricep Pushdown (Reverse Grip)",
+    "ko": "리버스 그립 트라이셉 푸시다운",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_22",
+    "name": "Single-Arm Tricep Pushdown",
+    "ko": "단팔 트라이셉 푸시다운",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_23",
+    "name": "Overhead Tricep Extension (Dumbbell)",
+    "ko": "오버헤드 트라이셉 익스텐션 (덤벨)",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_24",
+    "name": "Overhead Tricep Extension (EZ-Bar)",
+    "ko": "오버헤드 트라이셉 익스텐션 (EZ바)",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_25",
+    "name": "Overhead Tricep Extension (Cable Rope)",
+    "ko": "오버헤드 트라이셉 익스텐션 (케이블 로프)",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_26",
+    "name": "Skull Crusher (EZ-Bar)",
+    "ko": "스컬 크러셔 (EZ바)",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_27",
+    "name": "Skull Crusher (Dumbbell)",
+    "ko": "스컬 크러셔 (덤벨)",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_28",
+    "name": "Close-Grip Bench Press",
+    "ko": "클로즈 그립 벤치 프레스",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_29",
+    "name": "Smith Machine Close-Grip Press",
+    "ko": "스미스 머신 클로즈 그립 프레스",
+    "muscle": "arm",
+    "equipment": "smith",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_30",
+    "name": "Tricep Dips (Bodyweight)",
+    "ko": "트라이셉 딥스 (맨몸)",
+    "muscle": "arm",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "arm_31",
+    "name": "Tricep Dips (Weighted)",
+    "ko": "트라이셉 딥스 (중량)",
+    "muscle": "arm",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_32",
+    "name": "Tricep Dips (Machine-Assisted)",
+    "ko": "트라이셉 딥스 (머신 어시스티드)",
+    "muscle": "arm",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_33",
+    "name": "Bench Dip",
+    "ko": "벤치 딥",
+    "muscle": "arm",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "arm_34",
+    "name": "Dumbbell Kickback",
+    "ko": "덤벨 킥백",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_35",
+    "name": "Cable Kickback",
+    "ko": "케이블 킥백",
+    "muscle": "arm",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_36",
+    "name": "Machine Tricep Extension",
+    "ko": "머신 트라이셉 익스텐션",
+    "muscle": "arm",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_37",
+    "name": "Wrist Curl (Barbell)",
+    "ko": "손목 컬 (바벨)",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_38",
+    "name": "Wrist Curl (Dumbbell)",
+    "ko": "손목 컬 (덤벨)",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_39",
+    "name": "Reverse Wrist Curl",
+    "ko": "리버스 손목 컬",
+    "muscle": "arm",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "arm_40",
+    "name": "Farmer's Carry",
+    "ko": "파머스 캐리",
+    "muscle": "arm",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_01",
+    "name": "Crunch",
+    "ko": "크런치",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_02",
+    "name": "Cable Crunch",
+    "ko": "케이블 크런치",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_03",
+    "name": "Decline Crunch",
+    "ko": "디클라인 크런치",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_04",
+    "name": "Machine Crunch",
+    "ko": "머신 크런치",
+    "muscle": "core",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_05",
+    "name": "Reverse Crunch",
+    "ko": "리버스 크런치",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_06",
+    "name": "Hanging Leg Raise",
+    "ko": "행잉 레그 레이즈",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_07",
+    "name": "Lying Leg Raise",
+    "ko": "라잉 레그 레이즈",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_08",
+    "name": "Captain's Chair Leg Raise",
+    "ko": "캡틴스 체어 레그 레이즈",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_09",
+    "name": "Toes-to-Bar",
+    "ko": "토즈 투 바",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_10",
+    "name": "Plank",
+    "ko": "플랭크",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_11",
+    "name": "Side Plank",
+    "ko": "사이드 플랭크",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_12",
+    "name": "Weighted Plank",
+    "ko": "웨이티드 플랭크",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_13",
+    "name": "Ab Wheel Rollout",
+    "ko": "AB 휠 롤아웃",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_14",
+    "name": "Barbell Rollout",
+    "ko": "바벨 롤아웃",
+    "muscle": "core",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_15",
+    "name": "Cable Rollout",
+    "ko": "케이블 롤아웃",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_16",
+    "name": "Russian Twist",
+    "ko": "러시안 트위스트",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_17",
+    "name": "Weighted Russian Twist",
+    "ko": "웨이티드 러시안 트위스트",
+    "muscle": "core",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_18",
+    "name": "Cable Woodchop (High-to-Low)",
+    "ko": "케이블 우드찹 (하이-로우)",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_19",
+    "name": "Cable Woodchop (Low-to-High)",
+    "ko": "케이블 우드찹 (로우-하이)",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_20",
+    "name": "Landmine Twist",
+    "ko": "랜드마인 트위스트",
+    "muscle": "core",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_21",
+    "name": "Oblique Crunch",
+    "ko": "오블리크 크런치",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_22",
+    "name": "Sit-Up",
+    "ko": "싯업",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_23",
+    "name": "Weighted Sit-Up",
+    "ko": "웨이티드 싯업",
+    "muscle": "core",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_24",
+    "name": "Decline Sit-Up",
+    "ko": "디클라인 싯업",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_25",
+    "name": "V-Up",
+    "ko": "브이업",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_26",
+    "name": "Dragon Flag",
+    "ko": "드래곤 플래그",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_27",
+    "name": "Hollow Body Hold",
+    "ko": "할로우 바디 홀드",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_28",
+    "name": "Pallof Press (Standing)",
+    "ko": "팔로프 프레스 (스탠딩)",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_29",
+    "name": "Pallof Press (Kneeling)",
+    "ko": "팔로프 프레스 (닐링)",
+    "muscle": "core",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_30",
+    "name": "Dead Bug",
+    "ko": "데드 버그",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_31",
+    "name": "Bird Dog",
+    "ko": "버드 독",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "core_32",
+    "name": "L-Sit",
+    "ko": "엘싯",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_01",
+    "name": "Barbell Hip Thrust",
+    "ko": "바벨 힙 쓰러스트",
+    "muscle": "glute",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_02",
+    "name": "Dumbbell Hip Thrust",
+    "ko": "덤벨 힙 쓰러스트",
+    "muscle": "glute",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_03",
+    "name": "Smith Machine Hip Thrust",
+    "ko": "스미스 머신 힙 쓰러스트",
+    "muscle": "glute",
+    "equipment": "smith",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_04",
+    "name": "Single-Leg Hip Thrust",
+    "ko": "단다리 힙 쓰러스트",
+    "muscle": "glute",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_05",
+    "name": "Banded Hip Thrust",
+    "ko": "밴디드 힙 쓰러스트",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_06",
+    "name": "Barbell Glute Bridge",
+    "ko": "바벨 글루트 브릿지",
+    "muscle": "glute",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_07",
+    "name": "Single-Leg Glute Bridge",
+    "ko": "단다리 글루트 브릿지",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_08",
+    "name": "Elevated Glute Bridge",
+    "ko": "엘리베이티드 글루트 브릿지",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_09",
+    "name": "Cable Kickback",
+    "ko": "케이블 킥백 (둔근)",
+    "muscle": "glute",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_10",
+    "name": "Machine Glute Kickback",
+    "ko": "머신 글루트 킥백",
+    "muscle": "glute",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_11",
+    "name": "Donkey Kick",
+    "ko": "당키 킥",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_12",
+    "name": "Abductor Machine",
+    "ko": "어브덕터 머신",
+    "muscle": "glute",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_13",
+    "name": "Cable Hip Abduction",
+    "ko": "케이블 힙 어브덕션",
+    "muscle": "glute",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_14",
+    "name": "Sumo Squat (Barbell)",
+    "ko": "스모 스쿼트 (바벨)",
+    "muscle": "glute",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_15",
+    "name": "Sumo Squat (Dumbbell)",
+    "ko": "스모 스쿼트 (덤벨)",
+    "muscle": "glute",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_16",
+    "name": "Sumo Deadlift",
+    "ko": "스모 데드리프트 (둔근)",
+    "muscle": "glute",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_17",
+    "name": "Fire Hydrant",
+    "ko": "파이어 하이드런트",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_18",
+    "name": "Banded Hip Abduction",
+    "ko": "밴디드 힙 어브덕션",
+    "muscle": "glute",
+    "equipment": "bodyweight",
+    "type": "isolation",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "glute_19",
+    "name": "Reverse Hyperextension",
+    "ko": "리버스 하이퍼익스텐션",
+    "muscle": "glute",
+    "equipment": "machine",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "glute_20",
+    "name": "Cable Pull-Through",
+    "ko": "케이블 풀 쓰루",
+    "muscle": "glute",
+    "equipment": "cable",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_39",
+    "name": "Front Foot Elevated Split Squat (Dumbbell)",
+    "ko": "프론트 풋 엘리베이티드 스플릿 스쿼트 (덤벨)",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_40",
+    "name": "Front Foot Elevated Split Squat (Barbell)",
+    "ko": "프론트 풋 엘리베이티드 스플릿 스쿼트 (바벨)",
+    "muscle": "legs",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_41",
+    "name": "Foot Elevated Squat (Dumbbell)",
+    "ko": "풋 엘리베이티드 스쿼트 (덤벨)",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "legs_42",
+    "name": "Foot Elevated Squat (Kettlebell)",
+    "ko": "풋 엘리베이티드 스쿼트 (케틀벨)",
+    "muscle": "legs",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "core_33",
+    "name": "Front Rack Carry",
+    "ko": "프론트 랙 캐리",
+    "muscle": "core",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_01",
+    "name": "Russian Kettlebell Swing",
+    "ko": "러시안 케틀벨 스윙",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_02",
+    "name": "American Kettlebell Swing",
+    "ko": "아메리칸 케틀벨 스윙",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_03",
+    "name": "Kettlebell Snatch",
+    "ko": "케틀벨 스내치",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_04",
+    "name": "Kettlebell Clean",
+    "ko": "케틀벨 클린",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_05",
+    "name": "Kettlebell Clean & Press",
+    "ko": "케틀벨 클린 앤 프레스",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_06",
+    "name": "Kettlebell Turkish Get-Up",
+    "ko": "케틀벨 터키시 겟업",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_07",
+    "name": "Alternating Dumbbell Snatch",
+    "ko": "얼터네이팅 덤벨 스내치",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_08",
+    "name": "Dumbbell Thruster",
+    "ko": "덤벨 쓰러스터",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_09",
+    "name": "Plate Ground-to-Overhead",
+    "ko": "플레이트 그라운드 투 오버헤드",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_10",
+    "name": "Plate Halo",
+    "ko": "플레이트 헤일로",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_11",
+    "name": "Barbell Thruster",
+    "ko": "바벨 쓰러스터",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_12",
+    "name": "Power Clean",
+    "ko": "파워 클린",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_13",
+    "name": "Hang Power Clean",
+    "ko": "행 파워 클린",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_14",
+    "name": "Power Snatch",
+    "ko": "파워 스내치",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_15",
+    "name": "Hang Power Snatch",
+    "ko": "행 파워 스내치",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_16",
+    "name": "Clean & Jerk",
+    "ko": "클린 앤 저크",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_17",
+    "name": "Box Step-Up",
+    "ko": "박스 스텝업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_18",
+    "name": "Burpee",
+    "ko": "버피",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_19",
+    "name": "Burpee Box Step-Up",
+    "ko": "버피 박스 스텝업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_20",
+    "name": "Wall Ball",
+    "ko": "월볼",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_21",
+    "name": "Double Under",
+    "ko": "더블 언더",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_22",
+    "name": "Battle Rope Waves",
+    "ko": "배틀 로프 웨이브",
+    "muscle": "hiit",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "time"
+  },
+  {
+    "id": "hiit_23",
+    "name": "Battle Rope Alternating Waves",
+    "ko": "얼터네이팅 배틀 로프 웨이브",
+    "muscle": "hiit",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "time"
+  },
+  {
+    "id": "hiit_24",
+    "name": "Battle Rope Slams",
+    "ko": "배틀 로프 슬램",
+    "muscle": "hiit",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "time"
+  },
+  {
+    "id": "hiit_25",
+    "name": "Battle Rope Circles",
+    "ko": "배틀 로프 서클",
+    "muscle": "hiit",
+    "equipment": "cable",
+    "type": "compound",
+    "log_type": "time"
+  },
+  {
+    "id": "hiit_26",
+    "name": "Ball Slam",
+    "ko": "볼 슬램",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_27",
+    "name": "Wall Ball Shot",
+    "ko": "월볼 샷",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_28",
+    "name": "Med Ball Rotational Throw",
+    "ko": "메드볼 로테이셔널 쓰로우",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "cardio_01",
+    "name": "Treadmill Running",
+    "ko": "트레드밀 러닝",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_02",
+    "name": "Treadmill Incline Walk",
+    "ko": "트레드밀 인클라인 워크",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_03",
+    "name": "Treadmill Incline Run",
+    "ko": "트레드밀 인클라인 런",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_04",
+    "name": "Stationary Bike",
+    "ko": "스테이셔너리 바이크",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_05",
+    "name": "Assault Bike",
+    "ko": "어설트 바이크",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_06",
+    "name": "Rowing Machine",
+    "ko": "로잉 머신",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_07",
+    "name": "Ski Erg",
+    "ko": "스키 에르그",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_08",
+    "name": "Stairmaster",
+    "ko": "스테어마스터",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_09",
+    "name": "Elliptical",
+    "ko": "일립티컬",
+    "muscle": "cardio",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_10",
+    "name": "Outdoor Running",
+    "ko": "야외 달리기",
+    "muscle": "cardio",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "cardio_11",
+    "name": "Jump Rope",
+    "ko": "줄넘기",
+    "muscle": "cardio",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "cardio"
+  },
+  {
+    "id": "hiit_29",
+    "name": "Box Jump",
+    "ko": "박스 점프",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_30",
+    "name": "Box Jump Over",
+    "ko": "박스 점프 오버",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_31",
+    "name": "Burpee Box Jump",
+    "ko": "버피 박스 점프",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_32",
+    "name": "Jump Squat",
+    "ko": "점프 스쿼트",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_33",
+    "name": "Jumping Lunge",
+    "ko": "점핑 런지",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_34",
+    "name": "Broad Jump",
+    "ko": "브로드 점프",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_35",
+    "name": "Tuck Jump",
+    "ko": "턱 점프",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_36",
+    "name": "Inchworm",
+    "ko": "인치웜",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_37",
+    "name": "Inchworm Push-Up",
+    "ko": "인치웜 푸시업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_38",
+    "name": "Dumbbell Burpee",
+    "ko": "덤벨 버피",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_39",
+    "name": "Barbell Burpee",
+    "ko": "바벨 버피",
+    "muscle": "hiit",
+    "equipment": "barbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_40",
+    "name": "Man Maker",
+    "ko": "맨 메이커",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_41",
+    "name": "Devil Press",
+    "ko": "데빌 프레스",
+    "muscle": "hiit",
+    "equipment": "dumbbell",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_42",
+    "name": "Mountain Climber",
+    "ko": "마운틴 클라이머",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_43",
+    "name": "Bear Crawl",
+    "ko": "베어 크롤",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_44",
+    "name": "Lateral Bound",
+    "ko": "래터럴 바운드",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_45",
+    "name": "Skater Jump",
+    "ko": "스케이터 점프",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_46",
+    "name": "Shuttle Run",
+    "ko": "셔틀런",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_47",
+    "name": "Sled Push",
+    "ko": "슬레드 푸시",
+    "muscle": "hiit",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_48",
+    "name": "Sled Pull",
+    "ko": "슬레드 풀",
+    "muscle": "hiit",
+    "equipment": "machine",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_49",
+    "name": "Chest-to-Bar Pull-Up",
+    "ko": "체스트 투 바 풀업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_50",
+    "name": "Muscle-Up",
+    "ko": "머슬업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_51",
+    "name": "Handstand Push-Up",
+    "ko": "핸드스탠드 푸시업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_52",
+    "name": "Kipping Pull-Up",
+    "ko": "킵핑 풀업",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_53",
+    "name": "Rope Climb",
+    "ko": "로프 클라임",
+    "muscle": "hiit",
+    "equipment": "bodyweight",
+    "type": "compound",
+    "log_type": "reps_only"
+  },
+  {
+    "id": "hiit_54",
+    "name": "Bulgarian Bag Snatch",
+    "ko": "불가리안 백 스내치",
+    "muscle": "hiit",
+    "equipment": "bulgarian_bag",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_55",
+    "name": "Bulgarian Bag Squat",
+    "ko": "불가리안 백 스쿼트",
+    "muscle": "hiit",
+    "equipment": "bulgarian_bag",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_56",
+    "name": "Bulgarian Bag Spin",
+    "ko": "불가리안 백 스핀",
+    "muscle": "hiit",
+    "equipment": "bulgarian_bag",
+    "type": "compound",
+    "log_type": "weight_reps"
+  },
+  {
+    "id": "hiit_57",
+    "name": "Bulgarian Bag Swing",
+    "ko": "불가리안 백 스윙",
+    "muscle": "hiit",
+    "equipment": "bulgarian_bag",
+    "type": "compound",
+    "log_type": "weight_reps"
+  }
+]

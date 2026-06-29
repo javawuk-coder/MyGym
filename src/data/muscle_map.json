@@ -1,0 +1,3514 @@
+{
+  "chest_01": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "가슴 상·하부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_02": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_03": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_04": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "가슴 상·하부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_05": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_06": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "옆 가슴 (전거근)",
+      "코어"
+    ]
+  },
+  "chest_07": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "가슴 상·하부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_08": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_09": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_10": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "가슴 전체",
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_11": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_12": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_13": {
+    "primary": [
+      "가슴 중·하부"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두",
+      "코어"
+    ]
+  },
+  "chest_14": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_15": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_16": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두",
+      "코어"
+    ]
+  },
+  "chest_17": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_18": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_19": {
+    "primary": [
+      "가슴 전체"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "이두"
+    ]
+  },
+  "chest_20": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_21": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어",
+      "복근"
+    ]
+  },
+  "chest_22": {
+    "primary": [
+      "가슴 외측"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_23": {
+    "primary": [
+      "삼두",
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_24": {
+    "primary": [
+      "상부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_25": {
+    "primary": [
+      "하부 가슴"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_26": {
+    "primary": [
+      "하부 가슴",
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_27": {
+    "primary": [
+      "하부 가슴",
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_28": {
+    "primary": [
+      "하부 가슴",
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": []
+  },
+  "chest_29": {
+    "primary": [
+      "상부 가슴",
+      "앞 어깨"
+    ],
+    "secondary": [
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "chest_30": {
+    "primary": [
+      "가슴 중부"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_01": {
+    "primary": [
+      "햄스트링",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "상부 등",
+      "광배근",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "전완",
+      "코어"
+    ]
+  },
+  "back_02": {
+    "primary": [
+      "햄스트링",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "상부 등",
+      "광배근",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "전완",
+      "코어"
+    ]
+  },
+  "back_03": {
+    "primary": [
+      "햄스트링",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "광배근",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "back_04": {
+    "primary": [
+      "햄스트링",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "back_05": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "상부 등",
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "back_06": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "뒤 어깨",
+      "코어"
+    ]
+  },
+  "back_07": {
+    "primary": [
+      "광배근 외측"
+    ],
+    "secondary": [
+      "이두",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "뒤 어깨"
+    ]
+  },
+  "back_08": {
+    "primary": [
+      "광배근",
+      "이두"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "뒤 어깨"
+    ]
+  },
+  "back_09": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_10": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_11": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": []
+  },
+  "back_12": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "뒤 어깨"
+    ]
+  },
+  "back_13": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_14": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_15": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_16": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_17": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어"
+    ]
+  },
+  "back_18": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어"
+    ]
+  },
+  "back_19": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_20": {
+    "primary": [
+      "광배근 하부",
+      "중부 등"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_21": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_22": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_23": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_24": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": []
+  },
+  "back_25": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_26": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_27": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_28": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": []
+  },
+  "back_29": {
+    "primary": [
+      "중부 등",
+      "광배근"
+    ],
+    "secondary": [
+      "이두",
+      "뒤 어깨"
+    ],
+    "stabilizer": []
+  },
+  "back_30": {
+    "primary": [
+      "광배근",
+      "가슴 상부"
+    ],
+    "secondary": [
+      "삼두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_31": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "삼두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_32": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "뒤 어깨"
+    ],
+    "stabilizer": []
+  },
+  "back_33": {
+    "primary": [
+      "광배근"
+    ],
+    "secondary": [
+      "삼두",
+      "뒤 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_34": {
+    "primary": [
+      "뒤 어깨",
+      "상부 등"
+    ],
+    "secondary": [
+      "어깨 회전근",
+      "이두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_35": {
+    "primary": [
+      "척추 기립근",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_36": {
+    "primary": [
+      "척추 기립근",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_37": {
+    "primary": [
+      "척추 기립근",
+      "햄스트링"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "back_38": {
+    "primary": [
+      "척추 기립근",
+      "햄스트링"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_01": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_02": {
+    "primary": [
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "엉덩이",
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어"
+    ]
+  },
+  "legs_03": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어"
+    ]
+  },
+  "legs_04": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "척추 기립근",
+      "코어"
+    ]
+  },
+  "legs_05": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_06": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_07": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_08": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "종아리"
+    ]
+  },
+  "legs_09": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "종아리"
+    ]
+  },
+  "legs_10": {
+    "primary": [
+      "앞 허벅지 내측",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": []
+  },
+  "legs_11": {
+    "primary": [
+      "앞 허벅지 외측",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": []
+  },
+  "legs_12": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": []
+  },
+  "legs_13": {
+    "primary": [
+      "햄스트링",
+      "엉덩이"
+    ],
+    "secondary": [
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_14": {
+    "primary": [
+      "햄스트링",
+      "엉덩이"
+    ],
+    "secondary": [
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_15": {
+    "primary": [
+      "햄스트링",
+      "엉덩이"
+    ],
+    "secondary": [
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어",
+      "균형 근육"
+    ]
+  },
+  "legs_16": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_17": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_18": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_19": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_20": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_21": {
+    "primary": [
+      "내전근",
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_22": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_23": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "legs_24": {
+    "primary": [
+      "햄스트링"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "엉덩이"
+    ]
+  },
+  "legs_25": {
+    "primary": [
+      "햄스트링"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_26": {
+    "primary": [
+      "햄스트링"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_27": {
+    "primary": [
+      "햄스트링"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_28": {
+    "primary": [
+      "앞 허벅지"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_29": {
+    "primary": [
+      "앞 허벅지"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_30": {
+    "primary": [
+      "종아리 (비복근)"
+    ],
+    "secondary": [
+      "종아리 (가자미근)"
+    ],
+    "stabilizer": []
+  },
+  "legs_31": {
+    "primary": [
+      "종아리 (가자미근)"
+    ],
+    "secondary": [
+      "종아리 (비복근)"
+    ],
+    "stabilizer": []
+  },
+  "legs_32": {
+    "primary": [
+      "종아리 전체"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_33": {
+    "primary": [
+      "종아리 전체"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "균형 근육"
+    ]
+  },
+  "legs_34": {
+    "primary": [
+      "종아리 전체"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_35": {
+    "primary": [
+      "종아리 전체"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_36": {
+    "primary": [
+      "내전근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_37": {
+    "primary": [
+      "외전근",
+      "중둔근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_38": {
+    "primary": [
+      "햄스트링"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "legs_39": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "균형 근육"
+    ]
+  },
+  "legs_40": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "균형 근육"
+    ]
+  },
+  "legs_41": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "legs_42": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "내전근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_01": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "승모근 상부"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "shoulder_02": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "승모근 상부"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_03": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "승모근 상부"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_04": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "승모근 상부"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_05": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_06": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_07": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_08": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_09": {
+    "primary": [
+      "앞 어깨",
+      "옆 어깨"
+    ],
+    "secondary": [
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_10": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "승모근 상부"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_11": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_12": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_13": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "승모근"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_14": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_15": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_16": {
+    "primary": [
+      "옆 어깨"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_17": {
+    "primary": [
+      "앞 어깨"
+    ],
+    "secondary": [
+      "옆 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_18": {
+    "primary": [
+      "앞 어깨"
+    ],
+    "secondary": [
+      "옆 어깨",
+      "승모근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_19": {
+    "primary": [
+      "앞 어깨"
+    ],
+    "secondary": [
+      "옆 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_20": {
+    "primary": [
+      "앞 어깨"
+    ],
+    "secondary": [
+      "옆 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_21": {
+    "primary": [
+      "뒤 어깨"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_22": {
+    "primary": [
+      "뒤 어깨"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_23": {
+    "primary": [
+      "뒤 어깨"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_24": {
+    "primary": [
+      "뒤 어깨",
+      "상부 등"
+    ],
+    "secondary": [
+      "어깨 회전근",
+      "이두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_25": {
+    "primary": [
+      "뒤 어깨"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "shoulder_26": {
+    "primary": [
+      "옆 어깨",
+      "승모근"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_27": {
+    "primary": [
+      "옆 어깨",
+      "승모근"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "shoulder_28": {
+    "primary": [
+      "승모근 상부"
+    ],
+    "secondary": [
+      "승모근 중부"
+    ],
+    "stabilizer": []
+  },
+  "shoulder_29": {
+    "primary": [
+      "승모근 상부"
+    ],
+    "secondary": [
+      "승모근 중부"
+    ],
+    "stabilizer": []
+  },
+  "shoulder_30": {
+    "primary": [
+      "승모근 상부"
+    ],
+    "secondary": [
+      "승모근 중부"
+    ],
+    "stabilizer": []
+  },
+  "shoulder_31": {
+    "primary": [
+      "승모근 상부"
+    ],
+    "secondary": [
+      "승모근 중부"
+    ],
+    "stabilizer": []
+  },
+  "shoulder_32": {
+    "primary": [
+      "승모근 상부"
+    ],
+    "secondary": [
+      "승모근 중부"
+    ],
+    "stabilizer": []
+  },
+  "arm_01": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_02": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_03": {
+    "primary": [
+      "이두 하부"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_04": {
+    "primary": [
+      "이두 하부"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_05": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_06": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_07": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_08": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_09": {
+    "primary": [
+      "이두 장두 (외측)"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_10": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_11": {
+    "primary": [
+      "이두 단두 (내측)"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_12": {
+    "primary": [
+      "이두",
+      "상완근"
+    ],
+    "secondary": [
+      "전완"
+    ],
+    "stabilizer": []
+  },
+  "arm_13": {
+    "primary": [
+      "이두",
+      "상완근"
+    ],
+    "secondary": [
+      "전완"
+    ],
+    "stabilizer": []
+  },
+  "arm_14": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_15": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_16": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_17": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_18": {
+    "primary": [
+      "이두"
+    ],
+    "secondary": [
+      "상완근"
+    ],
+    "stabilizer": []
+  },
+  "arm_19": {
+    "primary": [
+      "삼두 외측"
+    ],
+    "secondary": [
+      "삼두 내측"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_20": {
+    "primary": [
+      "삼두 전체"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_21": {
+    "primary": [
+      "삼두 내측"
+    ],
+    "secondary": [
+      "삼두 외측"
+    ],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_22": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_23": {
+    "primary": [
+      "삼두 장두 (내측 상단)"
+    ],
+    "secondary": [
+      "삼두 내측"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_24": {
+    "primary": [
+      "삼두 장두 (내측 상단)"
+    ],
+    "secondary": [
+      "삼두 내측"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_25": {
+    "primary": [
+      "삼두 장두 (내측 상단)"
+    ],
+    "secondary": [
+      "삼두 내측"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_26": {
+    "primary": [
+      "삼두 전체"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_27": {
+    "primary": [
+      "삼두 전체"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "전완"
+    ]
+  },
+  "arm_28": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_29": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "가슴 중부",
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_30": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "하부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_31": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨",
+      "하부 가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "arm_32": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": []
+  },
+  "arm_33": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [
+      "앞 어깨"
+    ],
+    "stabilizer": []
+  },
+  "arm_34": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_35": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_36": {
+    "primary": [
+      "삼두"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_37": {
+    "primary": [
+      "전완 굴근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_38": {
+    "primary": [
+      "전완 굴근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_39": {
+    "primary": [
+      "전완 신근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "arm_40": {
+    "primary": [
+      "전완",
+      "승모근"
+    ],
+    "secondary": [
+      "코어"
+    ],
+    "stabilizer": []
+  },
+  "core_01": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_02": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "외복사근 (옆 복근)"
+    ],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_03": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_04": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "외복사근 (옆 복근)"
+    ],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_05": {
+    "primary": [
+      "복직근 하부 (아랫배)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_06": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "외복사근 (옆 복근)",
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_07": {
+    "primary": [
+      "복직근 하부 (아랫배)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_08": {
+    "primary": [
+      "복직근 하부 (아랫배)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_09": {
+    "primary": [
+      "복직근 하부 (아랫배)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_10": {
+    "primary": [
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)",
+      "외복사근 (옆 복근)"
+    ],
+    "stabilizer": [
+      "척추 기립근"
+    ]
+  },
+  "core_11": {
+    "primary": [
+      "옆 복근 (내·외복사근)",
+      "복횡근"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "척추 기립근"
+    ]
+  },
+  "core_12": {
+    "primary": [
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)",
+      "외복사근 (옆 복근)"
+    ],
+    "stabilizer": [
+      "척추 기립근"
+    ]
+  },
+  "core_13": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": [
+      "어깨"
+    ]
+  },
+  "core_14": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": [
+      "어깨"
+    ]
+  },
+  "core_15": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": [
+      "어깨"
+    ]
+  },
+  "core_16": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_17": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "장요근"
+    ]
+  },
+  "core_18": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "코어 전체"
+    ]
+  },
+  "core_19": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "코어 전체"
+    ]
+  },
+  "core_20": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "코어 전체"
+    ]
+  },
+  "core_21": {
+    "primary": [
+      "옆 복근 (내·외복사근)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": []
+  },
+  "core_22": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_23": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_24": {
+    "primary": [
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "장요근"
+    ],
+    "stabilizer": []
+  },
+  "core_25": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "장요근"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "core_26": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": []
+  },
+  "core_27": {
+    "primary": [
+      "복횡근 (깊은 코어)",
+      "복직근 (앞 복근)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": []
+  },
+  "core_28": {
+    "primary": [
+      "복횡근 (깊은 코어)",
+      "옆 복근"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "core_29": {
+    "primary": [
+      "복횡근 (깊은 코어)",
+      "옆 복근"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)"
+    ],
+    "stabilizer": [
+      "어깨 회전근"
+    ]
+  },
+  "core_30": {
+    "primary": [
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "복직근 (앞 복근)",
+      "옆 복근"
+    ],
+    "stabilizer": [
+      "척추 기립근"
+    ]
+  },
+  "core_31": {
+    "primary": [
+      "척추 기립근",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "어깨"
+    ]
+  },
+  "core_32": {
+    "primary": [
+      "복직근 (앞 복근)",
+      "복횡근 (깊은 코어)"
+    ],
+    "secondary": [
+      "옆 복근"
+    ],
+    "stabilizer": [
+      "어깨",
+      "삼두"
+    ]
+  },
+  "core_33": {
+    "primary": [
+      "앞 어깨",
+      "상부 등",
+      "코어"
+    ],
+    "secondary": [
+      "승모근",
+      "전완"
+    ],
+    "stabilizer": [
+      "척추 기립근"
+    ]
+  },
+  "glute_01": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "glute_02": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_03": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_04": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "균형 근육"
+    ]
+  },
+  "glute_05": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_06": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "glute_07": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_08": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_09": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_10": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": []
+  },
+  "glute_11": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_12": {
+    "primary": [
+      "엉덩이 외측 (중둔근)"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "glute_13": {
+    "primary": [
+      "엉덩이 외측 (중둔근)"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_14": {
+    "primary": [
+      "엉덩이 (대둔근)",
+      "내전근"
+    ],
+    "secondary": [
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_15": {
+    "primary": [
+      "엉덩이 (대둔근)",
+      "내전근"
+    ],
+    "secondary": [
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_16": {
+    "primary": [
+      "엉덩이 (대둔근)",
+      "햄스트링"
+    ],
+    "secondary": [
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "glute_17": {
+    "primary": [
+      "엉덩이 외측 (중둔근)"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_18": {
+    "primary": [
+      "엉덩이 외측 (중둔근)"
+    ],
+    "secondary": [],
+    "stabilizer": []
+  },
+  "glute_19": {
+    "primary": [
+      "엉덩이 (대둔근)"
+    ],
+    "secondary": [
+      "햄스트링",
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "glute_20": {
+    "primary": [
+      "엉덩이 (대둔근)",
+      "햄스트링"
+    ],
+    "secondary": [
+      "척추 기립근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_01": {
+    "primary": [
+      "엉덩이",
+      "햄스트링"
+    ],
+    "secondary": [
+      "광배근",
+      "앞 어깨"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "hiit_02": {
+    "primary": [
+      "엉덩이",
+      "햄스트링",
+      "어깨 전체"
+    ],
+    "secondary": [
+      "광배근",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_03": {
+    "primary": [
+      "엉덩이",
+      "어깨",
+      "삼두"
+    ],
+    "secondary": [
+      "햄스트링",
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_04": {
+    "primary": [
+      "엉덩이",
+      "어깨",
+      "광배근"
+    ],
+    "secondary": [
+      "앞 허벅지",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_05": {
+    "primary": [
+      "엉덩이",
+      "어깨",
+      "삼두"
+    ],
+    "secondary": [
+      "광배근",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_06": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "어깨",
+      "엉덩이",
+      "코어"
+    ],
+    "stabilizer": [
+      "전완",
+      "균형 근육"
+    ]
+  },
+  "hiit_07": {
+    "primary": [
+      "엉덩이",
+      "앞 허벅지",
+      "어깨"
+    ],
+    "secondary": [
+      "햄스트링",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "hiit_08": {
+    "primary": [
+      "앞 허벅지",
+      "어깨",
+      "삼두"
+    ],
+    "secondary": [
+      "엉덩이",
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_09": {
+    "primary": [
+      "어깨",
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_10": {
+    "primary": [
+      "어깨",
+      "승모근"
+    ],
+    "secondary": [
+      "코어"
+    ],
+    "stabilizer": []
+  },
+  "hiit_11": {
+    "primary": [
+      "앞 허벅지",
+      "어깨",
+      "삼두"
+    ],
+    "secondary": [
+      "엉덩이",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "hiit_12": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이",
+      "척추 기립근"
+    ],
+    "secondary": [
+      "어깨",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_13": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "어깨",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_14": {
+    "primary": [
+      "어깨",
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_15": {
+    "primary": [
+      "어깨",
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "삼두",
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_16": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "어깨",
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_17": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "종아리"
+    ]
+  },
+  "hiit_18": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "가슴",
+      "삼두",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_19": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "가슴",
+      "삼두",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_20": {
+    "primary": [
+      "앞 허벅지",
+      "어깨"
+    ],
+    "secondary": [
+      "엉덩이",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_21": {
+    "primary": [
+      "종아리",
+      "앞 허벅지"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_22": {
+    "primary": [
+      "어깨 전체",
+      "광배근"
+    ],
+    "secondary": [
+      "상부 등",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_23": {
+    "primary": [
+      "어깨 전체",
+      "광배근"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_24": {
+    "primary": [
+      "어깨 전체",
+      "광배근"
+    ],
+    "secondary": [
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_25": {
+    "primary": [
+      "어깨 전체"
+    ],
+    "secondary": [
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_26": {
+    "primary": [
+      "광배근",
+      "어깨"
+    ],
+    "secondary": [
+      "삼두",
+      "코어"
+    ],
+    "stabilizer": []
+  },
+  "hiit_27": {
+    "primary": [
+      "앞 허벅지",
+      "어깨"
+    ],
+    "secondary": [
+      "엉덩이",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_28": {
+    "primary": [
+      "옆 복근",
+      "어깨"
+    ],
+    "secondary": [
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_29": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_30": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_31": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "앞 허벅지",
+      "엉덩이",
+      "가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_32": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_33": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_34": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_35": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_36": {
+    "primary": [
+      "척추 기립근",
+      "햄스트링"
+    ],
+    "secondary": [
+      "어깨",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_37": {
+    "primary": [
+      "척추 기립근",
+      "가슴"
+    ],
+    "secondary": [
+      "어깨",
+      "삼두",
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_38": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "가슴",
+      "삼두",
+      "앞 허벅지",
+      "어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_39": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "가슴",
+      "삼두",
+      "앞 허벅지",
+      "어깨"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_40": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "어깨",
+      "광배근",
+      "앞 허벅지",
+      "가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_41": {
+    "primary": [
+      "전신"
+    ],
+    "secondary": [
+      "가슴",
+      "어깨",
+      "앞 허벅지"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_42": {
+    "primary": [
+      "코어",
+      "앞 어깨"
+    ],
+    "secondary": [
+      "앞 허벅지"
+    ],
+    "stabilizer": []
+  },
+  "hiit_43": {
+    "primary": [
+      "어깨",
+      "코어"
+    ],
+    "secondary": [
+      "앞 허벅지",
+      "광배근"
+    ],
+    "stabilizer": []
+  },
+  "hiit_44": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이 외측"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_45": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이 외측",
+      "종아리"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_46": {
+    "primary": [
+      "앞 허벅지",
+      "햄스트링",
+      "종아리"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_47": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "hiit_48": {
+    "primary": [
+      "햄스트링",
+      "광배근"
+    ],
+    "secondary": [
+      "엉덩이",
+      "이두"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_49": {
+    "primary": [
+      "광배근",
+      "이두"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_50": {
+    "primary": [
+      "광배근",
+      "삼두",
+      "이두"
+    ],
+    "secondary": [
+      "어깨",
+      "가슴"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_51": {
+    "primary": [
+      "앞 어깨",
+      "삼두"
+    ],
+    "secondary": [
+      "가슴 상부"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_52": {
+    "primary": [
+      "광배근",
+      "이두"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_53": {
+    "primary": [
+      "광배근",
+      "이두",
+      "전완"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_54": {
+    "primary": [
+      "엉덩이",
+      "어깨",
+      "광배근"
+    ],
+    "secondary": [
+      "앞 허벅지",
+      "삼두"
+    ],
+    "stabilizer": [
+      "코어",
+      "전완"
+    ]
+  },
+  "hiit_55": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "hiit_56": {
+    "primary": [
+      "어깨 전체",
+      "코어"
+    ],
+    "secondary": [
+      "상부 등"
+    ],
+    "stabilizer": []
+  },
+  "hiit_57": {
+    "primary": [
+      "엉덩이",
+      "햄스트링",
+      "어깨"
+    ],
+    "secondary": [
+      "광배근"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_01": {
+    "primary": [
+      "앞 허벅지",
+      "햄스트링",
+      "종아리"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_02": {
+    "primary": [
+      "엉덩이",
+      "앞 허벅지",
+      "종아리"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어",
+      "척추 기립근"
+    ]
+  },
+  "cardio_03": {
+    "primary": [
+      "앞 허벅지",
+      "햄스트링",
+      "엉덩이",
+      "종아리"
+    ],
+    "secondary": [],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_04": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_05": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이",
+      "상체 전신"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_06": {
+    "primary": [
+      "광배근",
+      "이두",
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "어깨",
+      "햄스트링",
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_07": {
+    "primary": [
+      "광배근",
+      "이두",
+      "어깨"
+    ],
+    "secondary": [
+      "코어",
+      "앞 허벅지"
+    ],
+    "stabilizer": []
+  },
+  "cardio_08": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이",
+      "종아리"
+    ],
+    "secondary": [
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_09": {
+    "primary": [
+      "앞 허벅지",
+      "엉덩이"
+    ],
+    "secondary": [
+      "햄스트링",
+      "종아리"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_10": {
+    "primary": [
+      "앞 허벅지",
+      "햄스트링",
+      "종아리"
+    ],
+    "secondary": [
+      "엉덩이"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  },
+  "cardio_11": {
+    "primary": [
+      "종아리",
+      "앞 허벅지"
+    ],
+    "secondary": [
+      "엉덩이",
+      "햄스트링"
+    ],
+    "stabilizer": [
+      "코어"
+    ]
+  }
+}

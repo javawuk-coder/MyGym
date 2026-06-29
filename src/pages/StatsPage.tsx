@@ -1,0 +1,105 @@
+import type { DayLog, Exercise } from '../types'
+
+const ML: Record<string, string> = {
+  chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
+  arm:'Arms', core:'Core', glute:'Glute', hiit:'HIIT', cardio:'Cardio',
+}
+const MR: Record<string, string> = {
+  chest:'#378ADD', back:'#639922', legs:'#BA7517', shoulder:'#534AB7',
+  arm:'#D4537E', core:'#1D9E75', glute:'#D85A30', hiit:'#E24B4A', cardio:'#1D9E75',
+}
+
+interface Props {
+  logs: DayLog[]
+  allExercises: Exercise[]
+  unit: 'kg' | 'lb'
+}
+
+function fromKg(kg: number, unit: 'kg' | 'lb') {
+  return unit === 'lb' ? Math.round(kg * 2.205 * 10) / 10 : kg
+}
+
+export default function StatsPage({ logs, allExercises, unit }: Props) {
+  const getEx = (id: string) => allExercises.find(e => e.id === id)
+
+  const all = logs.flatMap(l => l.exercises)
+  const totalSets = all.filter(e => e.sets).reduce((a, e) => a + (e.sets?.length || 0), 0)
+  const totalVol = Math.round(
+    all.filter(e => e.log_type === 'weight_reps' || !e.log_type)
+      .reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
+  )
+  const workoutDays = logs.filter(l => l.exercises.length).length
+
+  // Volume by muscle
+  const mv: Record<string, number> = {}
+  all.forEach(e => {
+    const x = getEx(e.exId)
+    const v = (e.sets || []).reduce((a, s) => a + (s.weight || 0) * (s.reps || 0), 0)
+    const m = x?.muscle || 'custom'
+    mv[m] = (mv[m] || 0) + v
+  })
+  const maxVol = Math.max(...Object.values(mv), 1)
+
+  // Est. 1RM top 6
+  const orm: Record<string, number> = {}
+  all.forEach(e => {
+    (e.sets || []).forEach(s => {
+      if (!s.weight || !s.reps) return
+      const r = s.weight * (1 + s.reps / 30)
+      if (!orm[e.exId] || r > orm[e.exId]) orm[e.exId] = r
+    })
+  })
+  const top6 = Object.entries(orm).sort((a, b) => b[1] - a[1]).slice(0, 6)
+
+  return (
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
+        <div className="sc"><div className="sn">{workoutDays}</div><div className="sl">Workout days</div></div>
+        <div className="sc"><div className="sn">{totalSets}</div><div className="sl">Total sets</div></div>
+        <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}t</div><div className="sl">Total volume</div></div>
+      </div>
+
+      <div className="card">
+        <div className="stitle" style={{ marginBottom: '12px' }}>Volume by muscle</div>
+        {!Object.keys(mv).length ? (
+          <div style={{ fontSize: '13px', color: 'var(--tm)', textAlign: 'center', padding: '1rem' }}>운동을 기록하면 나타나요</div>
+        ) : (
+          Object.entries(mv).sort((a, b) => b[1] - a[1]).map(([m, v]) => (
+            <div key={m} style={{ marginBottom: '10px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                <span>{ML[m] || m}</span>
+                <span>{Math.round(fromKg(v, unit))} {unit}</span>
+              </div>
+              <div className="cbg">
+                <div className="cb" style={{ width: `${Math.round(v / maxVol * 100)}%`, background: MR[m] || '#888' }} />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="card">
+        <div className="stitle" style={{ marginBottom: '12px' }}>Top lifts — est. 1RM</div>
+        {!top6.length ? (
+          <div style={{ fontSize: '13px', color: 'var(--tm)', textAlign: 'center', padding: '.5rem' }}>데이터 없음</div>
+        ) : (
+          top6.map(([id, rm]) => {
+            const x = getEx(id)
+            const d = `${fromKg(rm, unit).toFixed(1)} ${unit}`
+            return (
+              <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '0.5px solid var(--bd)' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 500 }}>{x?.name || id}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{x?.ko || '—'}</div>
+                </div>
+                <div style={{ fontWeight: 600, fontSize: '15px' }}>
+                  {d} <span style={{ fontSize: '12px', color: 'var(--tm)', fontWeight: 400 }}>1RM</span>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
+}
