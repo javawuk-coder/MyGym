@@ -11,7 +11,7 @@ import StatsPage from './pages/StatsPage'
 import { useRoutines } from './hooks/useRoutines'
 import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
-import type { Routine } from './types'
+import type { Routine, Exercise } from './types'
 import DB from './data/full_db.json'
 import './index.css'
 
@@ -37,7 +37,7 @@ function MainApp() {
   const { logs, addLogEntry, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
 
-  const allExercises = [...(DB as typeof DB), ...customExercises]
+  const allExercises = [...(DB as Exercise[]), ...customExercises]
 
   const handleStartRoutine = (r: Routine & { id: string }) => {
     setPendingRoutine(r)
