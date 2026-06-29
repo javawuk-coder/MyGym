@@ -343,12 +343,26 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   }
 
   const save = async () => {
-    if (!routineName.trim()) { alert('Routine name required'); return }
-    if (!selected.length) { alert('Select at least one exercise'); return }
-    const data = { name: routineName.trim(), exercises: selected, format }
-    if (editingId) await onUpdateRoutine(editingId, data)
-    else await onAddRoutine(data)
-    setShowModal(false)
+    if (!routineName.trim()) { alert('루틴 이름을 입력하세요'); return }
+    if (!selected.length) { alert('운동을 하나 이상 추가하세요'); return }
+
+    // Firestore는 undefined 값을 거부 — undefined 필드 제거
+    const cleanExercises = selected.map(s => {
+      const e: Record<string, unknown> = { exId: s.exId, sets: s.sets, reps: s.reps }
+      if (s.maxReps) e.maxReps = true
+      if (s.roundType && s.roundType !== 'all') e.roundType = s.roundType
+      if (s.note) e.note = s.note
+      return e as RoutineExercise
+    })
+
+    try {
+      const data = { name: routineName.trim(), exercises: cleanExercises, format }
+      if (editingId) await onUpdateRoutine(editingId, data)
+      else await onAddRoutine(data)
+      setShowModal(false)
+    } catch (err) {
+      alert(`저장 실패: ${String(err)}`)
+    }
   }
 
   const muscles = ['all', ...Object.keys(ML)]
