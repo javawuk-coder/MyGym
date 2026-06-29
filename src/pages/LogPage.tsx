@@ -472,14 +472,14 @@ export default function LogPage({
       {/* ── Fill 모달 ── */}
       {modal === 'fill' && (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: '560px', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
+          <div className="mo" style={{ maxWidth: '560px', padding: 0 }}>
+            <div style={{ padding: '14px 18px', borderBottom: '0.5px solid var(--bd)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || '운동 기록'}</div>
                 <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
               </div>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '14px 18px', minHeight: 0 }}>
+            <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '14px 18px' }}>
               {draftExes.map((d, di) => renderDraftEx(d, di))}
               {showAddExInFill ? (
                 <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '10px 12px', marginBottom: '10px' }}>
@@ -508,7 +508,7 @@ export default function LogPage({
                 </button>
               )}
             </div>
-            <div style={{ padding: '12px 18px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
+            <div style={{ padding: '12px 18px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <button className="btn" onClick={closeFill}>Cancel</button>
               <button className="btn btn-p" onClick={save}>Save</button>
             </div>

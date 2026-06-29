@@ -541,7 +541,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       {/* ───── 모달 ───── */}
       {showModal && (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: parsedImageUrl ? '960px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0, overflow: 'hidden' }}>
+          <div className="mo" style={{ maxWidth: parsedImageUrl ? '960px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>
 
             {/* 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '0.5px solid var(--bd)' }}>
@@ -581,7 +581,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               )}
 
               {/* 폼 패널 */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+              <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '16px 20px' }}>
 
             {/* 파싱 상태 */}
             {parsing && (
