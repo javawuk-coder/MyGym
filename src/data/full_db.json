@@ -3220,5 +3220,32 @@
         "log_type":  "reps_only",
         "equipment":  "bodyweight",
         "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_40",
+        "name":  "Burpee Broad Jump",
+        "ko":  "버피 브로드 점프",
+        "type":  "compound",
+        "log_type":  "reps_only",
+        "equipment":  "bodyweight",
+        "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_41",
+        "name":  "Sled Push",
+        "ko":  "슬레드 푸시",
+        "type":  "compound",
+        "log_type":  "reps_only",
+        "equipment":  "machine",
+        "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_42",
+        "name":  "Sandbag Carry",
+        "ko":  "샌드백 캐리",
+        "type":  "compound",
+        "log_type":  "weight_reps",
+        "equipment":  "sandbag",
+        "muscle":  "hiit"
     }
 ]

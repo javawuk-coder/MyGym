@@ -25,7 +25,9 @@ Return ONLY a valid JSON object with this exact structure:
 }
 
 Rules:
-- Common abbreviations to expand: RKS/R.K.S.=Russian Kettlebell Swing, S2OH/STOH=Shoulder to Overhead, C2B=Chest-to-Bar Pull-Up, HSPU=Handstand Push-Up, DU=Double Under, T2B/TTB=Toes-to-Bar, OHS=Overhead Squat, GHD=GHD Sit-Up, BJO=Box Jump Over
+- Common abbreviations to expand: RKS/R.K.S.=Russian Kettlebell Swing, S2OH/STOH=Shoulder to Overhead, C2B=Chest-to-Bar Pull-Up, HSPU=Handstand Push-Up, DU=Double Under, T2B/TTB=Toes-to-Bar, OHS=Overhead Squat, GHD=GHD Sit-Up, BJO=Box Jump Over, W.B.S./WBS=Wall Ball Shot, Row=Rowing Machine, Ski=Ski Erg, Run=Outdoor Running
+- For distance exercises (e.g. "800/1000M Row"), put the distance in the note field (e.g. note="800/1000M") and use the base exercise name
+- "Farmers Carry" → use name "Farmer's Carry"
 - For 'Cal' exercises (Cal Row, Cal Ski, Cal Run, Cal Bike), set maxReps=true unless specific number given
 - For 'Max' prefix exercises, always set maxReps=true
 - Detect ODD/EVEN round patterns and set roundType ('odd', 'even', or 'all')

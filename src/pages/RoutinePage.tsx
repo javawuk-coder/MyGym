@@ -210,6 +210,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
   // 약어/별칭 → 정식 이름 맵
   const ALIASES: Record<string, string> = {
+    // CrossFit 약어
     'rks': 'russian kettlebell swing',
     'r.k.s.': 'russian kettlebell swing',
     'r. k. s.': 'russian kettlebell swing',
@@ -226,6 +227,18 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     'bjj': 'box jump',
     'bjo': 'box jump over',
     'ghr': 'ghd back extension',
+    'w.b.s.': 'wall ball shot',
+    'w. b. s.': 'wall ball shot',
+    'wbs': 'wall ball shot',
+    'wall ball shots': 'wall ball shot',
+    // 단축 운동명
+    'row': 'rowing machine',
+    'ski': 'ski erg',
+    'run': 'outdoor running',
+    'bike': 'assault bike',
+    'farmers carry': "farmer's carry",
+    'farmer carry': "farmer's carry",
+    // 칼로리
     'cal run': 'run calorie',
     'cal row': 'row calorie',
     'cal ski': 'ski erg calorie',
@@ -258,8 +271,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       if (partial) return partial
     }
 
-    // 4. 단일 토큰이라도 핵심어 매칭 (3자 이상)
-    if (tokens.length === 1 && tokens[0].length >= 4) {
+    // 4. 단일 토큰이라도 핵심어 매칭 (3자 이상, 단어 경계 우선)
+    if (tokens.length === 1 && tokens[0].length >= 3) {
       return allExercises.find(e =>
         e.name.toLowerCase().includes(tokens[0]) || (e.ko && e.ko.includes(tokens[0]))
       ) ?? null
