@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
-  IconPencil, IconSearch, IconX, IconGripVertical,
+  IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise, WorkoutFormat, WorkoutFormatType } from '../types'
 
@@ -141,6 +141,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const [filterMuscle, setFilterMuscle] = useState('all')
   const dragIndex = useRef<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [parsing, setParsing] = useState(false)
+  const [parseError, setParseError] = useState<string | null>(null)
+  const [parseWarnings, setParseWarnings] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const getEx = (id: string) => allExercises.find(e => e.id === id)
 
@@ -200,7 +204,87 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const openAdd = () => {
     setEditingId(null); setRoutineName(''); setSelected([])
     setFormat(defaultFormat()); setSearch(''); setFilterMuscle('all')
+    setParseError(null); setParseWarnings([])
     setShowModal(true)
+  }
+
+  // 운동 이름으로 DB 매칭 (토큰 기반 퍼지 매칭)
+  const matchExercise = (name: string): Exercise | null => {
+    const q = name.toLowerCase().trim()
+    return (
+      allExercises.find(e => e.name.toLowerCase() === q || (e.ko && e.ko === q)) ??
+      allExercises.find(e => {
+        const tokens = q.split(/\s+/)
+        const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
+        return tokens.length >= 2 && tokens.every(t => target.includes(t))
+      }) ??
+      null
+    )
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+
+    setParsing(true); setParseError(null); setParseWarnings([])
+
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve((reader.result as string).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+
+      const res = await fetch('/api/parse-workout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json() as { error: string }
+        throw new Error(err.error || 'Parse failed')
+      }
+
+      const parsed = await res.json() as {
+        name?: string
+        format?: WorkoutFormat
+        exercises?: { name: string; sets: number; reps: number; maxReps?: boolean; roundType?: 'all'|'odd'|'even'; note?: string }[]
+      }
+
+      // 루틴 이름
+      if (parsed.name) setRoutineName(parsed.name)
+
+      // 포맷
+      if (parsed.format?.type) setFormat(withDefaults(parsed.format))
+
+      // 운동 매칭
+      const warnings: string[] = []
+      const newSelected: RoutineExercise[] = []
+      for (const ex of parsed.exercises ?? []) {
+        const match = matchExercise(ex.name)
+        if (!match) {
+          warnings.push(`"${ex.name}" — DB에서 찾지 못했습니다`)
+          continue
+        }
+        newSelected.push({
+          exId: match.id,
+          sets: ex.sets ?? 1,
+          reps: ex.reps ?? 10,
+          maxReps: ex.maxReps ?? false,
+          roundType: ex.roundType ?? 'all',
+          note: ex.note || undefined,
+        })
+      }
+      setSelected(newSelected)
+      setParseWarnings(warnings)
+    } catch (err) {
+      setParseError(String(err))
+    } finally {
+      setParsing(false)
+    }
   }
 
   const openEdit = (r: Routine & { id: string }) => {
@@ -230,7 +314,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div className="stitle">My Routines</div>
-        <button className="btn btn-p" onClick={openAdd}><IconPlus size={14} style={{ marginRight: 4 }} />New Routine</button>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <button className="btn btn-p" onClick={openAdd}><IconPlus size={14} style={{ marginRight: 4 }} />New Routine</button>
+        </div>
       </div>
 
       {!routines.length ? (
@@ -306,7 +392,38 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       {showModal && (
         <div className="mbg">
           <div className="mo" style={{ maxWidth: '540px' }}>
-            <div className="mt2">{editingId ? 'Edit Routine' : 'New Routine'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <div className="mt2" style={{ margin: 0 }}>{editingId ? 'Edit Routine' : 'New Routine'}</div>
+              {!editingId && (
+                <>
+                  <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+                  <button className="btn" onClick={() => fileInputRef.current?.click()}
+                    disabled={parsing}
+                    style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px' }}>
+                    <IconPhoto size={15} />
+                    {parsing ? '분석 중...' : '이미지로 생성'}
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* 파싱 상태 */}
+            {parsing && (
+              <div style={{ background: '#1D9E7522', border: '0.5px solid #1D9E75', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: '#1D9E75' }}>
+                🤖 Gemini가 워크아웃을 분석 중입니다...
+              </div>
+            )}
+            {parseError && (
+              <div style={{ background: '#E24B4A22', border: '0.5px solid #E24B4A', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: '#E24B4A' }}>
+                ⚠ 파싱 오류: {parseError}
+              </div>
+            )}
+            {parseWarnings.length > 0 && (
+              <div style={{ background: '#EF9F2722', border: '0.5px solid #EF9F27', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '12px', color: '#EF9F27' }}>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>일부 운동을 DB에서 찾지 못했습니다:</div>
+                {parseWarnings.map((w, i) => <div key={i}>• {w}</div>)}
+              </div>
+            )}
 
             {/* 루틴 이름 */}
             <span className="fl">Routine name</span>
