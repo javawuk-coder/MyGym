@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
-  IconPencil, IconSearch, IconX,
+  IconPencil, IconSearch, IconX, IconGripVertical,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise } from '../types'
 
@@ -37,6 +37,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const [selected, setSelected] = useState<RoutineExercise[]>([])
   const [search, setSearch] = useState('')
   const [filterMuscle, setFilterMuscle] = useState('all')
+  const dragIndex = useRef<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   const getEx = (id: string) => allExercises.find(e => e.id === id)
 
@@ -64,6 +66,25 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const removeFromSelected = (exId: string) => {
     setSelected(prev => prev.filter(s => s.exId !== exId))
   }
+
+  const onDragStart = (i: number) => { dragIndex.current = i }
+  const onDragOver = (e: React.DragEvent, i: number) => {
+    e.preventDefault()
+    setDragOverIndex(i)
+  }
+  const onDrop = (i: number) => {
+    const from = dragIndex.current
+    if (from === null || from === i) { setDragOverIndex(null); return }
+    setSelected(prev => {
+      const arr = [...prev]
+      const [item] = arr.splice(from, 1)
+      arr.splice(i, 0, item)
+      return arr
+    })
+    dragIndex.current = null
+    setDragOverIndex(null)
+  }
+  const onDragEnd = () => { dragIndex.current = null; setDragOverIndex(null) }
 
   const openAdd = () => {
     setEditingId(null)
@@ -235,28 +256,43 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                 <div className="stitle" style={{ marginBottom: '8px' }}>선택된 운동 ({selected.length})</div>
                 <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
                   {/* 헤더 */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 60px 28px', gap: '6px', padding: '6px 10px', background: 'var(--s1)', fontSize: '11px', color: 'var(--tm)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '20px 1fr 60px 60px 28px', gap: '6px', padding: '6px 10px', background: 'var(--s1)', fontSize: '11px', color: 'var(--tm)' }}>
+                    <span></span>
                     <span>운동</span>
                     <span style={{ textAlign: 'center' }}>세트</span>
                     <span style={{ textAlign: 'center' }}>횟수/초</span>
                     <span></span>
                   </div>
-                  {selected.map((s) => {
+                  {selected.map((s, i) => {
                     const ex = getEx(s.exId)
                     if (!ex) return null
                     const isTime = ex.log_type === 'time'
                     const isCardio = ex.log_type === 'cardio'
+                    const isDragOver = dragOverIndex === i
                     return (
-                      <div key={s.exId} style={{
-                        display: 'grid', gridTemplateColumns: '1fr 60px 60px 28px', gap: '6px',
-                        padding: '7px 10px', borderTop: '0.5px solid var(--bd)', alignItems: 'center',
-                      }}>
+                      <div
+                        key={s.exId}
+                        draggable
+                        onDragStart={() => onDragStart(i)}
+                        onDragOver={e => onDragOver(e, i)}
+                        onDrop={() => onDrop(i)}
+                        onDragEnd={onDragEnd}
+                        style={{
+                          display: 'grid', gridTemplateColumns: '20px 1fr 60px 60px 28px', gap: '6px',
+                          padding: '7px 10px', borderTop: '0.5px solid var(--bd)', alignItems: 'center',
+                          background: isDragOver ? 'var(--s1)' : undefined,
+                          borderLeft: isDragOver ? '2px solid #378ADD' : '2px solid transparent',
+                          transition: 'background 0.1s',
+                          cursor: 'grab',
+                        }}
+                      >
+                        <IconGripVertical size={14} style={{ color: 'var(--tm)', cursor: 'grab' }} />
                         <div>
                           <div style={{ fontSize: '13px', fontWeight: 500 }}>{ex.ko || ex.name}</div>
                           {ex.ko && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{ex.name}</div>}
                         </div>
                         {isCardio ? (
-                          <div style={{ gridColumn: '2 / 4', fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
+                          <div style={{ gridColumn: '3 / 5', fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
                         ) : (
                           <>
                             <input
