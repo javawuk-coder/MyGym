@@ -3184,5 +3184,41 @@
         "log_type":  "weight_reps",
         "equipment":  "bodyweight",
         "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_36",
+        "name":  "Shoulder to Overhead",
+        "ko":  "숄더 투 오버헤드",
+        "type":  "compound",
+        "log_type":  "weight_reps",
+        "equipment":  "barbell",
+        "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_37",
+        "name":  "Burpee to Plate",
+        "ko":  "버피 투 플레이트",
+        "type":  "compound",
+        "log_type":  "reps_only",
+        "equipment":  "bodyweight",
+        "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_38",
+        "name":  "Burpee Box Jump Over",
+        "ko":  "버피 박스 점프 오버",
+        "type":  "compound",
+        "log_type":  "reps_only",
+        "equipment":  "bodyweight",
+        "muscle":  "hiit"
+    },
+    {
+        "id":  "hiit_cf_39",
+        "name":  "Bar Facing Burpee",
+        "ko":  "바 페이싱 버피",
+        "type":  "compound",
+        "log_type":  "reps_only",
+        "equipment":  "bodyweight",
+        "muscle":  "hiit"
     }
 ]

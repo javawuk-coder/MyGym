@@ -208,18 +208,64 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     setShowModal(true)
   }
 
-  // 운동 이름으로 DB 매칭 (토큰 기반 퍼지 매칭)
+  // 약어/별칭 → 정식 이름 맵
+  const ALIASES: Record<string, string> = {
+    'rks': 'russian kettlebell swing',
+    'r.k.s.': 'russian kettlebell swing',
+    'r. k. s.': 'russian kettlebell swing',
+    's2oh': 'shoulder to overhead',
+    'stoh': 'shoulder to overhead',
+    'c2b': 'chest-to-bar pull-up',
+    'hspu': 'handstand push-up',
+    'du': 'double under',
+    'tu': 'triple under',
+    'kb swing': 'russian kettlebell swing',
+    'ohs': 'overhead squat',
+    't2b': 'toes-to-bar',
+    'ttb': 'toes-to-bar',
+    'bjj': 'box jump',
+    'bjo': 'box jump over',
+    'ghr': 'ghd back extension',
+    'cal run': 'run calorie',
+    'cal row': 'row calorie',
+    'cal ski': 'ski erg calorie',
+    'cal bike': 'assault bike calorie',
+  }
+
+  // 운동 이름으로 DB 매칭 (약어 → 퍼지 매칭)
   const matchExercise = (name: string): Exercise | null => {
-    const q = name.toLowerCase().trim()
-    return (
-      allExercises.find(e => e.name.toLowerCase() === q || (e.ko && e.ko === q)) ??
-      allExercises.find(e => {
-        const tokens = q.split(/\s+/)
-        const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
-        return tokens.length >= 2 && tokens.every(t => target.includes(t))
-      }) ??
-      null
+    // 점·공백 정리 후 소문자
+    const q = name.toLowerCase().trim().replace(/\.\s*/g, '. ').trim()
+    const qClean = q.replace(/[.\s]+/g, ' ').trim()
+
+    // 1. 약어 맵
+    const aliased = ALIASES[qClean] ?? ALIASES[q]
+    const searchQ = aliased ?? qClean
+
+    // 2. 정확 매칭 (name 또는 ko)
+    const exact = allExercises.find(e =>
+      e.name.toLowerCase() === searchQ || (e.ko && e.ko.toLowerCase() === searchQ)
     )
+    if (exact) return exact
+
+    // 3. 토큰 부분 매칭 (2토큰 이상)
+    const tokens = searchQ.split(/\s+/).filter(Boolean)
+    if (tokens.length >= 2) {
+      const partial = allExercises.find(e => {
+        const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
+        return tokens.every(t => target.includes(t))
+      })
+      if (partial) return partial
+    }
+
+    // 4. 단일 토큰이라도 핵심어 매칭 (3자 이상)
+    if (tokens.length === 1 && tokens[0].length >= 4) {
+      return allExercises.find(e =>
+        e.name.toLowerCase().includes(tokens[0]) || (e.ko && e.ko.includes(tokens[0]))
+      ) ?? null
+    }
+
+    return null
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
