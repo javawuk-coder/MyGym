@@ -32,6 +32,7 @@ Rules:
 - For 'Max' prefix exercises, always set maxReps=true
 - Detect ODD/EVEN round patterns and set roundType ('odd', 'even', or 'all')
 - If intervalUnit is 'sec', populate workSec2/restSec2 fields
+- For time-based exercises (e.g. planks, holds) where reps target is given in seconds (e.g. "60s", "30s"), put the number of seconds in the reps field (e.g. "60s" → reps=60)
 - Only include format fields relevant to the detected format type
 - Return ONLY the JSON, no markdown fences, no explanation`
 

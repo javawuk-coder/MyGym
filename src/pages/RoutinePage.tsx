@@ -232,6 +232,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     'w. b. s.': 'wall ball shot',
     'wbs': 'wall ball shot',
     'wall ball shots': 'wall ball shot',
+    'weighted decline crunches': 'decline crunch',
+    'weighted decline crunch': 'decline crunch',
+    'decline crunches': 'decline crunch',
     // 단축 운동명
     'row': 'rowing machine',
     'ski': 'ski erg',
