@@ -1,13 +1,21 @@
+import { useState } from 'react'
 import type { DayLog, Exercise } from '../types'
 
 const ML: Record<string, string> = {
-  chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
-  arm:'Arms', core:'Core', glute:'Glute', hiit:'HIIT', cardio:'Cardio',
+  chest: 'Chest', back: 'Back', legs: 'Legs', shoulder: 'Shoulder',
+  arm: 'Arms', core: 'Core', glute: 'Glute', hiit: 'HIIT', cardio: 'Cardio',
 }
 const MR: Record<string, string> = {
-  chest:'#378ADD', back:'#639922', legs:'#BA7517', shoulder:'#534AB7',
-  arm:'#D4537E', core:'#1D9E75', glute:'#D85A30', hiit:'#E24B4A', cardio:'#1D9E75',
+  chest: '#378ADD', back: '#639922', legs: '#BA7517', shoulder: '#534AB7',
+  arm: '#D4537E', core: '#1D9E75', glute: '#D85A30', hiit: '#E24B4A', cardio: '#1D9E75',
 }
+
+const PERIODS = [
+  { label: '7일', days: 7 },
+  { label: '30일', days: 30 },
+  { label: '90일', days: 90 },
+  { label: '전체', days: 0 },
+]
 
 interface Props {
   logs: DayLog[]
@@ -20,15 +28,23 @@ function fromKg(kg: number, unit: 'kg' | 'lb') {
 }
 
 export default function StatsPage({ logs, allExercises, unit }: Props) {
+  const [periodDays, setPeriodDays] = useState(30)
+
   const getEx = (id: string) => allExercises.find(e => e.id === id)
 
-  const all = logs.flatMap(l => l.exercises)
+  const cutoff = periodDays > 0
+    ? new Date(Date.now() - periodDays * 86400000).toISOString().slice(0, 10)
+    : ''
+
+  const filtered = cutoff ? logs.filter(l => l.date >= cutoff) : logs
+
+  const all = filtered.flatMap(l => l.exercises)
   const totalSets = all.filter(e => e.sets).reduce((a, e) => a + (e.sets?.length || 0), 0)
   const totalVol = Math.round(
     all.filter(e => e.log_type === 'weight_reps' || !e.log_type)
       .reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
   )
-  const workoutDays = logs.filter(l => l.exercises.length).length
+  const workoutDays = filtered.filter(l => l.exercises.length).length
 
   // Volume by muscle
   const mv: Record<string, number> = {}
@@ -53,14 +69,29 @@ export default function StatsPage({ logs, allExercises, unit }: Props) {
 
   return (
     <div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
-        <div className="sc"><div className="sn">{workoutDays}</div><div className="sl">Workout days</div></div>
-        <div className="sc"><div className="sn">{totalSets}</div><div className="sl">Total sets</div></div>
-        <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}t</div><div className="sl">Total volume</div></div>
+      {/* 기간 필터 */}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
+        {PERIODS.map(p => (
+          <button key={p.days} onClick={() => setPeriodDays(p.days)} style={{
+            padding: '6px 14px', borderRadius: '20px', fontSize: '13px', cursor: 'pointer',
+            border: `1px solid ${periodDays === p.days ? 'var(--tp)' : 'var(--bd)'}`,
+            background: periodDays === p.days ? 'var(--tp)' : 'transparent',
+            color: periodDays === p.days ? '#fff' : 'var(--ts)',
+            fontWeight: periodDays === p.days ? 600 : 400, fontFamily: 'inherit',
+          }}>{p.label}</button>
+        ))}
       </div>
 
+      {/* 요약 카드 */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
+        <div className="sc"><div className="sn">{workoutDays}</div><div className="sl">운동한 날</div></div>
+        <div className="sc"><div className="sn">{totalSets}</div><div className="sl">총 세트</div></div>
+        <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}t</div><div className="sl">총 볼륨</div></div>
+      </div>
+
+      {/* Volume by muscle */}
       <div className="card">
-        <div className="stitle" style={{ marginBottom: '12px' }}>Volume by muscle</div>
+        <div className="stitle" style={{ marginBottom: '12px' }}>근육별 볼륨</div>
         {!Object.keys(mv).length ? (
           <div style={{ fontSize: '13px', color: 'var(--tm)', textAlign: 'center', padding: '1rem' }}>운동을 기록하면 나타나요</div>
         ) : (
@@ -68,7 +99,7 @@ export default function StatsPage({ logs, allExercises, unit }: Props) {
             <div key={m} style={{ marginBottom: '10px' }}>
               <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
                 <span>{ML[m] || m}</span>
-                <span>{Math.round(fromKg(v, unit))} {unit}</span>
+                <span>{Math.round(fromKg(v, unit)).toLocaleString()} {unit}</span>
               </div>
               <div className="cbg">
                 <div className="cb" style={{ width: `${Math.round(v / maxVol * 100)}%`, background: MR[m] || '#888' }} />
@@ -78,6 +109,7 @@ export default function StatsPage({ logs, allExercises, unit }: Props) {
         )}
       </div>
 
+      {/* Top lifts 1RM */}
       <div className="card">
         <div className="stitle" style={{ marginBottom: '12px' }}>Top lifts — est. 1RM</div>
         {!top6.length ? (
@@ -85,15 +117,14 @@ export default function StatsPage({ logs, allExercises, unit }: Props) {
         ) : (
           top6.map(([id, rm]) => {
             const x = getEx(id)
-            const d = `${fromKg(rm, unit).toFixed(1)} ${unit}`
             return (
               <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '0.5px solid var(--bd)' }}>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 500 }}>{x?.name || id}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{x?.ko || '—'}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 500 }}>{x?.ko || x?.name || id}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{x?.ko ? x.name : '—'}</div>
                 </div>
                 <div style={{ fontWeight: 600, fontSize: '15px' }}>
-                  {d} <span style={{ fontSize: '12px', color: 'var(--tm)', fontWeight: 400 }}>1RM</span>
+                  {fromKg(rm, unit).toFixed(1)} {unit} <span style={{ fontSize: '12px', color: 'var(--tm)', fontWeight: 400 }}>1RM</span>
                 </div>
               </div>
             )

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconCalendar } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
 
 const ML: Record<string, string> = {
@@ -10,11 +10,15 @@ const MB: Record<string, string> = {
   chest: 'bc', back: 'bb', legs: 'bl', shoulder: 'bs', arm: 'ba',
   core: 'bco', glute: 'bg', hiit: 'bhiit', cardio: 'bcard', custom: 'bx',
 }
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function toKg(v: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(v / 2.205 * 10) / 10 : parseFloat(String(v)) || 0 }
 function fromKg(kg: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(kg * 2.205 * 10) / 10 : kg }
-function formatDate(d: string) { return new Date(d + 'T00:00:00').toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' }) }
 function today() { return new Date().toISOString().slice(0, 10) }
+function toLocalDate(dateStr: string) { return new Date(dateStr + 'T00:00:00') }
+function formatDateHeader(d: string) {
+  return toLocalDate(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
+}
 
 interface SetRow { weight: string; reps: string; duration: string }
 interface DraftEx {
@@ -22,23 +26,24 @@ interface DraftEx {
   rows: SetRow[]
   cardio: { dist: string; time: string; cal: string }
 }
-
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
 
 function makeRows(count: number, reps?: number): SetRow[] {
-  return Array.from({ length: count }, () => ({
-    weight: '', reps: reps != null ? String(reps) : '', duration: '',
-  }))
+  return Array.from({ length: count }, () => ({ weight: '', reps: reps != null ? String(reps) : '', duration: '' }))
 }
-
 function draftFromRoutine(routine: Routine, allExercises: Exercise[]): DraftEx[] {
   return routine.exercises.map(re => {
     const ex = allExercises.find(e => e.id === re.exId)
     const lt = ex?.log_type || 'weight_reps'
     if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' } }
-    const reps = lt !== 'weight_reps' ? re.reps : undefined
-    return { exId: re.exId, rows: makeRows(re.sets || 3, reps), cardio: { dist: '', time: '', cal: '' } }
+    return { exId: re.exId, rows: makeRows(re.sets || 3, lt !== 'weight_reps' ? re.reps : undefined), cardio: { dist: '', time: '', cal: '' } }
   })
+}
+
+function dayVolume(log: DayLog | undefined): number {
+  if (!log) return 0
+  return log.exercises.reduce((a, e) =>
+    a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
 }
 
 interface Props {
@@ -57,7 +62,9 @@ export default function LogPage({
   onAddEntries, onDeleteEntry,
   initialRoutine, onConsumedInitial,
 }: Props) {
-  const [selectedDate, setSelectedDate] = useState(today())
+  const todayStr = today()
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const [calMonth, setCalMonth] = useState(todayStr.slice(0, 7)) // YYYY-MM
   const [modal, setModal] = useState<ModalState>(null)
   const [fillTitle, setFillTitle] = useState('')
   const [draftExes, setDraftExes] = useState<DraftEx[]>([])
@@ -66,7 +73,6 @@ export default function LogPage({
   const [showAddExInFill, setShowAddExInFill] = useState(false)
   const [addExSearch, setAddExSearch] = useState('')
 
-  // Start 버튼으로 들어온 루틴 처리
   useEffect(() => {
     if (!initialRoutine) return
     setFillTitle(initialRoutine.name)
@@ -75,22 +81,67 @@ export default function LogPage({
     onConsumedInitial?.()
   }, [initialRoutine]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const selectedLog = logs.find(l => l.date === selectedDate)
-  const recentDates = logs
-    .filter(l => l.date !== selectedDate && l.exercises.length)
-    .slice(0, 8)
-
   const getEx = (id: string) => allExercises.find(e => e.id === id)
+  const selectedLog = logs.find(l => l.date === selectedDate)
+  const logMap = Object.fromEntries(logs.map(l => [l.date, l]))
 
-  const sortedEx = [...allExercises].sort((a, b) => (a.ko || a.name).localeCompare(b.ko || b.name, 'ko'))
+  // ── Calendar ─────────────────────────────────────────────────
+  const [calYear, calMonthNum] = calMonth.split('-').map(Number)
+  const firstDow = new Date(calYear, calMonthNum - 1, 1).getDay()
+  const daysInMonth = new Date(calYear, calMonthNum, 0).getDate()
 
-  const filterEx = (search: string) => {
-    if (!search) return sortedEx
-    const tokens = search.toLowerCase().split(/\s+/).filter(Boolean)
-    return sortedEx.filter(x => {
-      const target = `${x.name} ${x.ko || ''}`.toLowerCase()
-      return tokens.every(t => target.includes(t))
-    })
+  // 이달 최대 볼륨 (색 정규화용)
+  const monthVolumes = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = `${calMonth}-${String(i + 1).padStart(2, '0')}`
+    return dayVolume(logMap[d])
+  })
+  const maxMonthVol = Math.max(...monthVolumes, 1)
+
+  const prevMonth = () => {
+    const d = new Date(calYear, calMonthNum - 2, 1)
+    setCalMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
+  }
+  const nextMonth = () => {
+    const d = new Date(calYear, calMonthNum, 1)
+    const next = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    if (next <= todayStr.slice(0, 7)) setCalMonth(next)
+  }
+  const canGoNext = calMonth < todayStr.slice(0, 7)
+
+  const selectDay = (dateStr: string) => {
+    setSelectedDate(dateStr)
+    setCalMonth(dateStr.slice(0, 7))
+  }
+
+  // ── Exercise summary ──────────────────────────────────────────
+  const summarizeEntry = (entry: LogEntry): string => {
+    const lt = entry.log_type || 'weight_reps'
+    const sets = entry.sets || []
+    if (lt === 'cardio') {
+      const parts: string[] = []
+      if (entry.dist) parts.push(`${entry.dist}km`)
+      if (entry.time) parts.push(`${entry.time}분`)
+      if (entry.cal) parts.push(`${entry.cal}kcal`)
+      return parts.join(' · ') || '—'
+    }
+    if (!sets.length) return '—'
+    if (lt === 'weight_reps') {
+      const ws = sets.map(s => s.weight || 0)
+      const rs = sets.map(s => s.reps || 0)
+      if (ws.every(w => w === ws[0]) && rs.every(r => r === rs[0])) {
+        return `${fromKg(ws[0], unit)}${unit} × ${rs[0]}회 × ${sets.length}set`
+      }
+      return sets.map(s => `${fromKg(s.weight || 0, unit)}${unit}×${s.reps}회`).join(', ')
+    }
+    if (lt === 'reps_only') {
+      const rs = sets.map(s => s.reps || 0)
+      return rs.every(r => r === rs[0]) ? `${rs[0]}회 × ${sets.length}set` : rs.map(r => `${r}회`).join(', ')
+    }
+    if (lt === 'time') {
+      const ds = sets.map(s => s.duration || 0)
+      return ds.every(d => d === ds[0]) ? `${ds[0]}초 × ${sets.length}set` : ds.map(d => `${d}초`).join(', ')
+    }
+    return '—'
   }
 
   // ── Draft mutations ───────────────────────────────────────────
@@ -98,55 +149,43 @@ export default function LogPage({
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: d.rows.map((r, j) => j !== ri ? r : { ...r, [field]: val }),
     }))
-
   const addRow = (di: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: [...d.rows, { weight: '', reps: '', duration: '' }],
     }))
-
   const removeRow = (di: number, ri: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: d.rows.filter((_, j) => j !== ri),
     }))
-
   const updateCardio = (di: number, field: 'dist' | 'time' | 'cal', val: string) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, cardio: { ...d.cardio, [field]: val },
     }))
-
   const removeDraftEx = (di: number) =>
     setDraftExes(prev => prev.filter((_, i) => i !== di))
-
   const addDraftEx = (exId: string) => {
     setDraftExes(prev => [...prev, { exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }])
-    setAddExSearch('')
-    setShowAddExInFill(false)
+    setAddExSearch(''); setShowAddExInFill(false)
   }
 
-  // ── Open helpers ──────────────────────────────────────────────
+  const sortedEx = [...allExercises].sort((a, b) => (a.ko || a.name).localeCompare(b.ko || b.name, 'ko'))
+  const filterEx = (s: string) => {
+    if (!s) return sortedEx
+    const tokens = s.toLowerCase().split(/\s+/).filter(Boolean)
+    return sortedEx.filter(x => tokens.every(t => `${x.name} ${x.ko || ''}`.toLowerCase().includes(t)))
+  }
+
   const openRoutineFill = (r: Routine & { id: string }) => {
-    setFillTitle(r.name)
-    setDraftExes(draftFromRoutine(r, allExercises))
-    setModal('fill')
+    setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises)); setModal('fill')
   }
-
   const openExFill = (exId: string) => {
-    setFillTitle('')
-    setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }])
-    setModal('fill')
+    setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }]); setModal('fill')
   }
-
   const closeFill = () => {
-    setModal(null)
-    setDraftExes([])
-    setFillTitle('')
-    setExSearch('')
-    setRoutineSearch('')
-    setShowAddExInFill(false)
-    setAddExSearch('')
+    setModal(null); setDraftExes([]); setFillTitle('')
+    setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
   }
 
-  // ── Save ──────────────────────────────────────────────────────
   const save = async () => {
     const entries: LogEntry[] = []
     for (const d of draftExes) {
@@ -179,73 +218,28 @@ export default function LogPage({
     closeFill()
   }
 
-  // ── Entry body renderer (for saved log view) ──────────────────
-  const renderEntryBody = (entry: LogEntry) => {
-    const lt = entry.log_type || 'weight_reps'
-    if (lt === 'cardio') {
-      return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '8px' }}>
-          <div style={{ textAlign: 'center' }}><div style={{ fontSize: '10px', color: 'var(--tm)' }}>거리</div><div style={{ fontWeight: 500 }}>{entry.dist || 0} km</div></div>
-          <div style={{ textAlign: 'center' }}><div style={{ fontSize: '10px', color: 'var(--tm)' }}>시간</div><div style={{ fontWeight: 500 }}>{entry.time || 0} 분</div></div>
-          <div style={{ textAlign: 'center' }}><div style={{ fontSize: '10px', color: 'var(--tm)' }}>칼로리</div><div style={{ fontWeight: 500 }}>{entry.cal || 0} kcal</div></div>
-        </div>
-      )
-    }
-    const cols = lt === 'weight_reps' ? '28px 1fr 1fr' : '28px 1fr'
-    const vol = lt === 'weight_reps'
-      ? Math.round((entry.sets || []).reduce((a, s) => a + (s.weight || 0) * (s.reps || 0), 0))
-      : null
-    return (
-      <div>
-        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '6px', fontSize: '11px', color: 'var(--tm)', padding: '3px 0' }}>
-          <span>#</span>
-          {lt === 'weight_reps' ? <><span>Weight</span><span>Reps</span></> : <span>{lt === 'time' ? '시간' : 'Reps'}</span>}
-        </div>
-        {(entry.sets || []).map((s, si) => (
-          <div key={si} style={{ display: 'grid', gridTemplateColumns: cols, gap: '6px', padding: '4px 0', borderBottom: '0.5px solid var(--bd)', fontSize: '13px' }}>
-            <span style={{ textAlign: 'center', color: 'var(--tm)' }}>{si + 1}</span>
-            {lt === 'weight_reps'
-              ? <><span style={{ textAlign: 'center', fontWeight: 500 }}>{fromKg(s.weight || 0, unit)} {unit}</span><span style={{ textAlign: 'center' }}>{s.reps} reps</span></>
-              : lt === 'time'
-              ? <span style={{ fontWeight: 500 }}>{s.duration}초</span>
-              : <span style={{ fontWeight: 500 }}>{s.reps} reps</span>
-            }
-          </div>
-        ))}
-        {vol !== null && <div style={{ marginTop: '5px', fontSize: '11px', color: 'var(--tm)', textAlign: 'right' }}>Volume: {vol} kg</div>}
-      </div>
-    )
-  }
-
-  // ── Draft exercise card ───────────────────────────────────────
   const renderDraftEx = (d: DraftEx, di: number) => {
     const ex = getEx(d.exId)
     const lt: LogType = ex?.log_type || 'weight_reps'
-    const isCardio = lt === 'cardio'
-
     return (
       <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '10px', overflow: 'hidden' }}>
-        {/* 운동 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
           <div>
             <span style={{ fontWeight: 600, fontSize: '14px' }}>{ex?.ko || ex?.name || d.exId}</span>
             {ex?.ko && <span style={{ fontSize: '11px', color: 'var(--tm)', marginLeft: '6px' }}>{ex.name}</span>}
             {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ marginLeft: '6px', fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
           </div>
-          <button className="idb" onClick={() => removeDraftEx(di)} title="제거"><IconTrash size={14} /></button>
+          <button className="idb" onClick={() => removeDraftEx(di)}><IconTrash size={14} /></button>
         </div>
-
-        {/* 세트 입력 */}
         <div style={{ padding: '10px 12px' }}>
-          {isCardio ? (
+          {lt === 'cardio' ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
               {(['dist', 'time', 'cal'] as const).map(f => (
                 <div key={f}>
                   <div style={{ fontSize: '10px', color: 'var(--tm)', marginBottom: '3px', textAlign: 'center' }}>
-                    {f === 'dist' ? '거리 (km)' : f === 'time' ? '시간 (분)' : '칼로리'}
+                    {f === 'dist' ? '거리(km)' : f === 'time' ? '시간(분)' : '칼로리'}
                   </div>
-                  <input type="number" value={d.cardio[f]} onChange={e => updateCardio(di, f, e.target.value)}
-                    placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                  <input type="number" value={d.cardio[f]} onChange={e => updateCardio(di, f, e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
                 </div>
               ))}
             </div>
@@ -255,8 +249,7 @@ export default function LogPage({
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
                   ? <><span style={{ textAlign: 'center' }}>Weight ({unit})</span><span style={{ textAlign: 'center' }}>Reps</span></>
-                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? '시간 (초)' : 'Reps'}</span>
-                }
+                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? '시간(초)' : 'Reps'}</span>}
                 <span />
               </div>
               {d.rows.map((row, ri) => (
@@ -268,8 +261,7 @@ export default function LogPage({
                       <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
                     </>
                   ) : (
-                    <input type="number"
-                      value={lt === 'time' ? row.duration : row.reps}
+                    <input type="number" value={lt === 'time' ? row.duration : row.reps}
                       onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
                       placeholder="0" min="0" style={{ textAlign: 'center' }} />
                   )}
@@ -287,26 +279,79 @@ export default function LogPage({
   }
 
   // ── Render ────────────────────────────────────────────────────
+  const totalDayVol = Math.round(dayVolume(selectedLog))
+
   return (
     <div>
-      {/* 날짜 선택 헤더 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="stitle" style={{ margin: 0 }}>
-            {selectedDate === today() ? 'Today' : formatDate(selectedDate)}
-          </div>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <IconCalendar size={16} style={{ position: 'absolute', left: 8, color: 'var(--tm)', pointerEvents: 'none' }} />
-            <input
-              type="date"
-              value={selectedDate}
-              max={today()}
-              onChange={e => setSelectedDate(e.target.value)}
-              style={{ paddingLeft: '28px', fontSize: '13px', cursor: 'pointer', width: '150px' }}
-            />
-          </div>
-          {selectedDate !== today() && (
-            <button className="btn" onClick={() => setSelectedDate(today())} style={{ fontSize: '12px' }}>Today</button>
+      {/* ── 달력 ── */}
+      <div className="card" style={{ marginBottom: '16px', padding: '14px 16px' }}>
+        {/* 월 네비게이션 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <button className="idb" onClick={prevMonth}><IconChevronLeft size={16} /></button>
+          <span style={{ fontWeight: 600, fontSize: '15px' }}>
+            {toLocalDate(calMonth + '-01').toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+          </span>
+          <button className="idb" onClick={nextMonth} disabled={!canGoNext} style={{ opacity: canGoNext ? 1 : 0.3 }}>
+            <IconChevronRight size={16} />
+          </button>
+        </div>
+
+        {/* 요일 헤더 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
+          {DOW.map(d => (
+            <div key={d} style={{ textAlign: 'center', fontSize: '10px', color: 'var(--tm)', padding: '2px 0' }}>{d}</div>
+          ))}
+        </div>
+
+        {/* 날짜 셀 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+          {/* 앞 빈칸 */}
+          {Array.from({ length: firstDow }).map((_, i) => <div key={`e${i}`} />)}
+
+          {Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1
+            const dateStr = `${calMonth}-${String(day).padStart(2, '0')}`
+            const vol = monthVolumes[i]
+            const hasLog = vol > 0
+            const intensity = hasLog ? 0.15 + (vol / maxMonthVol) * 0.75 : 0
+            const isSelected = dateStr === selectedDate
+            const isToday = dateStr === todayStr
+            const isFuture = dateStr > todayStr
+
+            return (
+              <div key={day} onClick={() => !isFuture && selectDay(dateStr)}
+                style={{
+                  textAlign: 'center', padding: '5px 2px', borderRadius: '6px', cursor: isFuture ? 'default' : 'pointer',
+                  fontSize: '12px', fontWeight: isToday ? 700 : 400, position: 'relative',
+                  background: isSelected
+                    ? 'var(--tp)'
+                    : hasLog
+                    ? `rgba(24, 95, 165, ${intensity})`
+                    : 'transparent',
+                  color: isSelected ? '#fff' : isFuture ? 'var(--bd)' : 'var(--ts)',
+                  outline: isToday && !isSelected ? '1.5px solid var(--tp)' : 'none',
+                  outlineOffset: '-1px',
+                }}>
+                {day}
+                {hasLog && !isSelected && (
+                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'var(--tp)', margin: '1px auto 0', opacity: 0.8 }} />
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── 선택된 날짜 로그 ── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div>
+          <span style={{ fontWeight: 600, fontSize: '15px' }}>
+            {selectedDate === todayStr ? 'Today' : formatDateHeader(selectedDate)}
+          </span>
+          {totalDayVol > 0 && (
+            <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '10px' }}>
+              Total {Math.round(fromKg(totalDayVol, unit)).toLocaleString()} {unit}
+            </span>
           )}
         </div>
         <button className="btn btn-p" onClick={() => setModal('pick')}>
@@ -314,56 +359,36 @@ export default function LogPage({
         </button>
       </div>
 
-      {/* 선택된 날짜의 로그 */}
       {!selectedLog || !selectedLog.exercises.length ? (
-        <div className="emp">{selectedDate === today() ? '오늘 기록이 없어요' : '이 날 기록이 없어요'}</div>
+        <div className="emp">이 날 기록이 없어요</div>
       ) : (
-        selectedLog.exercises.map((entry, ei) => {
-          const x = getEx(entry.exId)
-          return (
-            <div className="card" key={ei}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div>
-                  <span style={{ fontWeight: 600, fontSize: '15px' }}>{x?.ko || x?.name || entry.exId}</span>
-                  {x?.ko && <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '8px' }}>{x.name}</span>}
-                  {x && <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ marginLeft: '6px' }}>{ML[x.muscle] || x.muscle}</span>}
+        <div className="card" style={{ padding: '4px 0' }}>
+          {selectedLog.exercises.map((entry, ei) => {
+            const x = getEx(entry.exId)
+            const summary = summarizeEntry(entry)
+            return (
+              <div key={ei} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: ei < selectedLog.exercises.length - 1 ? '0.5px solid var(--bd)' : 'none' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, fontSize: '14px' }}>{x?.ko || x?.name || entry.exId}</span>
+                    {x && <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--tm)', marginTop: '2px' }}>{summary}</div>
                 </div>
-                <button className="idb" onClick={() => onDeleteEntry(selectedDate, ei)}><IconTrash size={16} /></button>
+                <button className="idb" onClick={() => onDeleteEntry(selectedDate, ei)} style={{ marginLeft: '8px', flexShrink: 0 }}>
+                  <IconTrash size={15} />
+                </button>
               </div>
-              {renderEntryBody(entry)}
-            </div>
-          )
-        })
+            )
+          })}
+        </div>
       )}
 
-      {/* History */}
-      <div style={{ marginTop: '2rem' }}>
-        <div className="stitle" style={{ marginBottom: '10px' }}>History</div>
-        {!recentDates.length ? (
-          <div style={{ fontSize: '13px', color: 'var(--tm)', textAlign: 'center', padding: '1.5rem' }}>기록 없음</div>
-        ) : (
-          recentDates.map(l => (
-            <div className="le" key={l.date} onClick={() => setSelectedDate(l.date)}
-              style={{ cursor: 'pointer' }}>
-              <div style={{ fontSize: '12px', color: 'var(--tm)', marginBottom: '5px' }}>{formatDate(l.date)}</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {l.exercises.map((e, i) => {
-                  const x = getEx(e.exId)
-                  return <span key={i} className={`badge ${x ? (MB[x.muscle] || 'bx') : 'bx'}`}>{x?.ko || x?.name || e.exId}</span>
-                })}
-              </div>
-              <div style={{ fontSize: '13px', color: 'var(--tm)', marginTop: '5px' }}>{l.exercises.length} exercises</div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* ── 모달들 ── */}
+      {/* ── 모달 (pick / routine-select / ex-select) ── */}
       {modal && modal !== 'fill' && (
         <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
           <div className="mo" style={{ maxWidth: '480px' }}>
 
-            {/* Pick: 루틴 vs 개별 */}
             {modal === 'pick' && (
               <>
                 <div className="mt2">운동 추가</div>
@@ -385,7 +410,6 @@ export default function LogPage({
               </>
             )}
 
-            {/* Routine select */}
             {modal === 'routine-select' && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
@@ -398,19 +422,15 @@ export default function LogPage({
                     placeholder="루틴 검색..." style={{ paddingLeft: '36px' }} autoFocus />
                 </div>
                 <div style={{ maxHeight: '340px', overflowY: 'auto', border: '0.5px solid var(--bd)', borderRadius: 'var(--r)' }}>
-                  {routines.filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase())).length === 0 ? (
-                    <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>루틴 없음</div>
-                  ) : routines
-                    .filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase()))
-                    .map(r => (
+                  {routines.filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase())).length === 0
+                    ? <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>루틴 없음</div>
+                    : routines.filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase())).map(r => (
                       <div key={r.id} onClick={() => openRoutineFill(r)}
                         style={{ padding: '12px 14px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)' }}
                         onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
                         onMouseLeave={e => (e.currentTarget.style.background = '')}>
                         <div style={{ fontWeight: 500, fontSize: '14px' }}>{r.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
-                          {r.exercises.length}개 운동
-                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>{r.exercises.length}개 운동</div>
                       </div>
                     ))
                   }
@@ -418,7 +438,6 @@ export default function LogPage({
               </>
             )}
 
-            {/* Exercise select */}
             {modal === 'ex-select' && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
@@ -450,24 +469,18 @@ export default function LogPage({
         </div>
       )}
 
-      {/* Fill 모달 */}
+      {/* ── Fill 모달 ── */}
       {modal === 'fill' && (
         <div className="mbg">
           <div className="mo" style={{ maxWidth: '560px', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-            {/* 헤더 */}
             <div style={{ padding: '14px 18px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || '운동 기록'}</div>
-                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDate(selectedDate)}</div>
+                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
               </div>
             </div>
-
-            {/* 운동 목록 (스크롤) */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '14px 18px', minHeight: 0 }}>
               {draftExes.map((d, di) => renderDraftEx(d, di))}
-
-              {/* 운동 추가 */}
               {showAddExInFill ? (
                 <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '10px 12px', marginBottom: '10px' }}>
                   <div className="sw" style={{ marginBottom: '6px' }}>
@@ -478,7 +491,7 @@ export default function LogPage({
                   <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     {filterEx(addExSearch).slice(0, 50).map(x => (
                       <div key={x.id} onClick={() => addDraftEx(x.id)}
-                        style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}
+                        style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}
                         onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
                         onMouseLeave={e => (e.currentTarget.style.background = '')}>
                         <span>{x.ko || x.name}</span>
@@ -490,14 +503,11 @@ export default function LogPage({
                     style={{ marginTop: '6px', fontSize: '12px' }}>취소</button>
                 </div>
               ) : (
-                <button className="btn" onClick={() => setShowAddExInFill(true)}
-                  style={{ width: '100%', fontSize: '13px', padding: '10px' }}>
+                <button className="btn" onClick={() => setShowAddExInFill(true)} style={{ width: '100%', fontSize: '13px', padding: '10px' }}>
                   <IconPlus size={14} style={{ marginRight: 5 }} />운동 추가
                 </button>
               )}
             </div>
-
-            {/* 푸터 */}
             <div style={{ padding: '12px 18px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
               <button className="btn" onClick={closeFill}>Cancel</button>
               <button className="btn btn-p" onClick={save}>Save</button>
