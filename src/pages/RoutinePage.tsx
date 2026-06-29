@@ -31,28 +31,38 @@ const FORMAT_COLORS: Record<WorkoutFormatType, string> = {
   interval:  '#D4537E',
 }
 
+// 포맷별 기본값 적용 (저장된 데이터에 undefined 필드가 있을 때 대비)
+function withDefaults(f: WorkoutFormat): WorkoutFormat {
+  switch (f.type) {
+    case 'tabata':   return { workSec: 20, restSec: 10, tabataRounds: 8, tabataSets: 1, setRestSec: 120, ...f }
+    case 'for_time': return { formatRounds: 1, ...f }
+    case 'amrap':    return { duration: 20, ...f }
+    case 'emom':     return { every: 1, duration: 20, ...f }
+    case 'interval': return { workMin: 2, restMin: 1, intervalRounds: 6, ...f }
+    default:         return f
+  }
+}
+
 // 카드에 표시할 포맷 요약
-function formatSummary(f: WorkoutFormat): string {
+function formatSummary(raw: WorkoutFormat): string {
+  const f = withDefaults(raw)
   switch (f.type) {
     case 'tabata': {
-      const w = f.workSec ?? 20, r = f.restSec ?? 10, rds = f.tabataRounds ?? 8
       const sets = f.tabataSets ?? 1
-      return `Tabata ${w}s/${r}s × ${rds}rds${sets > 1 ? ` × ${sets}sets` : ''}`
+      return `Tabata ${f.workSec}s/${f.restSec}s × ${f.tabataRounds}rds${sets > 1 ? ` × ${sets}sets` : ''}`
     }
     case 'for_time': {
       const rds = f.formatRounds ?? 1
       return `For Time${rds > 1 ? ` — ${rds} Rounds` : ''}${f.timeCap ? ` (cap ${f.timeCap}min)` : ''}`
     }
     case 'amrap':
-      return `AMRAP ${f.duration ?? 20}min`
+      return `AMRAP ${f.duration}min`
     case 'emom': {
       const ev = f.every ?? 1
-      return `E${ev > 1 ? ev : ''}MOM × ${f.duration ?? 20}min`
+      return `E${ev > 1 ? ev : ''}MOM × ${f.duration}min`
     }
-    case 'interval': {
-      const wm = f.workMin ?? 1, rm = f.restMin ?? 1, rds = f.intervalRounds ?? 5
-      return `${wm}min on / ${rm}min off × ${rds}rounds`
-    }
+    case 'interval':
+      return `${f.workMin}min on / ${f.restMin}min off × ${f.intervalRounds}rounds`
     default: return 'Sets & Reps'
   }
 }
@@ -195,7 +205,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     setSelected(r.exercises.map(e =>
       typeof e === 'string' ? { exId: e as unknown as string, sets: 3, reps: 10 } : e
     ))
-    setFormat(r.format ?? defaultFormat())
+    setFormat(withDefaults(r.format ?? defaultFormat()))
     setSearch(''); setFilterMuscle('all'); setShowModal(true)
   }
 
