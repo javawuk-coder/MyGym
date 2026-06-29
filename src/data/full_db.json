@@ -3060,6 +3060,15 @@
         "muscle":  "core"
     },
     {
+        "id":  "core_cf_07",
+        "name":  "Copenhagen Plank",
+        "ko":  "코펜하겐 플랭크",
+        "type":  "isolation",
+        "log_type":  "time",
+        "equipment":  "bodyweight",
+        "muscle":  "core"
+    },
+    {
         "id":  "hiit_cf_22",
         "name":  "Triple Under",
         "ko":  "트리플 언더",
