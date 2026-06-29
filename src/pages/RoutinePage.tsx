@@ -235,6 +235,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     'weighted decline crunches': 'decline crunch',
     'weighted decline crunch': 'decline crunch',
     'decline crunches': 'decline crunch',
+    // RDL
+    'rdl': 'romanian deadlift',
+    'bb rdl': 'romanian deadlift',
+    'db rdl': 'romanian deadlift',
     // 단축 운동명
     'row': 'rowing machine',
     'ski': 'ski erg',
