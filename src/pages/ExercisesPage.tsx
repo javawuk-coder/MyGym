@@ -1,6 +1,11 @@
 import { useState } from 'react'
-import { IconPlus, IconSearch } from '@tabler/icons-react'
+import { IconPlus, IconSearch, IconInfoCircle } from '@tabler/icons-react'
 import type { Exercise } from '../types'
+import MUSCLE_MAP from '../data/muscle_map.json'
+
+const RC: Record<string, string> = { primary: '#E24B4A', secondary: '#EF9F27', stabilizer: '#378ADD' }
+const RL: Record<string, string> = { primary: 'Primary', secondary: 'Secondary', stabilizer: 'Stabilizer' }
+type MuscleMap = Record<string, { primary?: string[]; secondary?: string[]; stabilizer?: string[] }>
 
 const ML: Record<string, string> = {
   chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
@@ -30,6 +35,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
   const [search, setSearch] = useState('')
   const [filterMuscle, setFilterMuscle] = useState('')
   const [filterEquip, setFilterEquip] = useState('')
+  const [openMuscleId, setOpenMuscleId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [newName, setNewName] = useState('')
   const [newKo, setNewKo] = useState('')
@@ -119,28 +125,70 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
               <span style={{ fontSize: '12px', color: 'var(--tm)' }}>{xs.length}</span>
             </div>
             <div style={{ background: 'var(--s2)', border: '0.5px solid var(--bd)', borderRadius: '12px', padding: '0 8px' }}>
-              {xs.map(x => (
-                <div key={x.id} className="exrow">
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                      {x.name}
-                      {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>custom</span>}
+              {xs.map(x => {
+                const muscleData = (MUSCLE_MAP as MuscleMap)[x.id]
+                const isOpen = openMuscleId === x.id
+                return (
+                  <div key={x.id}>
+                    <div className="exrow" style={{ cursor: 'default' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                          {x.name}
+                          {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>custom</span>}
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
+                          {x.ko || '—'}
+                          {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
+                        <button
+                          className="idb"
+                          onClick={() => setOpenMuscleId(isOpen ? null : x.id)}
+                          title="Muscles worked"
+                          style={{ color: isOpen ? '#185FA5' : undefined }}
+                        >
+                          <IconInfoCircle size={16} />
+                        </button>
+                        {x.custom && (
+                          <button className="idb" onClick={() => { if (confirm('Delete?')) onDeleteCustom(x.id) }}>
+                            <IconPlus size={14} style={{ transform: 'rotate(45deg)' }} />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
-                      {x.ko || '—'}
-                      {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
-                    {x.custom && (
-                      <button className="idb" onClick={() => { if (confirm('Delete?')) onDeleteCustom(x.id) }}>
-                        <IconPlus size={14} style={{ transform: 'rotate(45deg)' }} />
-                      </button>
+                    {isOpen && (
+                      <div style={{
+                        background: 'var(--s1)', border: '0.5px solid var(--bd)',
+                        borderRadius: 'var(--r)', padding: '10px 12px', margin: '0 0 6px',
+                      }}>
+                        <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--ts)', marginBottom: '6px' }}>Muscles worked</div>
+                        {!muscleData ? (
+                          <div style={{ fontSize: '12px', color: 'var(--tm)' }}>데이터 준비 중</div>
+                        ) : (
+                          (['primary', 'secondary', 'stabilizer'] as const).map(role => {
+                            const list = muscleData[role]
+                            if (!list?.length) return null
+                            return (
+                              <div key={role} style={{ marginBottom: '5px' }}>
+                                <span style={{
+                                  display: 'inline-block', fontSize: '10px', padding: '1px 8px',
+                                  borderRadius: '20px', fontWeight: 500, marginBottom: '2px',
+                                  background: `${RC[role]}22`, color: RC[role], border: `0.5px solid ${RC[role]}44`,
+                                }}>{RL[role]}</span>
+                                <div style={{ fontSize: '12px', color: 'var(--tp)', lineHeight: 1.7 }}>
+                                  {list.join(' · ')}
+                                </div>
+                              </div>
+                            )
+                          })
+                        )}
+                      </div>
                     )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         ))
