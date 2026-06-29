@@ -29,9 +29,10 @@ interface Props {
 
 export default function LogPage({ logs, allExercises, unit, onAddEntry, onDeleteEntry, initialRoutine }: Props) {
   const firstExId = (() => {
-    const first = initialRoutine?.exercises[0]
+    const first = initialRoutine?.exercises[0] as unknown
     if (!first) return allExercises[0]?.id ?? ''
-    return typeof first === 'string' ? first : first.exId
+    if (typeof first === 'string') return first
+    return (first as { exId: string }).exId
   })()
   const [showModal, setShowModal] = useState(!!initialRoutine)
   const [selId, setSelId] = useState<string>(firstExId)
