@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconLayoutList, IconPlus, IconPlayerPlay, IconTrash, IconSearch, IconCircle, IconCircleCheck } from '@tabler/icons-react'
+import { IconLayoutList, IconPlus, IconPlayerPlay, IconTrash, IconPencil, IconSearch, IconCircle, IconCircleCheck } from '@tabler/icons-react'
 import type { Exercise, Routine } from '../types'
 
 const ML: Record<string, string> = {
@@ -11,20 +11,29 @@ const MB: Record<string, string> = {
   core:'bco', glute:'bg', hiit:'bhiit', cardio:'bcard', custom:'bx',
 }
 
+// 단어 순서 무관 검색
+function matchesQuery(x: Exercise, q: string) {
+  if (!q) return true
+  const tokens = q.toLowerCase().split(/\s+/).filter(Boolean)
+  const target = `${x.name} ${x.ko || ''}`.toLowerCase()
+  return tokens.every(t => target.includes(t))
+}
+
 interface Props {
   routines: (Routine & { id: string })[]
   allExercises: Exercise[]
   onAddRoutine: (r: Omit<Routine, 'id'>) => Promise<void>
+  onUpdateRoutine: (id: string, data: { name: string; exercises: string[] }) => Promise<void>
   onDeleteRoutine: (id: string) => Promise<void>
   onStartRoutine: (r: Routine & { id: string }) => void
 }
 
-function MBadge({ muscle }: { muscle: string }) {
-  return <span className={`badge ${MB[muscle] || 'bx'}`}>{ML[muscle] || muscle}</span>
-}
+type ModalMode = 'add' | 'edit'
 
-export default function RoutinePage({ routines, allExercises, onAddRoutine, onDeleteRoutine, onStartRoutine }: Props) {
+export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine }: Props) {
   const [showModal, setShowModal] = useState(false)
+  const [modalMode, setModalMode] = useState<ModalMode>('add')
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [routineName, setRoutineName] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [search, setSearch] = useState('')
@@ -33,38 +42,52 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
   const sortedEx = [...allExercises].sort((a, b) => (a.ko || a.name).localeCompare(b.ko || b.name, 'ko'))
   const filtered = sortedEx.filter(x => {
     const mOk = filterMuscle === 'all' || x.muscle === filterMuscle
-    const qOk = !search || x.name.toLowerCase().includes(search.toLowerCase()) || (x.ko && x.ko.includes(search))
-    return mOk && qOk
+    return mOk && matchesQuery(x, search)
   })
 
   const toggleSelect = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
 
-  const openModal = () => {
-    setShowModal(true)
+  const openAdd = () => {
+    setModalMode('add')
+    setEditingId(null)
     setRoutineName('')
     setSelected([])
     setSearch('')
     setFilterMuscle('all')
+    setShowModal(true)
   }
 
-  const saveRoutine = async () => {
+  const openEdit = (r: Routine & { id: string }) => {
+    setModalMode('edit')
+    setEditingId(r.id)
+    setRoutineName(r.name)
+    setSelected([...r.exercises])
+    setSearch('')
+    setFilterMuscle('all')
+    setShowModal(true)
+  }
+
+  const save = async () => {
     if (!routineName.trim()) { alert('Routine name required'); return }
     if (!selected.length) { alert('Select at least one exercise'); return }
-    await onAddRoutine({ name: routineName.trim(), exercises: selected })
+    if (modalMode === 'edit' && editingId) {
+      await onUpdateRoutine(editingId, { name: routineName.trim(), exercises: selected })
+    } else {
+      await onAddRoutine({ name: routineName.trim(), exercises: selected })
+    }
     setShowModal(false)
   }
 
   const getEx = (id: string) => allExercises.find(e => e.id === id)
-
   const muscles = ['all', ...Object.keys(ML)]
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div className="stitle">My Routines</div>
-        <button className="btn btn-p" onClick={openModal}><IconPlus size={14} style={{ marginRight: 4 }} />New Routine</button>
+        <button className="btn btn-p" onClick={openAdd}><IconPlus size={14} style={{ marginRight: 4 }} />New Routine</button>
       </div>
 
       {!routines.length ? (
@@ -83,6 +106,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button className="btn btn-p" onClick={() => onStartRoutine(r)}>
                   <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
+                </button>
+                <button className="btn" onClick={() => openEdit(r)}>
+                  <IconPencil size={14} />
                 </button>
                 <button className="btn btn-d" onClick={() => { if (confirm('Delete?')) onDeleteRoutine(r.id) }}>
                   <IconTrash size={14} />
@@ -103,7 +129,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
       {showModal && (
         <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}>
           <div className="mo">
-            <div className="mt2">New Routine</div>
+            <div className="mt2">{modalMode === 'edit' ? 'Edit Routine' : 'New Routine'}</div>
             <span className="fl">Routine name</span>
             <input
               value={routineName}
@@ -116,17 +142,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Search exercises..."
+                placeholder="Search exercises... (단어 순서 무관)"
                 style={{ paddingLeft: '36px' }}
               />
             </div>
             <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '8px' }}>
               {muscles.map(m => (
-                <button
-                  key={m}
-                  className={`mfb${filterMuscle === m ? ' on' : ''}`}
-                  onClick={() => setFilterMuscle(m)}
-                >
+                <button key={m} className={`mfb${filterMuscle === m ? ' on' : ''}`} onClick={() => setFilterMuscle(m)}>
                   {m === 'all' ? 'All' : (ML[m] || m)}
                 </button>
               ))}
@@ -137,18 +159,14 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
               ) : filtered.map(x => {
                 const checked = selected.includes(x.id)
                 return (
-                  <div
-                    key={x.id}
-                    className={`exrow${checked ? ' sel' : ''}`}
-                    onClick={() => toggleSelect(x.id)}
-                  >
+                  <div key={x.id} className={`exrow${checked ? ' sel' : ''}`} onClick={() => toggleSelect(x.id)}>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 500 }}>
                         {x.name}
                         {x.custom && <span className="ctag" style={{ marginLeft: '4px' }}>custom</span>}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)' }}>
-                        {x.ko || '—'} · <MBadge muscle={x.muscle} />
+                        {x.ko || '—'} · <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
                       </div>
                     </div>
                     {checked
@@ -162,7 +180,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onDe
             <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--ts)' }}>{selected.length} selected</div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '1.2rem', justifyContent: 'flex-end' }}>
               <button className="btn" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn btn-p" onClick={saveRoutine}>Save</button>
+              <button className="btn btn-p" onClick={save}>{modalMode === 'edit' ? 'Update' : 'Save'}</button>
             </div>
           </div>
         </div>

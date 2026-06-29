@@ -49,7 +49,9 @@ export default function LogPage({ logs, allExercises, unit, onAddEntry, onDelete
   const sortedEx = [...allExercises].sort((a, b) => (a.ko || a.name).localeCompare(b.ko || b.name, 'ko'))
   const filteredEx = sortedEx.filter(x => {
     if (!exSearch) return true
-    return x.name.toLowerCase().includes(exSearch.toLowerCase()) || (x.ko && x.ko.includes(exSearch))
+    const tokens = exSearch.toLowerCase().split(/\s+/).filter(Boolean)
+    const target = `${x.name} ${x.ko || ''}`.toLowerCase()
+    return tokens.every(t => target.includes(t))
   })
 
   const openModal = (routine?: Routine | null) => {

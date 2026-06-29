@@ -33,7 +33,7 @@ function MainApp() {
 
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
 
-  const { routines, addRoutine, deleteRoutine } = useRoutines(uid)
+  const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
   const { logs, addLogEntry, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
 
@@ -73,6 +73,7 @@ function MainApp() {
           routines={routines}
           allExercises={allExercises}
           onAddRoutine={addRoutine}
+          onUpdateRoutine={updateRoutine}
           onDeleteRoutine={deleteRoutine}
           onStartRoutine={handleStartRoutine}
         />

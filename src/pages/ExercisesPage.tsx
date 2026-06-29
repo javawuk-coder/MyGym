@@ -43,7 +43,12 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
   const filtered = allExercises.filter(x => {
     const mOk = !filterMuscle || x.muscle === filterMuscle
     const eOk = !filterEquip || x.equipment === filterEquip
-    const qOk = !search || x.name.toLowerCase().includes(search.toLowerCase()) || (x.ko && x.ko.includes(search))
+    const qOk = (() => {
+      if (!search) return true
+      const tokens = search.toLowerCase().split(/\s+/).filter(Boolean)
+      const target = `${x.name} ${x.ko || ''}`.toLowerCase()
+      return tokens.every(t => target.includes(t))
+    })()
     return mOk && eOk && qOk
   })
 

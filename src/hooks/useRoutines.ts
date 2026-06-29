@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   collection, onSnapshot, addDoc, deleteDoc,
-  doc, serverTimestamp, query, orderBy,
+  doc, serverTimestamp, query, orderBy, updateDoc,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import type { Routine } from '../types'
@@ -28,10 +28,15 @@ export function useRoutines(uid: string | undefined) {
     })
   }
 
+  const updateRoutine = async (routineId: string, data: { name: string; exercises: string[] }) => {
+    if (!uid) return
+    await updateDoc(doc(db, 'users', uid, 'routines', routineId), data)
+  }
+
   const deleteRoutine = async (routineId: string) => {
     if (!uid) return
     await deleteDoc(doc(db, 'users', uid, 'routines', routineId))
   }
 
-  return { routines, loading, addRoutine, deleteRoutine }
+  return { routines, loading, addRoutine, updateRoutine, deleteRoutine }
 }
