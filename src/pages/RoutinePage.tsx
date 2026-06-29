@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
   IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto,
@@ -268,11 +268,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     return null
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    e.target.value = ''
-
+  const processImageFile = async (file: File) => {
     setParsing(true); setParseError(null); setParseWarnings([])
 
     try {
@@ -284,6 +280,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       })
 
       const res = await fetch('/api/parse-workout', {
+
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
@@ -332,6 +329,26 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       setParsing(false)
     }
   }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    processImageFile(file)
+  }
+
+  // 모달 열릴 때 붙여넣기(Ctrl+V) 이미지 감지
+  useEffect(() => {
+    if (!showModal || editingId) return
+    const onPaste = (e: ClipboardEvent) => {
+      const item = Array.from(e.clipboardData?.items ?? []).find(i => i.type.startsWith('image/'))
+      if (!item) return
+      const file = item.getAsFile()
+      if (file) { e.preventDefault(); processImageFile(file) }
+    }
+    window.addEventListener('paste', onPaste)
+    return () => window.removeEventListener('paste', onPaste)
+  }, [showModal, editingId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const openEdit = (r: Routine & { id: string }) => {
     setEditingId(r.id); setRoutineName(r.name)
@@ -461,7 +478,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     disabled={parsing}
                     style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px' }}>
                     <IconPhoto size={15} />
-                    {parsing ? '분석 중...' : '이미지로 생성'}
+                    {parsing ? '분석 중...' : '이미지 업로드 / Ctrl+V'}
                   </button>
                 </>
               )}
