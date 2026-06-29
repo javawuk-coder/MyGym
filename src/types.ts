@@ -32,9 +32,15 @@ export interface DayLog {
   exercises: LogEntry[]
 }
 
+export interface RoutineExercise {
+  exId: string
+  sets: number
+  reps: number
+}
+
 export interface Routine {
   id?: string
   name: string
-  exercises: string[] // exercise ids
+  exercises: RoutineExercise[]
   createdAt?: unknown
 }

@@ -4,7 +4,7 @@ import {
   doc, serverTimestamp, query, orderBy, updateDoc,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import type { Routine } from '../types'
+import type { Routine, RoutineExercise } from '../types'
 
 export function useRoutines(uid: string | undefined) {
   const [routines, setRoutines] = useState<(Routine & { id: string })[]>([])
@@ -28,7 +28,7 @@ export function useRoutines(uid: string | undefined) {
     })
   }
 
-  const updateRoutine = async (routineId: string, data: { name: string; exercises: string[] }) => {
+  const updateRoutine = async (routineId: string, data: { name: string; exercises: RoutineExercise[] }) => {
     if (!uid) return
     await updateDoc(doc(db, 'users', uid, 'routines', routineId), data)
   }
