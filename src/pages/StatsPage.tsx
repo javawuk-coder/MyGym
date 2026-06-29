@@ -86,7 +86,7 @@ export default function StatsPage({ logs, allExercises, unit }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
         <div className="sc"><div className="sn">{workoutDays}</div><div className="sl">운동한 날</div></div>
         <div className="sc"><div className="sn">{totalSets}</div><div className="sl">총 세트</div></div>
-        <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}t</div><div className="sl">총 볼륨</div></div>
+        <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}{unit === 'kg' ? 't' : 'k lb'}</div><div className="sl">총 볼륨</div></div>
       </div>
 
       {/* Volume by muscle */}
