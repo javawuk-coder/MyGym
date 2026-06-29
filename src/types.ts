@@ -38,9 +38,29 @@ export interface RoutineExercise {
   reps: number
 }
 
+export type WorkoutFormatType = 'sets_reps' | 'tabata' | 'for_time' | 'amrap' | 'emom' | 'interval'
+
+export interface WorkoutFormat {
+  type: WorkoutFormatType
+  // tabata
+  workSec?: number
+  restSec?: number
+  rounds?: number
+  // for_time
+  timeCap?: number
+  // amrap / emom duration
+  duration?: number
+  // emom
+  every?: number
+  // interval
+  workMin?: number
+  restMin?: number
+}
+
 export interface Routine {
   id?: string
   name: string
   exercises: RoutineExercise[]
+  format?: WorkoutFormat
   createdAt?: unknown
 }
