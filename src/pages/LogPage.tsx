@@ -61,7 +61,10 @@ export default function LogPage({ logs, allExercises, unit, onAddEntry, onDelete
   })
 
   const openModal = (routine?: Routine | null) => {
-    const firstId = routine?.exercises[0] || sortedEx[0]?.id || ''
+    const first = routine?.exercises[0] as unknown
+    const firstId = !first
+      ? (sortedEx[0]?.id || '')
+      : typeof first === 'string' ? first : (first as { exId: string }).exId
     setSelId(firstId)
     setExSearch('')
     setSets([
