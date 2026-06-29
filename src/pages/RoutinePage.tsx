@@ -59,6 +59,7 @@ function formatSummary(f: WorkoutFormat): string {
 
 // 운동 목록에서 reps 레이블
 function repsLabel(fmt: WorkoutFormat, ex: Exercise, re: RoutineExercise): string {
+  if (re.maxReps) return 'MAX'
   const isTime = ex.log_type === 'time'
   const isCardio = ex.log_type === 'cardio'
   if (isCardio) return 'cardio'
@@ -77,6 +78,13 @@ function repsLabel(fmt: WorkoutFormat, ex: Exercise, re: RoutineExercise): strin
     default: return ''
   }
 }
+
+const ROUND_TYPE_COLORS: Record<string, string> = {
+  odd:  '#EF9F27',
+  even: '#534AB7',
+  all:  'var(--tm)',
+}
+const ROUND_TYPE_LABELS: Record<string, string> = { odd: 'ODD', even: 'EVEN', all: 'ALL' }
 
 function matchesQuery(x: Exercise, q: string) {
   if (!q) return true
@@ -141,6 +149,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     const n = Math.max(1, parseInt(val) || 1)
     setSelected(prev => prev.map(s => s.exId === exId ? { ...s, [field]: n } : s))
   }
+
+  const updateExercise = (exId: string, patch: Partial<RoutineExercise>) =>
+    setSelected(prev => prev.map(s => s.exId === exId ? { ...s, ...patch } : s))
 
   const removeFromSelected = (exId: string) => setSelected(prev => prev.filter(s => s.exId !== exId))
 
@@ -236,17 +247,26 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     : raw as RoutineExercise
                   const ex = getEx(exId)
                   if (!ex) return null
+                  const rt = reObj.roundType
+                  const rtColor = rt && rt !== 'all' ? ROUND_TYPE_COLORS[rt] : undefined
                   return (
                     <div key={exId + i} style={{
-                      display: 'flex', alignItems: 'baseline', gap: '8px',
+                      display: 'flex', alignItems: 'center', gap: '8px',
                       padding: '5px 0', borderBottom: i < r.exercises.length - 1 ? '0.5px solid var(--bd)' : 'none',
                     }}>
-                      <span style={{ color: 'var(--tm)', minWidth: '18px', fontSize: '11px' }}>{i + 1}.</span>
+                      {rt && rt !== 'all' && (
+                        <span style={{
+                          fontSize: '10px', padding: '1px 6px', borderRadius: '20px', flexShrink: 0,
+                          fontWeight: 700, background: `${rtColor}22`, color: rtColor, border: `0.5px solid ${rtColor}44`,
+                        }}>{ROUND_TYPE_LABELS[rt]}</span>
+                      )}
+                      {(!rt || rt === 'all') && <span style={{ color: 'var(--tm)', minWidth: '18px', fontSize: '11px', flexShrink: 0 }}>{i + 1}.</span>}
                       <span style={{ flex: 1, fontSize: '13px' }}>
                         <span style={{ fontWeight: 500 }}>{ex.ko || ex.name}</span>
                         {ex.ko && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({ex.name})</span>}
+                        {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>@ {reObj.note}</span>}
                       </span>
-                      <span style={{ color: 'var(--tm)', fontSize: '12px', flexShrink: 0 }}>
+                      <span style={{ color: reObj.maxReps ? '#E24B4A' : 'var(--tm)', fontSize: '12px', flexShrink: 0, fontWeight: reObj.maxReps ? 700 : 400 }}>
                         {repsLabel(fmt, ex, reObj)}
                       </span>
                     </div>
@@ -394,13 +414,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {format.type === 'interval' && (
               <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  Interval: 자유 형식 work / rest 반복
+                  Interval: 자유 형식 work / rest 반복 — 운동별 ODD/EVEN 라운드 지정 가능
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                   {[
-                    { label: 'Work (분)', key: 'workMin', def: 1 },
+                    { label: 'Work (분)', key: 'workMin', def: 2 },
                     { label: 'Rest (분)', key: 'restMin', def: 1 },
-                    { label: 'Rounds', key: 'intervalRounds', def: 5 },
+                    { label: 'Rounds', key: 'intervalRounds', def: 6 },
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
@@ -410,6 +430,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         style={{ textAlign: 'center', padding: '5px' }} />
                     </div>
                   ))}
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
+                  아래 운동별로 ODD/EVEN 라운드 지정 및 MAX 플래그, 메모 입력 가능
                 </div>
               </div>
             )}
@@ -470,6 +493,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     const isTime = ex.log_type === 'time'
                     const isCardio = ex.log_type === 'cardio'
                     const isDragOver = dragOverIndex === i
+                    const isInterval = format.type === 'interval'
+                    const rt = s.roundType ?? 'all'
+
                     return (
                       <div key={s.exId} draggable
                         onDragStart={() => onDragStart(i)}
@@ -477,32 +503,79 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         onDrop={() => onDrop(i)}
                         onDragEnd={onDragEnd}
                         style={{
-                          display: 'grid', gridTemplateColumns: gridCols, gap: '4px',
-                          padding: '7px 10px', borderTop: '0.5px solid var(--bd)', alignItems: 'center',
+                          padding: '8px 10px', borderTop: '0.5px solid var(--bd)',
                           background: isDragOver ? 'var(--s1)' : undefined,
                           borderLeft: isDragOver ? '2px solid #378ADD' : '2px solid transparent',
-                          cursor: 'grab',
                         }}>
-                        <IconGripVertical size={14} style={{ color: 'var(--tm)' }} />
-                        <div>
-                          <div style={{ fontSize: '13px', fontWeight: 500 }}>{ex.ko || ex.name}</div>
-                          {ex.ko && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{ex.name}</div>}
+
+                        {/* 1행: grip + 이름 + 컨트롤 */}
+                        <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '4px', alignItems: 'center', cursor: 'grab' }}>
+                          <IconGripVertical size={14} style={{ color: 'var(--tm)' }} />
+                          <div>
+                            <div style={{ fontSize: '13px', fontWeight: 500 }}>{ex.ko || ex.name}</div>
+                            {ex.ko && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{ex.name}</div>}
+                          </div>
+                          {hasSets && (
+                            isCardio
+                              ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>—</div>
+                              : <input type="number" min="1" value={s.sets}
+                                  onChange={e => updateSetsReps(s.exId, 'sets', e.target.value)}
+                                  style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }} />
+                          )}
+                          {isCardio
+                            ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
+                            : s.maxReps
+                              ? <div style={{ textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#E24B4A' }}>MAX</div>
+                              : <input type="number" min="1" value={s.reps}
+                                  onChange={e => updateSetsReps(s.exId, 'reps', e.target.value)}
+                                  style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }}
+                                  placeholder={isTime ? '초' : '회'} />
+                          }
+                          <button className="idb" onClick={() => removeFromSelected(s.exId)}><IconX size={14} /></button>
                         </div>
-                        {hasSets && (
-                          isCardio
-                            ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>—</div>
-                            : <input type="number" min="1" value={s.sets}
-                                onChange={e => updateSetsReps(s.exId, 'sets', e.target.value)}
-                                style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }} />
+
+                        {/* 2행: Interval 전용 — ODD/EVEN/ALL + MAX + note */}
+                        {isInterval && (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px', paddingLeft: '24px', flexWrap: 'wrap' }}>
+                            {/* ODD / EVEN / ALL 선택 */}
+                            {(['odd', 'even', 'all'] as const).map(v => (
+                              <button key={v} onClick={() => updateExercise(s.exId, { roundType: v })} style={{
+                                padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
+                                border: `1px solid ${rt === v ? ROUND_TYPE_COLORS[v] : 'var(--bd)'}`,
+                                background: rt === v ? `${ROUND_TYPE_COLORS[v]}22` : 'transparent',
+                                color: rt === v ? ROUND_TYPE_COLORS[v] : 'var(--tm)',
+                                fontWeight: rt === v ? 700 : 400,
+                              }}>{ROUND_TYPE_LABELS[v]}</button>
+                            ))}
+                            {/* MAX 토글 */}
+                            {!isCardio && (
+                              <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
+                                padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
+                                border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
+                                background: s.maxReps ? '#E24B4A22' : 'transparent',
+                                color: s.maxReps ? '#E24B4A' : 'var(--tm)',
+                                fontWeight: s.maxReps ? 700 : 400,
+                              }}>MAX</button>
+                            )}
+                            {/* 메모 (@ weight 등) */}
+                            <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
+                              placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
+                          </div>
                         )}
-                        {isCardio
-                          ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
-                          : <input type="number" min="1" value={s.reps}
-                              onChange={e => updateSetsReps(s.exId, 'reps', e.target.value)}
-                              style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }}
-                              placeholder={isTime ? '초' : '회'} />
-                        }
-                        <button className="idb" onClick={() => removeFromSelected(s.exId)}><IconX size={14} /></button>
+                        {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM 등) */}
+                        {!isInterval && !isCardio && (format.type === 'amrap' || format.type === 'emom' || format.type === 'tabata') && (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px' }}>
+                            <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
+                              padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
+                              border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
+                              background: s.maxReps ? '#E24B4A22' : 'transparent',
+                              color: s.maxReps ? '#E24B4A' : 'var(--tm)',
+                              fontWeight: s.maxReps ? 700 : 400,
+                            }}>MAX</button>
+                            <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
+                              placeholder="메모" style={{ flex: 1, minWidth: '100px', fontSize: '12px', padding: '3px 8px' }} />
+                          </div>
+                        )}
                       </div>
                     )
                   })}
