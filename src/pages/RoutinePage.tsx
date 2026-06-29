@@ -352,7 +352,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       if (s.maxReps) e.maxReps = true
       if (s.roundType && s.roundType !== 'all') e.roundType = s.roundType
       if (s.note) e.note = s.note
-      return e as RoutineExercise
+      return e as unknown as RoutineExercise
     })
 
     try {
