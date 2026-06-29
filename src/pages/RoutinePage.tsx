@@ -171,7 +171,18 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const onDragEnd = () => { dragIndex.current = null; setDragOverIndex(null) }
 
   const updateFormat = (patch: Partial<WorkoutFormat>) => setFormat(prev => ({ ...prev, ...patch }))
-  const setFormatType = (t: WorkoutFormatType) => setFormat({ type: t })
+
+  const setFormatType = (t: WorkoutFormatType) => {
+    const defaults: Record<WorkoutFormatType, Partial<WorkoutFormat>> = {
+      sets_reps: {},
+      tabata:    { workSec: 20, restSec: 10, tabataRounds: 8, tabataSets: 1, setRestSec: 120 },
+      for_time:  { formatRounds: 1 },
+      amrap:     { duration: 20 },
+      emom:      { every: 1, duration: 20 },
+      interval:  { workMin: 2, restMin: 1, intervalRounds: 6 },
+    }
+    setFormat({ type: t, ...defaults[t] })
+  }
 
   const openAdd = () => {
     setEditingId(null); setRoutineName(''); setSelected([])
