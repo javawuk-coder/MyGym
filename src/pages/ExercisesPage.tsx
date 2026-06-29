@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconPlus, IconSearch, IconInfoCircle } from '@tabler/icons-react'
+import { IconPlus, IconSearch, IconInfoCircle, IconBrandYoutube } from '@tabler/icons-react'
 import type { Exercise } from '../types'
 import MUSCLE_MAP from '../data/muscle_map.json'
 
@@ -184,6 +184,21 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                             )
                           })
                         )}
+                        <a
+                          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(x.name + ' proper form tutorial')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            marginTop: '8px', fontSize: '12px', color: '#FF0000',
+                            textDecoration: 'none', padding: '4px 10px',
+                            border: '0.5px solid #FF000044', borderRadius: '20px',
+                            background: '#FF000011',
+                          }}
+                        >
+                          <IconBrandYoutube size={14} />
+                          YouTube에서 폼 영상 보기
+                        </a>
                       </div>
                     )}
                   </div>
