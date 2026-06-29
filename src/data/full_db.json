@@ -2772,6 +2772,24 @@
         "log_type":  "weight_reps"
     },
     {
+        "id":  "hiit_58",
+        "name":  "Hand Release Push-Up",
+        "ko":  "핸드 릴리즈 푸시업",
+        "muscle":  "hiit",
+        "equipment":  "bodyweight",
+        "type":  "compound",
+        "log_type":  "reps_only"
+    },
+    {
+        "id":  "hiit_59",
+        "name":  "Hop Over",
+        "ko":  "홉 오버",
+        "muscle":  "hiit",
+        "equipment":  "bodyweight",
+        "type":  "compound",
+        "log_type":  "reps_only"
+    },
+    {
         "id":  "hiit_cf_01",
         "name":  "Wall Walk",
         "ko":  "월 워크",

@@ -301,7 +301,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
       {/* ───── 모달 ───── */}
       {showModal && (
-        <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}>
+        <div className="mbg">
           <div className="mo" style={{ maxWidth: '540px' }}>
             <div className="mt2">{editingId ? 'Edit Routine' : 'New Routine'}</div>
 
