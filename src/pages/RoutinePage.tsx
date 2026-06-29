@@ -245,33 +245,68 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     'cal bike': 'assault bike calorie',
   }
 
-  // 운동 이름으로 DB 매칭 (약어 → 퍼지 매칭)
+  // 이미지 파싱 시 자주 등장하는 수식어 — 매칭에서 제외
+  const MODIFIER_TOKENS = new Set([
+    'db', 'dumbbell', 'kb', 'bb', 'barbell', 'cable', 'machine', 'plate', 'loaded',
+    'single', 'dual', 'bilateral', 'unilateral', 'arm', 'hand', 'handed',
+    'neutral', 'grip', 'wide', 'narrow', 'close', 'reverse', 'supinated', 'pronated',
+    'chest', 'supported', 'incline', 'decline', 'flat', 'seated', 'standing',
+    'bent', 'over', 'overhead', 'rope', 'band', 'assisted', 'weighted',
+    'slow', 'fast', 'paused', 'tempo', 'eccentric', 'isometric',
+  ])
+
+  // 운동 이름으로 DB 매칭 (약어 → 정확 → 퍼지)
   const matchExercise = (name: string): Exercise | null => {
-    // 점·공백 정리 후 소문자
-    const q = name.toLowerCase().trim().replace(/\.\s*/g, '. ').trim()
-    const qClean = q.replace(/[.\s]+/g, ' ').trim()
+    const q = name.toLowerCase().trim().replace(/[.\s]+/g, ' ').trim()
 
     // 1. 약어 맵
-    const aliased = ALIASES[qClean] ?? ALIASES[q]
-    const searchQ = aliased ?? qClean
+    const aliased = ALIASES[q]
+    const searchQ = aliased ?? q
 
-    // 2. 정확 매칭 (name 또는 ko)
+    // 2. 정확 매칭
     const exact = allExercises.find(e =>
       e.name.toLowerCase() === searchQ || (e.ko && e.ko.toLowerCase() === searchQ)
     )
     if (exact) return exact
 
-    // 3. 토큰 부분 매칭 (2토큰 이상)
+    // 3. 전체 토큰 매칭 (모든 토큰 포함)
     const tokens = searchQ.split(/\s+/).filter(Boolean)
     if (tokens.length >= 2) {
-      const partial = allExercises.find(e => {
+      const allMatch = allExercises.find(e => {
         const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
         return tokens.every(t => target.includes(t))
       })
-      if (partial) return partial
+      if (allMatch) return allMatch
     }
 
-    // 4. 단일 토큰이라도 핵심어 매칭 (3자 이상, 단어 경계 우선)
+    // 4. 수식어 제거 후 핵심 토큰만으로 매칭
+    const coreTokens = tokens.filter(t => !MODIFIER_TOKENS.has(t) && t.length >= 3)
+    if (coreTokens.length >= 2) {
+      // 핵심 토큰 전부 포함하는 DB 항목 우선
+      const coreAllMatch = allExercises.find(e => {
+        const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
+        return coreTokens.every(t => target.includes(t))
+      })
+      if (coreAllMatch) return coreAllMatch
+
+      // 핵심 토큰 중 2/3 이상 포함 (최소 2개)
+      const minMatch = Math.max(2, Math.ceil(coreTokens.length * 2 / 3))
+      const fuzzy = allExercises.find(e => {
+        const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
+        const matched = coreTokens.filter(t => target.includes(t)).length
+        return matched >= minMatch
+      })
+      if (fuzzy) return fuzzy
+    }
+
+    // 5. 핵심 토큰 1개인 경우 (3자 이상)
+    if (coreTokens.length === 1) {
+      return allExercises.find(e =>
+        e.name.toLowerCase().includes(coreTokens[0]) || (e.ko && e.ko.includes(coreTokens[0]))
+      ) ?? null
+    }
+
+    // 6. 단일 원본 토큰 매칭 (3자 이상)
     if (tokens.length === 1 && tokens[0].length >= 3) {
       return allExercises.find(e =>
         e.name.toLowerCase().includes(tokens[0]) || (e.ko && e.ko.includes(tokens[0]))
