@@ -37,7 +37,7 @@ function withDefaults(f: WorkoutFormat): WorkoutFormat {
     case 'tabata':   return { workSec: 20, restSec: 10, tabataRounds: 8, tabataSets: 1, setRestSec: 120, ...f }
     case 'for_time': return { formatRounds: 1, ...f }
     case 'amrap':    return { duration: 20, ...f }
-    case 'emom':     return { every: 1, duration: 20, ...f }
+    case 'emom':     return { every: 1, emomSets: 20, ...f }
     case 'interval': return { workMin: 2, restMin: 1, intervalRounds: 6, ...f }
     default:         return f
   }
@@ -59,7 +59,8 @@ function formatSummary(raw: WorkoutFormat): string {
       return `AMRAP ${f.duration}min`
     case 'emom': {
       const ev = f.every ?? 1
-      return `E${ev > 1 ? ev : ''}MOM × ${f.duration}min`
+      const sets = f.emomSets ?? 20
+      return `E${ev > 1 ? ev : ''}MOM × ${sets}sets (${ev * sets}min)`
     }
     case 'interval':
       return `${f.workMin}min on / ${f.restMin}min off × ${f.intervalRounds}rounds`
@@ -147,23 +148,21 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
   const isSelected = (id: string) => selected.some(s => s.exId === id)
 
-  const toggleExercise = (id: string) => {
-    if (isSelected(id)) {
-      setSelected(prev => prev.filter(s => s.exId !== id))
-    } else {
-      setSelected(prev => [...prev, { exId: id, sets: 3, reps: 10 }])
-    }
-  }
+  // 항상 추가 (중복 허용) — 제거는 X 버튼으로만
+  const toggleExercise = (id: string) =>
+    setSelected(prev => [...prev, { exId: id, sets: 3, reps: 10 }])
 
-  const updateSetsReps = (exId: string, field: 'sets' | 'reps', val: string) => {
+  const updateAtIndex = (i: number, patch: Partial<RoutineExercise>) =>
+    setSelected(prev => prev.map((s, idx) => idx === i ? { ...s, ...patch } : s))
+
+  const updateSetsReps = (i: number, field: 'sets' | 'reps', val: string) => {
     const n = Math.max(1, parseInt(val) || 1)
-    setSelected(prev => prev.map(s => s.exId === exId ? { ...s, [field]: n } : s))
+    updateAtIndex(i, { [field]: n })
   }
 
-  const updateExercise = (exId: string, patch: Partial<RoutineExercise>) =>
-    setSelected(prev => prev.map(s => s.exId === exId ? { ...s, ...patch } : s))
+  const updateExercise = (i: number, patch: Partial<RoutineExercise>) => updateAtIndex(i, patch)
 
-  const removeFromSelected = (exId: string) => setSelected(prev => prev.filter(s => s.exId !== exId))
+  const removeFromSelected = (i: number) => setSelected(prev => prev.filter((_, idx) => idx !== i))
 
   const onDragStart = (i: number) => { dragIndex.current = i }
   const onDragOver = (e: React.DragEvent, i: number) => { e.preventDefault(); setDragOverIndex(i) }
@@ -188,7 +187,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       tabata:    { workSec: 20, restSec: 10, tabataRounds: 8, tabataSets: 1, setRestSec: 120 },
       for_time:  { formatRounds: 1 },
       amrap:     { duration: 20 },
-      emom:      { every: 1, duration: 20 },
+      emom:      { every: 1, emomSets: 20 },
       interval:  { workMin: 2, restMin: 1, intervalRounds: 6 },
     }
     setFormat({ type: t, ...defaults[t] })
@@ -407,30 +406,39 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               </div>
             )}
 
-            {format.type === 'emom' && (
-              <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  EMOM: 매 X분 시작에 정해진 reps 수행, 나머지는 휴식. 점수 = 완료율
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div>
-                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Every X분 (E<strong>X</strong>MOM)</div>
-                    <input type="number" min="1" max="10" value={format.every ?? 1}
-                      onChange={e => updateFormat({ every: parseInt(e.target.value) || 1 })}
-                      style={{ textAlign: 'center', padding: '5px' }} />
+            {format.type === 'emom' && (() => {
+              const ev = format.every ?? 1
+              const sets = format.emomSets ?? 20
+              const totalMin = ev * sets
+              return (
+                <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
+                    EMOM: 매 X분 시작에 정해진 reps 수행, 나머지는 휴식. 점수 = 완료율
                   </div>
-                  <div>
-                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Total Duration (분)</div>
-                    <input type="number" min="1" value={format.duration ?? 20}
-                      onChange={e => updateFormat({ duration: parseInt(e.target.value) || 20 })}
-                      style={{ textAlign: 'center', padding: '5px' }} />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', alignItems: 'end' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Every X분 (E<strong>X</strong>MOM)</div>
+                      <input type="number" min="1" max="10" value={ev}
+                        onChange={e => updateFormat({ every: parseInt(e.target.value) || 1 })}
+                        style={{ textAlign: 'center', padding: '5px' }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Sets</div>
+                      <input type="number" min="1" value={sets}
+                        onChange={e => updateFormat({ emomSets: parseInt(e.target.value) || 1 })}
+                        style={{ textAlign: 'center', padding: '5px' }} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Total Duration</div>
+                      <div style={{ fontSize: '18px', fontWeight: 700, color: '#1D9E75', padding: '4px 0' }}>{totalMin}min</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
+                    E{ev > 1 ? ev : ''}MOM × {sets}sets = {totalMin}분. 아래 reps = 인터벌당 횟수
                   </div>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  예: E2MOM × 20min = 10번의 인터벌. 아래 reps = 인터벌당 횟수
-                </div>
-              </div>
-            )}
+              )
+            })()}
 
             {format.type === 'interval' && (
               <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
@@ -518,7 +526,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     const rt = s.roundType ?? 'all'
 
                     return (
-                      <div key={s.exId} draggable
+                      <div key={`${s.exId}_${i}`} draggable
                         onDragStart={() => onDragStart(i)}
                         onDragOver={e => onDragOver(e, i)}
                         onDrop={() => onDrop(i)}
@@ -540,7 +548,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                             isCardio
                               ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>—</div>
                               : <input type="number" min="1" value={s.sets}
-                                  onChange={e => updateSetsReps(s.exId, 'sets', e.target.value)}
+                                  onChange={e => updateSetsReps(i, 'sets', e.target.value)}
                                   style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }} />
                           )}
                           {s.maxReps
@@ -548,11 +556,11 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                             : isCardio
                               ? <div style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center' }}>cardio</div>
                               : <input type="number" min="1" value={s.reps}
-                                  onChange={e => updateSetsReps(s.exId, 'reps', e.target.value)}
+                                  onChange={e => updateSetsReps(i, 'reps', e.target.value)}
                                   style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }}
                                   placeholder={isTime ? '초' : '회'} />
                           }
-                          <button className="idb" onClick={() => removeFromSelected(s.exId)}><IconX size={14} /></button>
+                          <button className="idb" onClick={() => removeFromSelected(i)}><IconX size={14} /></button>
                         </div>
 
                         {/* 2행: Interval 전용 — ODD/EVEN/ALL + MAX + note */}
@@ -560,7 +568,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px', paddingLeft: '24px', flexWrap: 'wrap' }}>
                             {/* ODD / EVEN / ALL 선택 */}
                             {(['odd', 'even', 'all'] as const).map(v => (
-                              <button key={v} onClick={() => updateExercise(s.exId, { roundType: v })} style={{
+                              <button key={v} onClick={() => updateExercise(i, { roundType: v })} style={{
                                 padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
                                 border: `1px solid ${rt === v ? ROUND_TYPE_COLORS[v] : 'var(--bd)'}`,
                                 background: rt === v ? `${ROUND_TYPE_COLORS[v]}22` : 'transparent',
@@ -569,7 +577,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               }}>{ROUND_TYPE_LABELS[v]}</button>
                             ))}
                             {/* MAX 토글 */}
-                            <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
+                            <button onClick={() => updateExercise(i, { maxReps: !s.maxReps })} style={{
                               padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
                               border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
                               background: s.maxReps ? '#E24B4A22' : 'transparent',
@@ -577,21 +585,21 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               fontWeight: s.maxReps ? 700 : 400,
                             }}>MAX</button>
                             {/* 메모 (@ weight 등) */}
-                            <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
+                            <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
                               placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
                         {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM, Tabata, For Time) */}
                         {!isInterval && (format.type === 'amrap' || format.type === 'emom' || format.type === 'tabata' || format.type === 'for_time') && (
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px', flexWrap: 'wrap' }}>
-                            <button onClick={() => updateExercise(s.exId, { maxReps: !s.maxReps })} style={{
+                            <button onClick={() => updateExercise(i, { maxReps: !s.maxReps })} style={{
                               padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
                               border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
                               background: s.maxReps ? '#E24B4A22' : 'transparent',
                               color: s.maxReps ? '#E24B4A' : 'var(--tm)',
                               fontWeight: s.maxReps ? 700 : 400,
                             }}>MAX</button>
-                            <input value={s.note ?? ''} onChange={e => updateExercise(s.exId, { note: e.target.value || undefined })}
+                            <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
                               placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}

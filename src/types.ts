@@ -68,6 +68,7 @@ export interface WorkoutFormat {
   // ── EMOM ────────────────────────────────────────────────────
   // 매 X분 시작에 정해진 reps 수행, 나머지 시간이 휴식. 점수 = 완료율
   every?: number        // X분마다 — 기본 1 (E1MOM), 2=E2MOM, 3=E3MOM
+  emomSets?: number     // 총 세트 수 — duration = every × emomSets
 
   // ── Interval ────────────────────────────────────────────────
   workMin?: number      // 운동 시간(분) — 기본 1
