@@ -144,6 +144,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const [parsing, setParsing] = useState(false)
   const [parseError, setParseError] = useState<string | null>(null)
   const [parseWarnings, setParseWarnings] = useState<string[]>([])
+  const [parsedImageUrl, setParsedImageUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const getEx = (id: string) => allExercises.find(e => e.id === id)
@@ -204,7 +205,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const openAdd = () => {
     setEditingId(null); setRoutineName(''); setSelected([])
     setFormat(defaultFormat()); setSearch(''); setFilterMuscle('all')
-    setParseError(null); setParseWarnings([])
+    setParseError(null); setParseWarnings([]); setParsedImageUrl(null)
     setShowModal(true)
   }
 
@@ -319,6 +320,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const processImageFile = async (file: File) => {
     setParsing(true); setParseError(null); setParseWarnings([])
 
+    // 미리보기 URL 생성
+    const previewUrl = URL.createObjectURL(file)
+    setParsedImageUrl(previewUrl)
+
     try {
       const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
@@ -404,7 +409,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       typeof e === 'string' ? { exId: e as unknown as string, sets: 3, reps: 10 } : e
     ))
     setFormat(withDefaults(r.format ?? defaultFormat()))
-    setSearch(''); setFilterMuscle('all'); setShowModal(true)
+    setSearch(''); setFilterMuscle('all'); setParsedImageUrl(null); setShowModal(true)
   }
 
   const save = async () => {
@@ -516,8 +521,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       {/* ───── 모달 ───── */}
       {showModal && (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: '540px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <div className="mo" style={{ maxWidth: parsedImageUrl ? '960px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0, overflow: 'hidden' }}>
+
+            {/* 헤더 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '0.5px solid var(--bd)' }}>
               <div className="mt2" style={{ margin: 0 }}>{editingId ? 'Edit Routine' : 'New Routine'}</div>
               {!editingId && (
                 <>
@@ -531,6 +538,30 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                 </>
               )}
             </div>
+
+            {/* 바디: 이미지가 있으면 좌우 분할 */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+
+              {/* 이미지 패널 */}
+              {parsedImageUrl && (
+                <div style={{
+                  width: '380px', flexShrink: 0,
+                  borderRight: '0.5px solid var(--bd)',
+                  overflowY: 'auto',
+                  padding: '16px',
+                  background: 'var(--bg2)',
+                }}>
+                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>원본 이미지</div>
+                  <img
+                    src={parsedImageUrl}
+                    alt="workout"
+                    style={{ width: '100%', borderRadius: 'var(--r)', border: '0.5px solid var(--bd)', display: 'block' }}
+                  />
+                </div>
+              )}
+
+              {/* 폼 패널 */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
 
             {/* 파싱 상태 */}
             {parsing && (
@@ -895,10 +926,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-              <button className="btn" onClick={() => setShowModal(false)}>Cancel</button>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '8px' }}>
+              <button className="btn" onClick={() => { setParsedImageUrl(null); setShowModal(false) }}>Cancel</button>
               <button className="btn btn-p" onClick={save}>{editingId ? 'Update' : 'Save'}</button>
             </div>
+
+            </div>{/* 폼 패널 끝 */}
+            </div>{/* 바디 끝 */}
           </div>
         </div>
       )}
