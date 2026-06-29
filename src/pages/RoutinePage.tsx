@@ -246,21 +246,32 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     'cal bike': 'assault bike calorie',
   }
 
-  // 이미지 파싱 시 자주 등장하는 수식어 — 매칭에서 제외
+  // 진짜 수식어만 (운동명 핵심어는 포함하지 않음)
   const MODIFIER_TOKENS = new Set([
-    'db', 'dumbbell', 'kb', 'bb', 'barbell', 'cable', 'machine', 'plate', 'loaded',
-    'single', 'dual', 'bilateral', 'unilateral', 'arm', 'hand', 'handed',
-    'neutral', 'grip', 'wide', 'narrow', 'close', 'reverse', 'supinated', 'pronated',
-    'chest', 'supported', 'incline', 'decline', 'flat', 'seated', 'standing',
-    'bent', 'over', 'overhead', 'rope', 'band', 'assisted', 'weighted',
+    'single', 'dual', 'bilateral', 'unilateral',
+    'arm', 'hand', 'handed',
+    'plate', 'loaded',
     'slow', 'fast', 'paused', 'tempo', 'eccentric', 'isometric',
+    'assisted', 'weighted',
   ])
 
-  // 운동 이름으로 DB 매칭 (약어 → 정확 → 퍼지)
+  // 토큰 정규화: 장비 약어 치환 + 복수형 제거
+  const normalizeToken = (t: string): string => {
+    if (t === 'db') return 'dumbbell'
+    if (t === 'bb') return 'barbell'
+    if (t === 'kb') return 'kettlebell'
+    // 복수형 → 단수: biceps→bicep, triceps→tricep, extensions→extension, curls→curl 등
+    if (t === 'biceps') return 'bicep'
+    if (t === 'triceps') return 'tricep'
+    if (t.endsWith('s') && t.length > 4) return t.slice(0, -1)
+    return t
+  }
+
+  // 운동 이름으로 DB 매칭 (약어 → 정확 → 정규화 토큰 → 퍼지)
   const matchExercise = (name: string): Exercise | null => {
     const q = name.toLowerCase().trim().replace(/[.\s]+/g, ' ').trim()
 
-    // 1. 약어 맵
+    // 1. 약어 맵 (전체 이름 치환)
     const aliased = ALIASES[q]
     const searchQ = aliased ?? q
 
@@ -270,47 +281,49 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     )
     if (exact) return exact
 
-    // 3. 전체 토큰 매칭 (모든 토큰 포함)
-    const tokens = searchQ.split(/\s+/).filter(Boolean)
-    if (tokens.length >= 2) {
+    // 토큰화 + 정규화
+    const rawTokens = searchQ.split(/\s+/).filter(Boolean)
+    const normTokens = rawTokens.map(normalizeToken)
+
+    // 3. 정규화 토큰 전체 매칭
+    if (normTokens.length >= 2) {
       const allMatch = allExercises.find(e => {
         const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
-        return tokens.every(t => target.includes(t))
+        return normTokens.every(t => target.includes(t))
       })
       if (allMatch) return allMatch
     }
 
-    // 4. 수식어 제거 후 핵심 토큰만으로 매칭
-    const coreTokens = tokens.filter(t => !MODIFIER_TOKENS.has(t) && t.length >= 3)
+    // 4. 수식어 제거 후 핵심 토큰으로 매칭
+    const coreTokens = normTokens.filter(t => !MODIFIER_TOKENS.has(t) && t.length >= 3)
     if (coreTokens.length >= 2) {
-      // 핵심 토큰 전부 포함하는 DB 항목 우선
+      // 핵심 토큰 전부 매칭
       const coreAllMatch = allExercises.find(e => {
         const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
         return coreTokens.every(t => target.includes(t))
       })
       if (coreAllMatch) return coreAllMatch
 
-      // 핵심 토큰 중 2/3 이상 포함 (최소 2개)
+      // 핵심 토큰 중 2/3 이상 매칭 (최소 2개)
       const minMatch = Math.max(2, Math.ceil(coreTokens.length * 2 / 3))
       const fuzzy = allExercises.find(e => {
         const target = (e.name + ' ' + (e.ko || '')).toLowerCase()
-        const matched = coreTokens.filter(t => target.includes(t)).length
-        return matched >= minMatch
+        return coreTokens.filter(t => target.includes(t)).length >= minMatch
       })
       if (fuzzy) return fuzzy
     }
 
-    // 5. 핵심 토큰 1개인 경우 (3자 이상)
-    if (coreTokens.length === 1) {
+    // 5. 핵심 토큰 1개 (단일 의미 있는 키워드)
+    if (coreTokens.length === 1 && coreTokens[0].length >= 4) {
       return allExercises.find(e =>
         e.name.toLowerCase().includes(coreTokens[0]) || (e.ko && e.ko.includes(coreTokens[0]))
       ) ?? null
     }
 
-    // 6. 단일 원본 토큰 매칭 (3자 이상)
-    if (tokens.length === 1 && tokens[0].length >= 3) {
+    // 6. 단일 원본 토큰
+    if (rawTokens.length === 1 && rawTokens[0].length >= 3) {
       return allExercises.find(e =>
-        e.name.toLowerCase().includes(tokens[0]) || (e.ko && e.ko.includes(tokens[0]))
+        e.name.toLowerCase().includes(rawTokens[0]) || (e.ko && e.ko.includes(rawTokens[0]))
       ) ?? null
     }
 
