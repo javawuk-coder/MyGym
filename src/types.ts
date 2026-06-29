@@ -71,8 +71,11 @@ export interface WorkoutFormat {
   emomSets?: number     // 총 세트 수 — duration = every × emomSets
 
   // ── Interval ────────────────────────────────────────────────
+  intervalUnit?: 'min' | 'sec'  // 단위 선택 — 기본 'min'
   workMin?: number      // 운동 시간(분) — 기본 1
   restMin?: number      // 휴식 시간(분) — 기본 1
+  workSec2?: number     // 운동 시간(초) — intervalUnit='sec'일 때
+  restSec2?: number     // 휴식 시간(초) — intervalUnit='sec'일 때
   intervalRounds?: number // 총 라운드 수 — 기본 5
 }
 

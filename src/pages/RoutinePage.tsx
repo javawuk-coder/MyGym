@@ -38,7 +38,7 @@ function withDefaults(f: WorkoutFormat): WorkoutFormat {
     case 'for_time': return { formatRounds: 1, ...f }
     case 'amrap':    return { duration: 20, ...f }
     case 'emom':     return { every: 1, emomSets: 20, ...f }
-    case 'interval': return { workMin: 2, restMin: 1, intervalRounds: 6, ...f }
+    case 'interval': return { intervalUnit: 'min', workMin: 2, restMin: 1, workSec2: 45, restSec2: 15, intervalRounds: 6, ...f }
     default:         return f
   }
 }
@@ -62,8 +62,12 @@ function formatSummary(raw: WorkoutFormat): string {
       const sets = f.emomSets ?? 20
       return `E${ev > 1 ? ev : ''}MOM × ${sets}sets (${ev * sets}min)`
     }
-    case 'interval':
-      return `${f.workMin}min on / ${f.restMin}min off × ${f.intervalRounds}rounds`
+    case 'interval': {
+      const unit = f.intervalUnit ?? 'min'
+      const w = unit === 'sec' ? `${f.workSec2 ?? 45}s` : `${f.workMin ?? 2}min`
+      const r = unit === 'sec' ? `${f.restSec2 ?? 15}s` : `${f.restMin ?? 1}min`
+      return `${w} on / ${r} off × ${f.intervalRounds ?? 6}rounds`
+    }
     default: return 'Sets & Reps'
   }
 }
@@ -188,7 +192,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       for_time:  { formatRounds: 1 },
       amrap:     { duration: 20 },
       emom:      { every: 1, emomSets: 20 },
-      interval:  { workMin: 2, restMin: 1, intervalRounds: 6 },
+      interval:  { intervalUnit: 'min', workMin: 2, restMin: 1, workSec2: 45, restSec2: 15, intervalRounds: 6 },
     }
     setFormat({ type: t, ...defaults[t] })
   }
@@ -333,7 +337,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   {[
                     { label: 'Work (초)', key: 'workSec', def: 20 },
                     { label: 'Rest (초)', key: 'restSec', def: 10 },
-                    { label: 'Rounds/운동', key: 'tabataRounds', def: 8 },
+                    { label: '운동당 반복 횟수', key: 'tabataRounds', def: 8 },
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
@@ -359,7 +363,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   ))}
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  예: 20s on / 10s off × 8rounds × 1set = 4분/운동
+                  예: 45s/15s × 2회/운동 → 운동 하나당 2라운드. Sets는 전체 블록 반복
                 </div>
               </div>
             )}
@@ -440,31 +444,70 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               )
             })()}
 
-            {format.type === 'interval' && (
-              <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  Interval: 자유 형식 work / rest 반복 — 운동별 ODD/EVEN 라운드 지정 가능
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                  {[
-                    { label: 'Work (분)', key: 'workMin', def: 2 },
-                    { label: 'Rest (분)', key: 'restMin', def: 1 },
-                    { label: 'Rounds', key: 'intervalRounds', def: 6 },
-                  ].map(({ label, key, def }) => (
-                    <div key={key}>
-                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
-                      <input type="number" min="1"
-                        value={(format as unknown as Record<string, number>)[key] ?? def}
-                        onChange={e => updateFormat({ [key]: parseInt(e.target.value) || def })}
+            {format.type === 'interval' && (() => {
+              const isSec = (format.intervalUnit ?? 'min') === 'sec'
+              return (
+                <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
+                    Interval: 자유 형식 work / rest 반복 — 운동별 ODD/EVEN 라운드 지정 가능
+                  </div>
+                  {/* 단위 전환 */}
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                    {(['min', 'sec'] as const).map(u => (
+                      <button key={u} onClick={() => updateFormat({ intervalUnit: u })} style={{
+                        padding: '4px 14px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit',
+                        border: `1px solid ${!isSec && u === 'min' || isSec && u === 'sec' ? '#D4537E' : 'var(--bd)'}`,
+                        background: (!isSec && u === 'min' || isSec && u === 'sec') ? '#D4537E22' : 'transparent',
+                        color: (!isSec && u === 'min' || isSec && u === 'sec') ? '#D4537E' : 'var(--tm)',
+                        fontWeight: (!isSec && u === 'min' || isSec && u === 'sec') ? 700 : 400,
+                      }}>{u === 'min' ? '분 (min)' : '초 (sec)'}</button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                    {isSec ? (
+                      <>
+                        <div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Work (초)</div>
+                          <input type="number" min="1" value={format.workSec2 ?? 45}
+                            onChange={e => updateFormat({ workSec2: parseInt(e.target.value) || 45 })}
+                            style={{ textAlign: 'center', padding: '5px' }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rest (초)</div>
+                          <input type="number" min="1" value={format.restSec2 ?? 15}
+                            onChange={e => updateFormat({ restSec2: parseInt(e.target.value) || 15 })}
+                            style={{ textAlign: 'center', padding: '5px' }} />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Work (분)</div>
+                          <input type="number" min="1" value={format.workMin ?? 2}
+                            onChange={e => updateFormat({ workMin: parseInt(e.target.value) || 2 })}
+                            style={{ textAlign: 'center', padding: '5px' }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rest (분)</div>
+                          <input type="number" min="1" value={format.restMin ?? 1}
+                            onChange={e => updateFormat({ restMin: parseInt(e.target.value) || 1 })}
+                            style={{ textAlign: 'center', padding: '5px' }} />
+                        </div>
+                      </>
+                    )}
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rounds</div>
+                      <input type="number" min="1" value={format.intervalRounds ?? 6}
+                        onChange={e => updateFormat({ intervalRounds: parseInt(e.target.value) || 6 })}
                         style={{ textAlign: 'center', padding: '5px' }} />
                     </div>
-                  ))}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
+                    아래 운동별로 ODD/EVEN 라운드 지정 및 MAX 플래그, 메모 입력 가능
+                  </div>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  아래 운동별로 ODD/EVEN 라운드 지정 및 MAX 플래그, 메모 입력 가능
-                </div>
-              </div>
-            )}
+              )
+            })()}
 
             {/* ── 운동 검색 ── */}
             <div className="stitle" style={{ marginBottom: '8px' }}>운동 추가</div>
