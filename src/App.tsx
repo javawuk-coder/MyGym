@@ -34,7 +34,7 @@ function MainApp() {
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
 
   const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
-  const { logs, addLogEntry, deleteLogEntry } = useLogs(uid)
+  const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
 
   const allExercises = [...(DB as Exercise[]), ...customExercises]
@@ -81,11 +81,13 @@ function MainApp() {
       {tab === 'log' && (
         <LogPage
           logs={logs}
+          routines={routines}
           allExercises={allExercises}
           unit={unit}
-          onAddEntry={addLogEntry}
+          onAddEntries={addLogEntries}
           onDeleteEntry={deleteLogEntry}
           initialRoutine={pendingRoutine}
+          onConsumedInitial={() => setPendingRoutine(null)}
         />
       )}
       {tab === 'exercises' && (

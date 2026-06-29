@@ -42,5 +42,17 @@ export function useLogs(uid: string | undefined) {
     await setDoc(ref, { date, exercises: updated })
   }
 
-  return { logs, loading, addLogEntry, deleteLogEntry }
+  const addLogEntries = async (date: string, entries: LogEntry[]) => {
+    if (!uid) return
+    const ref = doc(db, 'users', uid, 'logs', date)
+    const snap = await getDoc(ref)
+    if (snap.exists()) {
+      const existing = snap.data() as DayLog
+      await setDoc(ref, { date, exercises: [...existing.exercises, ...entries] })
+    } else {
+      await setDoc(ref, { date, exercises: entries })
+    }
+  }
+
+  return { logs, loading, addLogEntry, addLogEntries, deleteLogEntry }
 }
