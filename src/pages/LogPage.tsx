@@ -86,7 +86,7 @@ export default function LogPage({
   const [accWorkMs, setAccWorkMs] = useState(0)   // 누적 운동 시간
   const [accRestMs, setAccRestMs] = useState(0)   // 누적 휴식 시간
   const [segStartedAt, setSegStartedAt] = useState<number | null>(null)
-  const [tick, setTick] = useState(0)             // 1초마다 re-render용
+  const [, setTick] = useState(0)                 // 1초마다 re-render용
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
