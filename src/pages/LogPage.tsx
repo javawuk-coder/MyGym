@@ -81,47 +81,71 @@ export default function LogPage({
   const [addExSearch, setAddExSearch] = useState('')
 
   // ── Timer state ───────────────────────────────────────────────
-  const [workoutStartedAt, setWorkoutStartedAt] = useState<number | null>(null)
-  const [restStartedAt, setRestStartedAt] = useState<number | null>(null)
-  const [totalRestMs, setTotalRestMs] = useState(0)
-  const [elapsedMs, setElapsedMs] = useState(0)
+  // timerPhase: 'idle' | 'working' | 'resting'
+  const [timerPhase, setTimerPhase] = useState<'idle' | 'working' | 'resting'>('idle')
+  const [accWorkMs, setAccWorkMs] = useState(0)   // 누적 운동 시간
+  const [accRestMs, setAccRestMs] = useState(0)   // 누적 휴식 시간
+  const [segStartedAt, setSegStartedAt] = useState<number | null>(null)
+  const [tick, setTick] = useState(0)             // 1초마다 re-render용
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const restStartedAtRef = useRef<number | null>(null)
-  const workoutStartedAtRef = useRef<number | null>(null)
+  const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
+  const segStartRef = useRef<number | null>(null)
+  const accWorkRef = useRef(0)
+  const accRestRef = useRef(0)
 
   useEffect(() => {
-    if (modal === 'fill' && workoutStartedAt !== null) {
-      timerRef.current = setInterval(() => setElapsedMs(Date.now() - (workoutStartedAtRef.current ?? Date.now())), 1000)
+    if (modal === 'fill' && timerPhase !== 'idle') {
+      timerRef.current = setInterval(() => setTick(t => t + 1), 1000)
       return () => { if (timerRef.current) clearInterval(timerRef.current) }
     }
-  }, [modal, workoutStartedAt])
+  }, [modal, timerPhase])
 
   const startWorkout = () => {
     const now = Date.now()
-    workoutStartedAtRef.current = now
-    restStartedAtRef.current = null
-    setWorkoutStartedAt(now)
-    setRestStartedAt(null)
-    setTotalRestMs(0)
-    setElapsedMs(0)
+    phaseRef.current = 'working'
+    segStartRef.current = now
+    accWorkRef.current = 0
+    accRestRef.current = 0
+    setTimerPhase('working')
+    setSegStartedAt(now)
+    setAccWorkMs(0)
+    setAccRestMs(0)
+    setTick(0)
     setCompletedSets(new Set())
   }
 
+  // ✓ 완료 → 운동 시간 누적, 휴식 시작
   const completeSet = (key: string) => {
     const now = Date.now()
-    if (restStartedAtRef.current !== null) {
-      setTotalRestMs(prev => prev + (now - restStartedAtRef.current!))
+    if (phaseRef.current === 'working' && segStartRef.current !== null) {
+      accWorkRef.current += now - segStartRef.current
+      setAccWorkMs(accWorkRef.current)
     }
-    restStartedAtRef.current = now
-    setRestStartedAt(now)
+    phaseRef.current = 'resting'
+    segStartRef.current = now
+    setTimerPhase('resting')
+    setSegStartedAt(now)
     setCompletedSets(prev => new Set([...prev, key]))
   }
 
-  const currentRestMs = restStartedAt !== null ? Date.now() - restStartedAt : 0
-  const totalMs = elapsedMs
-  const restMs = totalRestMs + currentRestMs
-  const workMs = Math.max(0, totalMs - restMs)
+  // 시작 버튼 → 휴식 시간 누적, 운동 시작
+  const resumeWorkout = () => {
+    const now = Date.now()
+    if (phaseRef.current === 'resting' && segStartRef.current !== null) {
+      accRestRef.current += now - segStartRef.current
+      setAccRestMs(accRestRef.current)
+    }
+    phaseRef.current = 'working'
+    segStartRef.current = now
+    setTimerPhase('working')
+    setSegStartedAt(now)
+  }
+
+  const segElapsed = segStartedAt !== null ? Date.now() - segStartedAt : 0
+  const workMs = accWorkMs + (timerPhase === 'working' ? segElapsed : 0)
+  const restMs = accRestMs + (timerPhase === 'resting' ? segElapsed : 0)
+  const totalMs = workMs + restMs
 
   useEffect(() => {
     if (!initialRoutine) return
@@ -249,7 +273,8 @@ export default function LogPage({
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
-    setWorkoutStartedAt(null); setRestStartedAt(null); setTotalRestMs(0); setElapsedMs(0); setCompletedSets(new Set())
+    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set())
+    phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
   }
 
@@ -555,22 +580,33 @@ export default function LogPage({
         <div className="mbg">
           <div className="mo" style={{ maxWidth: '560px', padding: 0 }}>
             <div style={{ padding: '12px 18px', borderBottom: '0.5px solid var(--bd)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || '운동 기록'}</div>
                 <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
               </div>
-              {workoutStartedAt !== null && (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  {([
-                    { label: '총', ms: totalMs, color: 'var(--tp)' },
-                    { label: '운동', ms: workMs, color: '#1D9E75' },
-                    { label: '휴식', ms: restMs, color: '#BA7517' },
-                  ] as const).map(({ label, ms, color }) => (
-                    <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
-                    </div>
-                  ))}
+              {timerPhase !== 'idle' && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', gap: '14px' }}>
+                    {([
+                      { label: '총', ms: totalMs, color: 'var(--tp)' },
+                      { label: '운동', ms: workMs, color: '#1D9E75' },
+                      { label: '휴식', ms: restMs, color: '#BA7517' },
+                    ] as const).map(({ label, ms, color }) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {timerPhase === 'resting' && (
+                    <button onClick={resumeWorkout} style={{
+                      padding: '6px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 600,
+                      background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                    }}>▶ 시작</button>
+                  )}
+                  {timerPhase === 'working' && (
+                    <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>● 운동 중</span>
+                  )}
                 </div>
               )}
             </div>
