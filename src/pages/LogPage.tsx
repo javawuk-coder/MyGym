@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { useState, useEffect, useRef } from 'react'
+import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
 
 const ML: Record<string, string> = {
@@ -18,6 +18,13 @@ function today() { return new Date().toISOString().slice(0, 10) }
 function toLocalDate(dateStr: string) { return new Date(dateStr + 'T00:00:00') }
 function formatDateHeader(d: string) {
   return toLocalDate(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
+}
+function fmtTime(ms: number) {
+  const s = Math.floor(ms / 1000)
+  const m = Math.floor(s / 60)
+  const h = Math.floor(m / 60)
+  if (h > 0) return `${h}:${String(m % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+  return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 }
 
 interface SetRow { weight: string; reps: string; duration: string }
@@ -73,11 +80,55 @@ export default function LogPage({
   const [showAddExInFill, setShowAddExInFill] = useState(false)
   const [addExSearch, setAddExSearch] = useState('')
 
+  // ── Timer state ───────────────────────────────────────────────
+  const [workoutStartedAt, setWorkoutStartedAt] = useState<number | null>(null)
+  const [restStartedAt, setRestStartedAt] = useState<number | null>(null)
+  const [totalRestMs, setTotalRestMs] = useState(0)
+  const [elapsedMs, setElapsedMs] = useState(0)
+  const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const restStartedAtRef = useRef<number | null>(null)
+  const workoutStartedAtRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (modal === 'fill' && workoutStartedAt !== null) {
+      timerRef.current = setInterval(() => setElapsedMs(Date.now() - (workoutStartedAtRef.current ?? Date.now())), 1000)
+      return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    }
+  }, [modal, workoutStartedAt])
+
+  const startWorkout = () => {
+    const now = Date.now()
+    workoutStartedAtRef.current = now
+    restStartedAtRef.current = null
+    setWorkoutStartedAt(now)
+    setRestStartedAt(null)
+    setTotalRestMs(0)
+    setElapsedMs(0)
+    setCompletedSets(new Set())
+  }
+
+  const completeSet = (key: string) => {
+    const now = Date.now()
+    if (restStartedAtRef.current !== null) {
+      setTotalRestMs(prev => prev + (now - restStartedAtRef.current!))
+    }
+    restStartedAtRef.current = now
+    setRestStartedAt(now)
+    setCompletedSets(prev => new Set([...prev, key]))
+  }
+
+  const currentRestMs = restStartedAt !== null ? Date.now() - restStartedAt : 0
+  const totalMs = elapsedMs
+  const restMs = totalRestMs + currentRestMs
+  const workMs = Math.max(0, totalMs - restMs)
+
   useEffect(() => {
     if (!initialRoutine) return
     setFillTitle(initialRoutine.name)
     setDraftExes(draftFromRoutine(initialRoutine, allExercises))
     setModal('fill')
+    startWorkout()
     onConsumedInitial?.()
   }, [initialRoutine]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -163,6 +214,18 @@ export default function LogPage({
     }))
   const removeDraftEx = (di: number) =>
     setDraftExes(prev => prev.filter((_, i) => i !== di))
+  const moveExUp = (di: number) => setDraftExes(prev => {
+    if (di === 0) return prev
+    const next = [...prev];
+    [next[di - 1], next[di]] = [next[di], next[di - 1]]
+    return next
+  })
+  const moveExDown = (di: number) => setDraftExes(prev => {
+    if (di === prev.length - 1) return prev
+    const next = [...prev];
+    [next[di], next[di + 1]] = [next[di + 1], next[di]]
+    return next
+  })
   const addDraftEx = (exId: string) => {
     setDraftExes(prev => [...prev, { exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }])
     setAddExSearch(''); setShowAddExInFill(false)
@@ -177,13 +240,17 @@ export default function LogPage({
 
   const openRoutineFill = (r: Routine & { id: string }) => {
     setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises)); setModal('fill')
+    startWorkout()
   }
   const openExFill = (exId: string) => {
     setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }]); setModal('fill')
+    startWorkout()
   }
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
+    setWorkoutStartedAt(null); setRestStartedAt(null); setTotalRestMs(0); setElapsedMs(0); setCompletedSets(new Set())
+    if (timerRef.current) clearInterval(timerRef.current)
   }
 
   const save = async () => {
@@ -221,15 +288,21 @@ export default function LogPage({
   const renderDraftEx = (d: DraftEx, di: number) => {
     const ex = getEx(d.exId)
     const lt: LogType = ex?.log_type || 'weight_reps'
+    const colsWR = '20px 1fr 1fr 28px 28px'
+    const colsOther = '20px 1fr 28px 28px'
     return (
       <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '10px', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
-          <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <span style={{ fontWeight: 600, fontSize: '14px' }}>{ex?.ko || ex?.name || d.exId}</span>
             {ex?.ko && <span style={{ fontSize: '11px', color: 'var(--tm)', marginLeft: '6px' }}>{ex.name}</span>}
             {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ marginLeft: '6px', fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
           </div>
-          <button className="idb" onClick={() => removeDraftEx(di)}><IconTrash size={14} /></button>
+          <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
+            <button className="idb" onClick={() => moveExUp(di)} disabled={di === 0} style={{ opacity: di === 0 ? 0.3 : 1 }}><IconArrowUp size={13} /></button>
+            <button className="idb" onClick={() => moveExDown(di)} disabled={di === draftExes.length - 1} style={{ opacity: di === draftExes.length - 1 ? 0.3 : 1 }}><IconArrowDown size={13} /></button>
+            <button className="idb" onClick={() => removeDraftEx(di)}><IconTrash size={13} /></button>
+          </div>
         </div>
         <div style={{ padding: '10px 12px' }}>
           {lt === 'cardio' ? (
@@ -245,29 +318,37 @@ export default function LogPage({
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? '24px 1fr 1fr 24px' : '24px 1fr 24px', gap: '6px', fontSize: '10px', color: 'var(--tm)', marginBottom: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '6px', fontSize: '10px', color: 'var(--tm)', marginBottom: '4px' }}>
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
                   ? <><span style={{ textAlign: 'center' }}>Weight ({unit})</span><span style={{ textAlign: 'center' }}>Reps</span></>
                   : <span style={{ textAlign: 'center' }}>{lt === 'time' ? '시간(초)' : 'Reps'}</span>}
-                <span />
+                <span /><span />
               </div>
-              {d.rows.map((row, ri) => (
-                <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? '24px 1fr 1fr 24px' : '24px 1fr 24px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
-                  {lt === 'weight_reps' ? (
-                    <>
-                      <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center' }} />
-                      <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
-                    </>
-                  ) : (
-                    <input type="number" value={lt === 'time' ? row.duration : row.reps}
-                      onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
-                      placeholder="0" min="0" style={{ textAlign: 'center' }} />
-                  )}
-                  <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
-                </div>
-              ))}
+              {d.rows.map((row, ri) => {
+                const setKey = `${di}-${ri}`
+                const isDone = completedSets.has(setKey)
+                return (
+                  <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1 }}>
+                    <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
+                    {lt === 'weight_reps' ? (
+                      <>
+                        <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center' }} />
+                        <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                      </>
+                    ) : (
+                      <input type="number" value={lt === 'time' ? row.duration : row.reps}
+                        onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
+                        placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                    )}
+                    <button className="idb" onClick={() => completeSet(setKey)}
+                      style={{ color: isDone ? '#1D9E75' : undefined }}>
+                      <IconCheck size={14} />
+                    </button>
+                    <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
+                  </div>
+                )
+              })}
               <button className="btn" onClick={() => addRow(di)} style={{ marginTop: '6px', fontSize: '12px', width: '100%' }}>
                 <IconPlus size={12} style={{ marginRight: 3 }} />Set 추가
               </button>
@@ -473,11 +554,25 @@ export default function LogPage({
       {modal === 'fill' && (
         <div className="mbg">
           <div className="mo" style={{ maxWidth: '560px', padding: 0 }}>
-            <div style={{ padding: '14px 18px', borderBottom: '0.5px solid var(--bd)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ padding: '12px 18px', borderBottom: '0.5px solid var(--bd)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || '운동 기록'}</div>
                 <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
               </div>
+              {workoutStartedAt !== null && (
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {([
+                    { label: '총', ms: totalMs, color: 'var(--tp)' },
+                    { label: '운동', ms: workMs, color: '#1D9E75' },
+                    { label: '휴식', ms: restMs, color: '#BA7517' },
+                  ] as const).map(({ label, ms, color }) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '14px 18px' }}>
               {draftExes.map((d, di) => renderDraftEx(d, di))}
