@@ -368,7 +368,8 @@ export default function LogPage({
                 const isDone = completedSets.has(setKey)
                 const setLabel = `Set ${ri + 1} — ${nm.main}`
                 return (
-                  <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1 }}>
+                  <div key={ri}>
+                  <div className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1 }}>
                     <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
                     {lt === 'weight_reps' ? (
                       <>
@@ -386,7 +387,7 @@ export default function LogPage({
                     </button>
                     <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '2px 0 6px', borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', marginBottom: ri < d.rows.length - 1 ? '4px' : 0 }}>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '2px 0 6px', borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', marginBottom: ri < d.rows.length - 1 ? '4px' : 0, marginTop: '2px' }}>
                     <input value={row.note} onChange={e => updateRow(di, ri, 'note', e.target.value)}
                       placeholder="Note (e.g. RPE 8, 부상 주의)"
                       style={{ flex: 1, fontSize: '11px', padding: '3px 6px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
@@ -401,6 +402,7 @@ export default function LogPage({
                         placeholder="—" min="0" max="5"
                         style={{ width: '36px', fontSize: '11px', textAlign: 'center', padding: '3px 4px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
                     </div>
+                  </div>
                   </div>
                 )
               })}
