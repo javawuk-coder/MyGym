@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
-import { IconShield, IconLogout, IconUser } from '@tabler/icons-react'
+import { IconShield, IconLogout, IconUser, IconLanguage } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
+import { tr, LANG_LABELS, type Lang } from '../../lib/i18n'
 
 interface HeaderProps {
   unit: 'kg' | 'lb'
   onUnitToggle: (u: 'kg' | 'lb') => void
+  lang: Lang
+  onLangChange: (l: Lang) => void
 }
 
-export default function Header({ unit, onUnitToggle }: HeaderProps) {
+export default function Header({ unit, onUnitToggle, lang, onLangChange }: HeaderProps) {
   const { profile, isAdmin, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -88,6 +91,26 @@ export default function Header({ unit, onUnitToggle }: HeaderProps) {
                 </div>
               </div>
 
+              {/* 언어 선택 */}
+              <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--bd)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <IconLanguage size={12} />{tr(lang, 'language')}
+                </div>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {(['ko', 'en', 'vi'] as Lang[]).map(l => (
+                    <button key={l} onClick={() => { onLangChange(l); setMenuOpen(false) }} style={{
+                      flex: 1, padding: '4px 2px', fontSize: '11px', borderRadius: '6px',
+                      border: `0.5px solid ${lang === l ? 'var(--tp)' : 'var(--bd)'}`,
+                      background: lang === l ? 'var(--tp)' : 'transparent',
+                      color: lang === l ? '#fff' : 'var(--ts)',
+                      cursor: 'pointer', fontFamily: 'inherit',
+                    }}>
+                      {LANG_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Admin 패널 */}
               {isAdmin && (
                 <a
@@ -100,7 +123,7 @@ export default function Header({ unit, onUnitToggle }: HeaderProps) {
                   onClick={() => setMenuOpen(false)}
                 >
                   <IconShield size={15} />
-                  Admin 패널
+                  {tr(lang, 'adminPanel')}
                 </a>
               )}
 
@@ -115,7 +138,7 @@ export default function Header({ unit, onUnitToggle }: HeaderProps) {
                 }}
               >
                 <IconLogout size={15} />
-                로그아웃
+                {tr(lang, 'logout')}
               </button>
             </div>
           )}

@@ -4,6 +4,7 @@ import {
   IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise, WorkoutFormat, WorkoutFormatType } from '../types'
+import { tr, exName, type Lang } from '../lib/i18n'
 
 const ML: Record<string, string> = {
   chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
@@ -129,9 +130,10 @@ interface Props {
   onUpdateRoutine: (id: string, data: { name: string; exercises: RoutineExercise[]; format: WorkoutFormat }) => Promise<void>
   onDeleteRoutine: (id: string) => Promise<void>
   onStartRoutine: (r: Routine & { id: string }) => void
+  lang: Lang
 }
 
-export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine }: Props) {
+export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine, lang }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [routineName, setRoutineName] = useState('')
@@ -522,8 +524,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       )}
                       {(!rt || rt === 'all') && <span style={{ color: 'var(--tm)', minWidth: '18px', fontSize: '11px', flexShrink: 0 }}>{i + 1}.</span>}
                       <span style={{ flex: 1, fontSize: '13px' }}>
-                        <span style={{ fontWeight: 500 }}>{ex.ko || ex.name}</span>
-                        {ex.ko && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({ex.name})</span>}
+                        {(() => { const nm = exName(ex, lang); return (<><span style={{ fontWeight: 500 }}>{nm.main}</span>{nm.sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({nm.sub})</span>}</>); })()}
                         {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>@ {reObj.note}</span>}
                       </span>
                       <span style={{ color: reObj.maxReps ? '#E24B4A' : 'var(--tm)', fontSize: '12px', flexShrink: 0, fontWeight: reObj.maxReps ? 700 : 400 }}>
@@ -825,9 +826,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   <div key={x.id} className={`exrow${checked ? ' sel' : ''}`} onClick={() => toggleExercise(x.id)}>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                        {x.ko || x.name}
-                        {x.ko && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({x.name})</span>}
-                        {x.custom && <span className="ctag" style={{ marginLeft: '4px' }}>custom</span>}
+                        {(() => { const nm = exName(x, lang); return (<>{nm.main}{nm.sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({nm.sub})</span>}</>); })()}
+                        {x.custom && <span className="ctag" style={{ marginLeft: '4px' }}>{tr(lang, 'custom')}</span>}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)' }}>
                         <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
@@ -877,8 +877,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '4px', alignItems: 'center', cursor: 'grab' }}>
                           <IconGripVertical size={14} style={{ color: 'var(--tm)' }} />
                           <div>
-                            <div style={{ fontSize: '13px', fontWeight: 500 }}>{ex.ko || ex.name}</div>
-                            {ex.ko && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{ex.name}</div>}
+                            {(() => { const nm = exName(ex, lang); return (<><div style={{ fontSize: '13px', fontWeight: 500 }}>{nm.main}</div>{nm.sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</div>}</>); })()}
                           </div>
                           {hasSets && (
                             isCardio

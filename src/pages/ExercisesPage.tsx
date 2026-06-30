@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IconPlus, IconSearch, IconInfoCircle, IconBrandYoutube } from '@tabler/icons-react'
 import type { Exercise } from '../types'
+import { tr, exName, type Lang } from '../lib/i18n'
 import MUSCLE_MAP from '../data/muscle_map.json'
 
 const RC: Record<string, string> = { primary: '#E24B4A', secondary: '#EF9F27', stabilizer: '#378ADD' }
@@ -29,9 +30,10 @@ interface Props {
   allExercises: Exercise[]
   onAddCustom: (ex: Omit<Exercise, 'id' | 'custom'>) => Promise<void>
   onDeleteCustom: (id: string) => Promise<void>
+  lang: Lang
 }
 
-export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCustom }: Props) {
+export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCustom, lang }: Props) {
   const [search, setSearch] = useState('')
   const [filterMuscle, setFilterMuscle] = useState('')
   const [filterEquip, setFilterEquip] = useState('')
@@ -67,8 +69,8 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
   })
 
   const saveCustom = async () => {
-    if (!newName.trim()) { alert('Exercise name required'); return }
-    if (!newMuscle) { alert('Select muscle group'); return }
+    if (!newName.trim()) { alert(tr(lang, 'nameRequired')); return }
+    if (!newMuscle) { alert(tr(lang, 'muscleRequired')); return }
     await onAddCustom({
       name: newName.trim(),
       ko: newKo.trim() || undefined,
@@ -95,7 +97,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
 
       <div className="sw" style={{ marginBottom: '8px' }}>
         <IconSearch size={16} className="si" />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name or 한국어..." style={{ paddingLeft: '36px' }} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tr(lang, 'searchEx')} style={{ paddingLeft: '36px' }} />
       </div>
 
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
@@ -116,7 +118,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
       </div>
 
       {!filtered.length ? (
-        <div className="emp">검색 결과 없음</div>
+        <div className="emp">{tr(lang, 'noResults')}</div>
       ) : (
         Object.entries(grouped).map(([m, xs]) => (
           <div key={m} style={{ marginBottom: '1rem' }}>
@@ -132,15 +134,16 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                   <div key={x.id}>
                     <div className="exrow" style={{ cursor: 'default' }}>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                          {x.name}
-                          {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>custom</span>}
-                        </div>
-                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
-                          {x.ko || '—'}
-                          {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
-                        </div>
-                      </div>
+                        {(() => { const nm = exName(x, lang); return (<>
+                          <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                            {nm.main}
+                            {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>{tr(lang, 'custom')}</span>}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
+                            {nm.sub || '—'}
+                            {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
+                          </div>
+                        </>)})()</div>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
                         <button
@@ -152,7 +155,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                           <IconInfoCircle size={16} />
                         </button>
                         {x.custom && (
-                          <button className="idb" onClick={() => { if (confirm('Delete?')) onDeleteCustom(x.id) }}>
+                          <button className="idb" onClick={() => { if (confirm(tr(lang, 'confirmDelete'))) onDeleteCustom(x.id) }}>
                             <IconPlus size={14} style={{ transform: 'rotate(45deg)' }} />
                           </button>
                         )}
@@ -163,9 +166,9 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                         background: 'var(--s1)', border: '0.5px solid var(--bd)',
                         borderRadius: 'var(--r)', padding: '10px 12px', margin: '0 0 6px',
                       }}>
-                        <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--ts)', marginBottom: '6px' }}>Muscles worked</div>
+                        <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--ts)', marginBottom: '6px' }}>{tr(lang, 'musclesWorked')}</div>
                         {!muscleData ? (
-                          <div style={{ fontSize: '12px', color: 'var(--tm)' }}>데이터 준비 중</div>
+                          <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{tr(lang, 'dataLoading')}</div>
                         ) : (
                           (['primary', 'secondary', 'stabilizer'] as const).map(role => {
                             const list = muscleData[role]
@@ -197,7 +200,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                           }}
                         >
                           <IconBrandYoutube size={14} />
-                          YouTube에서 폼 영상 보기
+                          {tr(lang, 'ytLink')}
                         </a>
                       </div>
                     )}
@@ -212,12 +215,12 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
       {showModal && (
         <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}>
           <div className="mo">
-            <div className="mt2">Custom Exercise</div>
-            <span className="fl">Name (English)</span>
+            <div className="mt2">{tr(lang, 'customExTitle')}</div>
+            <span className="fl">{tr(lang, 'nameEn')}</span>
             <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Cable Pulldown" />
-            <span className="fl">한국어 이름 (선택)</span>
+            <span className="fl">{tr(lang, 'nameKo')}</span>
             <input value={newKo} onChange={e => setNewKo(e.target.value)} placeholder="e.g. 케이블 풀다운" />
-            <span className="fl">Muscle group</span>
+            <span className="fl">{tr(lang, 'muscleGroup')}</span>
             <div id="cxm" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '5px' }}>
               {muscles.map(m => (
                 <button key={m} className={`mpb${newMuscle === m ? ' on' : ''}`} onClick={() => setNewMuscle(m)}>
@@ -225,12 +228,12 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                 </button>
               ))}
             </div>
-            <span className="fl">Equipment</span>
+            <span className="fl">{tr(lang, 'equipment')}</span>
             <select value={newEquip} onChange={e => setNewEquip(e.target.value)}>
               <option value="">— Select —</option>
               {Object.entries(EQ_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
-            <span className="fl">Log type</span>
+            <span className="fl">{tr(lang, 'logType')}</span>
             <select value={newLogType} onChange={e => setNewLogType(e.target.value as typeof newLogType)}>
               <option value="weight_reps">Weight + Reps</option>
               <option value="reps_only">Reps only</option>
@@ -238,8 +241,8 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
               <option value="cardio">Cardio</option>
             </select>
             <div style={{ display: 'flex', gap: '8px', marginTop: '1.2rem', justifyContent: 'flex-end' }}>
-              <button className="btn" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn btn-p" onClick={saveCustom}>Save</button>
+              <button className="btn" onClick={() => setShowModal(false)}>{tr(lang, 'cancel')}</button>
+              <button className="btn btn-p" onClick={saveCustom}>{tr(lang, 'save')}</button>
             </div>
           </div>
         </div>

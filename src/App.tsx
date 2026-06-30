@@ -13,25 +13,29 @@ import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
 import type { Routine, Exercise } from './types'
 import DB from './data/full_db.json'
+import { tr, type Lang } from './lib/i18n'
 import './index.css'
 
 type Tab = 'routine' | 'log' | 'exercises' | 'stats'
-
-const TABS: { id: Tab; label: string; Icon: React.FC<{ size?: number }> }[] = [
-  { id: 'routine',   label: 'Routine',   Icon: IconLayoutList },
-  { id: 'log',       label: 'Log',       Icon: IconPencil },
-  { id: 'exercises', label: 'Exercises', Icon: IconBarbell },
-  { id: 'stats',     label: 'Stats',     Icon: IconChartBar },
-]
 
 function MainApp() {
   const { user, profile } = useAuth()
   const uid = user?.uid
   const [tab, setTab] = useState<Tab>('routine')
   const [unit, setUnit] = useState<'kg' | 'lb'>('kg')
+  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('lang') as Lang) || 'ko')
   const [pendingRoutine, setPendingRoutine] = useState<(Routine & { id: string }) | null>(null)
 
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
+
+  const handleLangChange = (l: Lang) => { setLang(l); localStorage.setItem('lang', l) }
+
+  const TABS: { id: Tab; label: string; Icon: React.FC<{ size?: number }> }[] = [
+    { id: 'routine',   label: tr(lang, 'tabRoutine'),   Icon: IconLayoutList },
+    { id: 'log',       label: tr(lang, 'tabLog'),       Icon: IconPencil },
+    { id: 'exercises', label: tr(lang, 'tabExercises'), Icon: IconBarbell },
+    { id: 'stats',     label: tr(lang, 'tabStats'),     Icon: IconChartBar },
+  ]
 
   const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
@@ -46,7 +50,7 @@ function MainApp() {
 
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '1.5rem 1rem' }}>
-      <Header unit={unit} onUnitToggle={setUnit} />
+      <Header unit={unit} onUnitToggle={setUnit} lang={lang} onLangChange={handleLangChange} />
 
       <div style={{ display: 'flex', borderBottom: '0.5px solid var(--bd)', marginBottom: '1.5rem' }}>
         {TABS.map(({ id, label, Icon }) => (
@@ -76,6 +80,7 @@ function MainApp() {
           onUpdateRoutine={updateRoutine}
           onDeleteRoutine={deleteRoutine}
           onStartRoutine={handleStartRoutine}
+          lang={lang}
         />
       )}
       {tab === 'log' && (
@@ -84,6 +89,7 @@ function MainApp() {
           routines={routines}
           allExercises={allExercises}
           unit={unit}
+          lang={lang}
           onAddEntries={addLogEntries}
           onDeleteEntry={deleteLogEntry}
           initialRoutine={pendingRoutine}
@@ -95,10 +101,11 @@ function MainApp() {
           allExercises={allExercises}
           onAddCustom={addCustomExercise}
           onDeleteCustom={deleteCustomExercise}
+          lang={lang}
         />
       )}
       {tab === 'stats' && (
-        <StatsPage logs={logs} allExercises={allExercises} unit={unit} />
+        <StatsPage logs={logs} allExercises={allExercises} unit={unit} lang={lang} />
       )}
     </div>
   )

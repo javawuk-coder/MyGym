@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
+import { tr, exName, type Lang } from '../lib/i18n'
 
 const ML: Record<string, string> = {
   chest: 'Chest', back: 'Back', legs: 'Legs', shoulder: 'Shoulder',
@@ -58,6 +59,7 @@ interface Props {
   routines: (Routine & { id: string })[]
   allExercises: Exercise[]
   unit: 'kg' | 'lb'
+  lang: Lang
   onAddEntries: (date: string, entries: LogEntry[]) => Promise<void>
   onDeleteEntry: (date: string, index: number) => Promise<void>
   initialRoutine?: (Routine & { id: string }) | null
@@ -65,7 +67,7 @@ interface Props {
 }
 
 export default function LogPage({
-  logs, routines, allExercises, unit,
+  logs, routines, allExercises, unit, lang,
   onAddEntries, onDeleteEntry,
   initialRoutine, onConsumedInitial,
 }: Props) {
@@ -88,6 +90,7 @@ export default function LogPage({
   const [segStartedAt, setSegStartedAt] = useState<number | null>(null)
   const [, setTick] = useState(0)                 // 1초마다 re-render용
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
+  const [lastCompletedLabel, setLastCompletedLabel] = useState('')
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
   const segStartRef = useRef<number | null>(null)
@@ -113,15 +116,17 @@ export default function LogPage({
     setAccRestMs(0)
     setTick(0)
     setCompletedSets(new Set())
+    setLastCompletedLabel('')
   }
 
   // ✓ 완료 → 운동 시간 누적, 휴식 시작
-  const completeSet = (key: string) => {
+  const completeSet = (key: string, label: string) => {
     const now = Date.now()
     if (phaseRef.current === 'working' && segStartRef.current !== null) {
       accWorkRef.current += now - segStartRef.current
       setAccWorkMs(accWorkRef.current)
     }
+    setLastCompletedLabel(label)
     phaseRef.current = 'resting'
     segStartRef.current = now
     setTimerPhase('resting')
@@ -273,7 +278,7 @@ export default function LogPage({
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
-    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set())
+    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel('')
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
   }
@@ -305,7 +310,7 @@ export default function LogPage({
       }
       if (sets.length) entries.push({ exId: d.exId, log_type: lt, sets })
     }
-    if (!entries.length) { alert('입력된 세트가 없습니다'); return }
+    if (!entries.length) { alert(tr(lang, 'noSets')); return }
     await onAddEntries(selectedDate, entries)
     closeFill()
   }
@@ -315,12 +320,13 @@ export default function LogPage({
     const lt: LogType = ex?.log_type || 'weight_reps'
     const colsWR = '20px 1fr 1fr 28px 28px'
     const colsOther = '20px 1fr 28px 28px'
+    const nm = ex ? exName(ex, lang) : { main: d.exId }
     return (
       <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '10px', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ fontWeight: 600, fontSize: '14px' }}>{ex?.ko || ex?.name || d.exId}</span>
-            {ex?.ko && <span style={{ fontSize: '11px', color: 'var(--tm)', marginLeft: '6px' }}>{ex.name}</span>}
+            <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
+            {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)', marginLeft: '6px' }}>{nm.sub}</span>}
             {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ marginLeft: '6px', fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
           </div>
           <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
@@ -335,7 +341,7 @@ export default function LogPage({
               {(['dist', 'time', 'cal'] as const).map(f => (
                 <div key={f}>
                   <div style={{ fontSize: '10px', color: 'var(--tm)', marginBottom: '3px', textAlign: 'center' }}>
-                    {f === 'dist' ? '거리(km)' : f === 'time' ? '시간(분)' : '칼로리'}
+                    {f === 'dist' ? tr(lang, 'distKm') : f === 'time' ? tr(lang, 'timMin') : tr(lang, 'calories')}
                   </div>
                   <input type="number" value={d.cardio[f]} onChange={e => updateCardio(di, f, e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
                 </div>
@@ -347,12 +353,13 @@ export default function LogPage({
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
                   ? <><span style={{ textAlign: 'center' }}>Weight ({unit})</span><span style={{ textAlign: 'center' }}>Reps</span></>
-                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? '시간(초)' : 'Reps'}</span>}
+                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? `${tr(lang, 'timerWork')}(${tr(lang, 'sec')})` : 'Reps'}</span>}
                 <span /><span />
               </div>
               {d.rows.map((row, ri) => {
                 const setKey = `${di}-${ri}`
                 const isDone = completedSets.has(setKey)
+                const setLabel = `Set ${ri + 1} — ${nm.main}`
                 return (
                   <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1 }}>
                     <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
@@ -366,7 +373,7 @@ export default function LogPage({
                         onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
                         placeholder="0" min="0" style={{ textAlign: 'center' }} />
                     )}
-                    <button className="idb" onClick={() => completeSet(setKey)}
+                    <button className="idb" onClick={() => completeSet(setKey, setLabel)}
                       style={{ color: isDone ? '#1D9E75' : undefined }}>
                       <IconCheck size={14} />
                     </button>
@@ -375,7 +382,7 @@ export default function LogPage({
                 )
               })}
               <button className="btn" onClick={() => addRow(di)} style={{ marginTop: '6px', fontSize: '12px', width: '100%' }}>
-                <IconPlus size={12} style={{ marginRight: 3 }} />Set 추가
+                <IconPlus size={12} style={{ marginRight: 3 }} />{tr(lang, 'addSet')}
               </button>
             </>
           )}
@@ -461,22 +468,23 @@ export default function LogPage({
           )}
         </div>
         <button className="btn btn-p" onClick={() => setModal('pick')}>
-          <IconPlus size={14} style={{ marginRight: 4 }} />Add
+          <IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'add')}
         </button>
       </div>
 
       {!selectedLog || !selectedLog.exercises.length ? (
-        <div className="emp">이 날 기록이 없어요</div>
+        <div className="emp">{tr(lang, 'noLog')}</div>
       ) : (
         <div className="card" style={{ padding: '4px 0' }}>
           {selectedLog.exercises.map((entry, ei) => {
             const x = getEx(entry.exId)
+            const nm = x ? exName(x, lang) : { main: entry.exId }
             const summary = summarizeEntry(entry)
             return (
               <div key={ei} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: ei < selectedLog.exercises.length - 1 ? '0.5px solid var(--bd)' : 'none' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, fontSize: '14px' }}>{x?.ko || x?.name || entry.exId}</span>
+                    <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
                     {x && <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--tm)', marginTop: '2px' }}>{summary}</div>
@@ -497,21 +505,21 @@ export default function LogPage({
 
             {modal === 'pick' && (
               <>
-                <div className="mt2">운동 추가</div>
+                <div className="mt2">{tr(lang, 'addWorkout')}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
                   <button onClick={() => { setRoutineSearch(''); setModal('routine-select') }}
                     style={{ padding: '18px', border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', background: 'var(--bg2)', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
-                    <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>루틴으로 추가</div>
-                    <div style={{ fontSize: '12px', color: 'var(--tm)' }}>저장된 루틴을 불러와 세트/무게를 입력합니다</div>
+                    <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>{tr(lang, 'addFromRoutine')}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{tr(lang, 'addFromRoutineDesc')}</div>
                   </button>
                   <button onClick={() => { setExSearch(''); setModal('ex-select') }}
                     style={{ padding: '18px', border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', background: 'var(--bg2)', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
-                    <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>개별 운동 추가</div>
-                    <div style={{ fontSize: '12px', color: 'var(--tm)' }}>운동을 하나 선택해 기록합니다</div>
+                    <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '4px' }}>{tr(lang, 'addExercise')}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{tr(lang, 'addExerciseDesc')}</div>
                   </button>
                 </div>
                 <div style={{ marginTop: '12px', textAlign: 'right' }}>
-                  <button className="btn" onClick={() => setModal(null)}>Cancel</button>
+                  <button className="btn" onClick={() => setModal(null)}>{tr(lang, 'cancel')}</button>
                 </div>
               </>
             )}
@@ -520,16 +528,16 @@ export default function LogPage({
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                   <button className="idb" onClick={() => setModal('pick')}><IconChevronLeft size={16} /></button>
-                  <div className="mt2" style={{ margin: 0 }}>루틴 선택</div>
+                  <div className="mt2" style={{ margin: 0 }}>{tr(lang, 'selectRoutine')}</div>
                 </div>
                 <div className="sw" style={{ marginBottom: '8px' }}>
                   <IconSearch size={16} className="si" />
                   <input value={routineSearch} onChange={e => setRoutineSearch(e.target.value)}
-                    placeholder="루틴 검색..." style={{ paddingLeft: '36px' }} autoFocus />
+                    placeholder={tr(lang, 'searchRoutine')} style={{ paddingLeft: '36px' }} autoFocus />
                 </div>
                 <div style={{ maxHeight: '340px', overflowY: 'auto', border: '0.5px solid var(--bd)', borderRadius: 'var(--r)' }}>
                   {routines.filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase())).length === 0
-                    ? <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>루틴 없음</div>
+                    ? <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'noRoutines')}</div>
                     : routines.filter(r => !routineSearch || r.name.toLowerCase().includes(routineSearch.toLowerCase())).map(r => (
                       <div key={r.id} onClick={() => openRoutineFill(r)}
                         style={{ padding: '12px 14px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)' }}
@@ -548,26 +556,29 @@ export default function LogPage({
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                   <button className="idb" onClick={() => setModal('pick')}><IconChevronLeft size={16} /></button>
-                  <div className="mt2" style={{ margin: 0 }}>운동 선택</div>
+                  <div className="mt2" style={{ margin: 0 }}>{tr(lang, 'selectExercise')}</div>
                 </div>
                 <div className="sw" style={{ marginBottom: '8px' }}>
                   <IconSearch size={16} className="si" />
                   <input value={exSearch} onChange={e => setExSearch(e.target.value)}
-                    placeholder="이름 검색..." style={{ paddingLeft: '36px' }} autoFocus />
+                    placeholder={tr(lang, 'searchExercise')} style={{ paddingLeft: '36px' }} autoFocus />
                 </div>
                 <div style={{ maxHeight: '360px', overflowY: 'auto', border: '0.5px solid var(--bd)', borderRadius: 'var(--r)' }}>
-                  {filterEx(exSearch).slice(0, 80).map(x => (
-                    <div key={x.id} onClick={() => openExFill(x.id)}
-                      style={{ padding: '9px 12px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = '')}>
-                      <div>
-                        <div style={{ fontSize: '13px', fontWeight: 500 }}>{x.ko || x.name}</div>
-                        {x.ko && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{x.name}</div>}
+                  {filterEx(exSearch).slice(0, 80).map(x => {
+                    const nm = exName(x, lang)
+                    return (
+                      <div key={x.id} onClick={() => openExFill(x.id)}
+                        style={{ padding: '9px 12px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 500 }}>{nm.main}</div>
+                          {nm.sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</div>}
+                        </div>
+                        <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
                       </div>
-                      <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </>
             )}
@@ -578,35 +589,61 @@ export default function LogPage({
       {/* ── Fill 모달 ── */}
       {modal === 'fill' && (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: '560px', padding: 0 }}>
+          <div className="mo" style={{ maxWidth: '560px', padding: 0, position: 'relative' }}>
+
+            {/* 휴식 오버레이 */}
+            {timerPhase === 'resting' && (
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: 'inherit',
+                background: 'rgba(0,0,0,0.88)', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', zIndex: 20,
+              }}>
+                <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
+                <div style={{ fontSize: '64px', fontWeight: 700, color: '#BA7517', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
+                  {fmtTime(restMs)}
+                </div>
+                {lastCompletedLabel && (
+                  <div style={{ fontSize: '12px', color: '#555', marginTop: '8px' }}>{lastCompletedLabel}</div>
+                )}
+                <button onClick={resumeWorkout} style={{
+                  marginTop: '32px', padding: '16px 48px', borderRadius: '40px',
+                  background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
+                  fontSize: '18px', fontWeight: 700, fontFamily: 'inherit',
+                }}>▶ {tr(lang, 'startWorkout')}</button>
+                <div style={{ display: 'flex', gap: '20px', marginTop: '24px' }}>
+                  {([
+                    { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+                    { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
+                  ] as const).map(({ label, ms, color }) => (
+                    <div key={label} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '10px', color: '#666' }}>{label}</div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div style={{ padding: '12px 18px', borderBottom: '0.5px solid var(--bd)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || '운동 기록'}</div>
+                <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
                 <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
               </div>
               {timerPhase !== 'idle' && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', gap: '14px' }}>
-                    {([
-                      { label: '총', ms: totalMs, color: 'var(--tp)' },
-                      { label: '운동', ms: workMs, color: '#1D9E75' },
-                      { label: '휴식', ms: restMs, color: '#BA7517' },
-                    ] as const).map(({ label, ms, color }) => (
+                    {[
+                      { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+                      { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
+                      { label: tr(lang, 'timerRest'), ms: restMs, color: '#BA7517' },
+                    ].map(({ label, ms, color }) => (
                       <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
                         <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
                         <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
                       </div>
                     ))}
                   </div>
-                  {timerPhase === 'resting' && (
-                    <button onClick={resumeWorkout} style={{
-                      padding: '6px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 600,
-                      background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                    }}>▶ 시작</button>
-                  )}
-                  {timerPhase === 'working' && (
-                    <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>● 운동 중</span>
-                  )}
+                  <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>{tr(lang, 'working')}</span>
                 </div>
               )}
             </div>
@@ -617,31 +654,34 @@ export default function LogPage({
                   <div className="sw" style={{ marginBottom: '6px' }}>
                     <IconSearch size={14} className="si" />
                     <input value={addExSearch} onChange={e => setAddExSearch(e.target.value)}
-                      placeholder="운동 검색..." style={{ paddingLeft: '32px', fontSize: '13px' }} autoFocus />
+                      placeholder={tr(lang, 'searchExercise')} style={{ paddingLeft: '32px', fontSize: '13px' }} autoFocus />
                   </div>
                   <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                    {filterEx(addExSearch).slice(0, 50).map(x => (
-                      <div key={x.id} onClick={() => addDraftEx(x.id)}
-                        style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = '')}>
-                        <span>{x.ko || x.name}</span>
-                        <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
-                      </div>
-                    ))}
+                    {filterEx(addExSearch).slice(0, 50).map(x => {
+                      const nm = exName(x, lang)
+                      return (
+                        <div key={x.id} onClick={() => addDraftEx(x.id)}
+                          style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                          <span>{nm.main}</span>
+                          <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
+                        </div>
+                      )
+                    })}
                   </div>
                   <button className="btn" onClick={() => { setShowAddExInFill(false); setAddExSearch('') }}
-                    style={{ marginTop: '6px', fontSize: '12px' }}>취소</button>
+                    style={{ marginTop: '6px', fontSize: '12px' }}>{tr(lang, 'cancel')}</button>
                 </div>
               ) : (
                 <button className="btn" onClick={() => setShowAddExInFill(true)} style={{ width: '100%', fontSize: '13px', padding: '10px' }}>
-                  <IconPlus size={14} style={{ marginRight: 5 }} />운동 추가
+                  <IconPlus size={14} style={{ marginRight: 5 }} />{tr(lang, 'addExInFill')}
                 </button>
               )}
             </div>
             <div style={{ padding: '12px 18px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-              <button className="btn" onClick={closeFill}>Cancel</button>
-              <button className="btn btn-p" onClick={save}>Save</button>
+              <button className="btn" onClick={closeFill}>{tr(lang, 'cancel')}</button>
+              <button className="btn btn-p" onClick={save}>{tr(lang, 'save')}</button>
             </div>
           </div>
         </div>
