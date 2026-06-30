@@ -12,11 +12,11 @@ const MR: Record<string, string> = {
 }
 
 const PERIODS = [
-  { label: '7일', days: 7 },
-  { label: '30일', days: 30 },
-  { label: '90일', days: 90 },
-  { label: '전체', days: 0 },
-]
+  { key: 'period7', days: 7 },
+  { key: 'period30', days: 30 },
+  { key: 'period90', days: 90 },
+  { key: 'periodAll', days: 0 },
+] as const
 
 interface Props {
   logs: DayLog[]
@@ -80,7 +80,7 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
             background: periodDays === p.days ? 'var(--tp)' : 'transparent',
             color: periodDays === p.days ? '#fff' : 'var(--ts)',
             fontWeight: periodDays === p.days ? 600 : 400, fontFamily: 'inherit',
-          }}>{p.label}</button>
+          }}>{tr(lang, p.key)}</button>
         ))}
       </div>
 

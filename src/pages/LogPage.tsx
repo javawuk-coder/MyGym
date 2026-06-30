@@ -17,8 +17,9 @@ function toKg(v: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(
 function fromKg(kg: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(kg * 2.205 * 10) / 10 : kg }
 function today() { return new Date().toISOString().slice(0, 10) }
 function toLocalDate(dateStr: string) { return new Date(dateStr + 'T00:00:00') }
-function formatDateHeader(d: string) {
-  return toLocalDate(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
+const LOCALE_MAP: Record<string, string> = { ko: 'ko-KR', en: 'en-US', vi: 'vi-VN' }
+function formatDateHeader(d: string, locale = 'ko-KR') {
+  return toLocalDate(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
 }
 function fmtTime(ms: number) {
   const s = Math.floor(ms / 1000)
@@ -28,7 +29,7 @@ function fmtTime(ms: number) {
   return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 }
 
-interface SetRow { weight: string; reps: string; duration: string }
+interface SetRow { weight: string; reps: string; duration: string; note: string; pr: boolean; rir: string }
 interface DraftEx {
   exId: string
   rows: SetRow[]
@@ -37,7 +38,7 @@ interface DraftEx {
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
 
 function makeRows(count: number, reps?: number): SetRow[] {
-  return Array.from({ length: count }, () => ({ weight: '', reps: reps != null ? String(reps) : '', duration: '' }))
+  return Array.from({ length: count }, () => ({ weight: '', reps: reps != null ? String(reps) : '', duration: '', note: '', pr: false, rir: '' }))
 }
 function draftFromRoutine(routine: Routine, allExercises: Exercise[]): DraftEx[] {
   return routine.exercises.map(re => {
@@ -150,6 +151,7 @@ export default function LogPage({
   const segElapsed = segStartedAt !== null ? Date.now() - segStartedAt : 0
   const workMs = accWorkMs + (timerPhase === 'working' ? segElapsed : 0)
   const restMs = accRestMs + (timerPhase === 'resting' ? segElapsed : 0)
+  const currentRestMs = timerPhase === 'resting' ? segElapsed : 0  // 현재 휴식 세션만 (오버레이용)
   const totalMs = workMs + restMs
 
   useEffect(() => {
@@ -225,13 +227,13 @@ export default function LogPage({
   }
 
   // ── Draft mutations ───────────────────────────────────────────
-  const updateRow = (di: number, ri: number, field: keyof SetRow, val: string) =>
+  const updateRow = (di: number, ri: number, field: keyof SetRow, val: string | boolean) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: d.rows.map((r, j) => j !== ri ? r : { ...r, [field]: val }),
     }))
   const addRow = (di: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
-      ...d, rows: [...d.rows, { weight: '', reps: '', duration: '' }],
+      ...d, rows: [...d.rows, { weight: '', reps: '', duration: '', note: '', pr: false, rir: '' }],
     }))
   const removeRow = (di: number, ri: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
@@ -297,15 +299,20 @@ export default function LogPage({
       }
       const sets: ExerciseSet[] = []
       for (const r of d.rows) {
+        const extras: Partial<ExerciseSet> = {
+          ...(r.note.trim() ? { note: r.note.trim() } : {}),
+          ...(r.pr ? { pr: true } : {}),
+          ...(r.rir !== '' && !isNaN(parseInt(r.rir)) ? { rir: parseInt(r.rir) } : {}),
+        }
         if (lt === 'weight_reps') {
           const w = parseFloat(r.weight), rep = parseInt(r.reps)
-          if (!isNaN(rep) && rep > 0) sets.push({ weight: isNaN(w) ? 0 : toKg(w, unit), reps: rep })
+          if (!isNaN(rep) && rep > 0) sets.push({ weight: isNaN(w) ? 0 : toKg(w, unit), reps: rep, ...extras })
         } else if (lt === 'reps_only') {
           const rep = parseInt(r.reps)
-          if (!isNaN(rep) && rep > 0) sets.push({ reps: rep })
+          if (!isNaN(rep) && rep > 0) sets.push({ reps: rep, ...extras })
         } else {
           const dur = parseInt(r.duration)
-          if (!isNaN(dur) && dur > 0) sets.push({ duration: dur })
+          if (!isNaN(dur) && dur > 0) sets.push({ duration: dur, ...extras })
         }
       }
       if (sets.length) entries.push({ exId: d.exId, log_type: lt, sets })
@@ -379,6 +386,22 @@ export default function LogPage({
                     </button>
                     <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
                   </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '2px 0 6px', borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', marginBottom: ri < d.rows.length - 1 ? '4px' : 0 }}>
+                    <input value={row.note} onChange={e => updateRow(di, ri, 'note', e.target.value)}
+                      placeholder="Note (e.g. RPE 8, 부상 주의)"
+                      style={{ flex: 1, fontSize: '11px', padding: '3px 6px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: row.pr ? '#E24B4A' : 'var(--tm)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      <input type="checkbox" checked={row.pr} onChange={e => updateRow(di, ri, 'pr', e.target.checked)}
+                        style={{ accentColor: '#E24B4A', width: '12px', height: '12px' }} />
+                      PR
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--tm)', whiteSpace: 'nowrap' }}>RIR</span>
+                      <input type="number" value={row.rir} onChange={e => updateRow(di, ri, 'rir', e.target.value)}
+                        placeholder="—" min="0" max="5"
+                        style={{ width: '36px', fontSize: '11px', textAlign: 'center', padding: '3px 4px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
+                    </div>
+                  </div>
                 )
               })}
               <button className="btn" onClick={() => addRow(di)} style={{ marginTop: '6px', fontSize: '12px', width: '100%' }}>
@@ -402,7 +425,7 @@ export default function LogPage({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <button className="idb" onClick={prevMonth}><IconChevronLeft size={16} /></button>
           <span style={{ fontWeight: 600, fontSize: '15px' }}>
-            {toLocalDate(calMonth + '-01').toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+            {toLocalDate(calMonth + '-01').toLocaleDateString(LOCALE_MAP[lang] || 'ko-KR', { year: 'numeric', month: 'long' })}
           </span>
           <button className="idb" onClick={nextMonth} disabled={!canGoNext} style={{ opacity: canGoNext ? 1 : 0.3 }}>
             <IconChevronRight size={16} />
@@ -459,7 +482,7 @@ export default function LogPage({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div>
           <span style={{ fontWeight: 600, fontSize: '15px' }}>
-            {selectedDate === todayStr ? 'Today' : formatDateHeader(selectedDate)}
+            {selectedDate === todayStr ? tr(lang, 'today') : formatDateHeader(selectedDate, LOCALE_MAP[lang])}
           </span>
           {totalDayVol > 0 && (
             <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '10px' }}>
@@ -600,7 +623,7 @@ export default function LogPage({
               }}>
                 <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
                 <div style={{ fontSize: '64px', fontWeight: 700, color: '#BA7517', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
-                  {fmtTime(restMs)}
+                  {fmtTime(currentRestMs)}
                 </div>
                 {lastCompletedLabel && (
                   <div style={{ fontSize: '12px', color: '#555', marginTop: '8px' }}>{lastCompletedLabel}</div>
@@ -627,7 +650,7 @@ export default function LogPage({
             <div style={{ padding: '12px 18px', borderBottom: '0.5px solid var(--bd)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
-                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate)}</div>
+                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
               </div>
               {timerPhase !== 'idle' && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

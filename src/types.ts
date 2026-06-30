@@ -15,6 +15,9 @@ export interface ExerciseSet {
   weight?: number
   reps?: number
   duration?: number
+  note?: string   // 세트 메모 (e.g. "RPE 8", "파워체인")
+  pr?: boolean    // Personal Record 마커
+  rir?: number    // Reps In Reserve (0~5)
 }
 
 export interface LogEntry {

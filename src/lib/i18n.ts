@@ -24,6 +24,7 @@ const strings = {
     workoutDays: '운동한 날', totalSets: '총 세트', totalVolume: '총 볼륨',
     volumeByMuscle: '근육별 볼륨', noData: '데이터 없음',
     logToSee: '운동을 기록하면 나타나요',
+    period7: '7일', period30: '30일', period90: '90일', periodAll: '전체',
     // exercises
     searchEx: '이름 검색 (한국어/영어)...', noResults: '검색 결과 없음',
     dataLoading: '데이터 준비 중', ytLink: 'YouTube에서 폼 영상 보기',
@@ -56,6 +57,7 @@ const strings = {
     workoutDays: 'Workout days', totalSets: 'Total sets', totalVolume: 'Total volume',
     volumeByMuscle: 'Volume by muscle', noData: 'No data',
     logToSee: 'Log workouts to see data',
+    period7: '7 days', period30: '30 days', period90: '90 days', periodAll: 'All',
     searchEx: 'Search name...', noResults: 'No results',
     dataLoading: 'Loading data', ytLink: 'Watch form video on YouTube',
     confirmDelete: 'Delete?', nameRequired: 'Exercise name required',
@@ -85,6 +87,7 @@ const strings = {
     workoutDays: 'Ngày tập', totalSets: 'Tổng set', totalVolume: 'Tổng khối lượng',
     volumeByMuscle: 'Khối lượng theo cơ', noData: 'Không có dữ liệu',
     logToSee: 'Hãy ghi lại để xem dữ liệu',
+    period7: '7 ngày', period30: '30 ngày', period90: '90 ngày', periodAll: 'Tất cả',
     searchEx: 'Tìm tên bài tập...', noResults: 'Không tìm thấy',
     dataLoading: 'Đang tải', ytLink: 'Xem video hướng dẫn trên YouTube',
     confirmDelete: 'Xóa?', nameRequired: 'Cần nhập tên bài tập',
