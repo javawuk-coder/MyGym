@@ -26,6 +26,22 @@ const EQ_CLASS: Record<string, string> = {
   machine: 'emc', bodyweight: 'ebw', smith: 'esmt', band: 'ebg2',
 }
 
+function ExerciseNameCell({ x, lang }: { x: Exercise; lang: Lang }) {
+  const nm = exName(x, lang)
+  return (
+    <div>
+      <div style={{ fontSize: '13px', fontWeight: 500 }}>
+        {nm.main}
+        {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>{tr(lang, 'custom')}</span>}
+      </div>
+      <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
+        {nm.sub || '—'}
+        {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
+      </div>
+    </div>
+  )
+}
+
 interface Props {
   allExercises: Exercise[]
   onAddCustom: (ex: Omit<Exercise, 'id' | 'custom'>) => Promise<void>
@@ -133,17 +149,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                 return (
                   <div key={x.id}>
                     <div className="exrow" style={{ cursor: 'default' }}>
-                      <div>
-                        {(() => { const nm = exName(x, lang); return (<>
-                          <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                            {nm.main}
-                            {x.custom && <span className="ctag" style={{ marginLeft: '6px' }}>{tr(lang, 'custom')}</span>}
-                          </div>
-                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
-                            {nm.sub || '—'}
-                            {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
-                          </div>
-                        </>)})()</div>
+                      <ExerciseNameCell x={x} lang={lang} />
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
                         <button
