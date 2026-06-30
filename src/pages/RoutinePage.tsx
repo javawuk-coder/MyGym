@@ -524,7 +524,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       )}
                       {(!rt || rt === 'all') && <span style={{ color: 'var(--tm)', minWidth: '18px', fontSize: '11px', flexShrink: 0 }}>{i + 1}.</span>}
                       <span style={{ flex: 1, fontSize: '13px' }}>
-                        {(() => { const nm = exName(ex, lang); return (<><span style={{ fontWeight: 500 }}>{nm.main}</span>{nm.sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({nm.sub})</span>}</>); })()}
+                        <span style={{ fontWeight: 500 }}>{exName(ex, lang).main}</span>
+                        {exName(ex, lang).sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({exName(ex, lang).sub})</span>}
                         {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>@ {reObj.note}</span>}
                       </span>
                       <span style={{ color: reObj.maxReps ? '#E24B4A' : 'var(--tm)', fontSize: '12px', flexShrink: 0, fontWeight: reObj.maxReps ? 700 : 400 }}>
@@ -826,7 +827,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   <div key={x.id} className={`exrow${checked ? ' sel' : ''}`} onClick={() => toggleExercise(x.id)}>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                        {(() => { const nm = exName(x, lang); return (<>{nm.main}{nm.sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({nm.sub})</span>}</>); })()}
+                        {exName(x, lang).main}
+                        {exName(x, lang).sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({exName(x, lang).sub})</span>}
                         {x.custom && <span className="ctag" style={{ marginLeft: '4px' }}>{tr(lang, 'custom')}</span>}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)' }}>
@@ -877,7 +879,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: '4px', alignItems: 'center', cursor: 'grab' }}>
                           <IconGripVertical size={14} style={{ color: 'var(--tm)' }} />
                           <div>
-                            {(() => { const nm = exName(ex, lang); return (<><div style={{ fontSize: '13px', fontWeight: 500 }}>{nm.main}</div>{nm.sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</div>}</>); })()}
+                            <div style={{ fontSize: '13px', fontWeight: 500 }}>{exName(ex, lang).main}</div>
+                            {exName(ex, lang).sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{exName(ex, lang).sub}</div>}
                           </div>
                           {hasSets && (
                             isCardio
