@@ -59,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { text: SYSTEM_PROMPT },
       ],
     }],
-    generationConfig: { temperature: 0.1, response_mime_type: 'application/json' },
+    generationConfig: { temperature: 0.1 },
   })
 
   let lastError = ''
