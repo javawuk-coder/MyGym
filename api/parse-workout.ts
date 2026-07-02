@@ -38,10 +38,9 @@ Rules:
 
 const MODELS = [
   'gemini-2.5-flash',
-  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash-lite-preview-06-17',
   'gemini-2.0-flash',
   'gemini-2.0-flash-lite',
-  'gemini-1.5-flash',
 ]
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -67,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   for (const model of MODELS) {
     try {
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }
       )
 
