@@ -561,17 +561,19 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               )}
             </div>
 
-            {/* 바디: 이미지가 있으면 좌우 분할 */}
-            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+            {/* 바디: 이미지가 있으면 좌우 분할 (좁은 화면에서는 세로 배치) */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0, flexWrap: 'wrap' }}>
 
               {/* 이미지 패널 */}
               {parsedImageUrl && (
                 <div style={{
-                  width: '380px', flexShrink: 0,
+                  flexBasis: '340px', flexShrink: 1, flexGrow: 0,
                   borderRight: '0.5px solid var(--bd)',
+                  borderBottom: '0.5px solid var(--bd)',
                   overflowY: 'auto',
                   padding: '16px',
                   background: 'var(--bg2)',
+                  maxHeight: '260px',
                 }}>
                   <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>원본 이미지</div>
                   <img
@@ -583,7 +585,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               )}
 
               {/* 폼 패널 */}
-              <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '16px 20px' }}>
+              <div style={{ flex: '1 1 280px', maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '16px 20px', minWidth: 0 }}>
 
             {/* 파싱 상태 */}
             {parsing && (
