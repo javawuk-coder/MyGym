@@ -541,9 +541,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       )}
 
       {/* ───── 모달 ───── */}
-      {showModal && (
+      {showModal && (() => {
+        const mobile = typeof window !== 'undefined' && window.innerWidth < 640
+        return (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: parsedImageUrl ? '900px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>
+          <div className="mo" style={mobile
+            ? { position: 'fixed', inset: 0, borderRadius: 0, maxWidth: '100%', width: '100%', maxHeight: '100dvh', margin: 0, display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }
+            : { maxWidth: parsedImageUrl ? '900px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>
 
             {/* 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '0.5px solid var(--bd)' }}>
@@ -563,7 +567,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
             {/* 바디: 이미지가 있으면 좌우 분할 (모바일은 세로) */}
             {(() => {
-              const wide = typeof window !== 'undefined' && window.innerWidth >= 640
+              const wide = !mobile
               return (
                 <div style={{ display: 'flex', flexDirection: wide && parsedImageUrl ? 'row' : 'column', flex: 1, overflow: 'hidden', minHeight: 0 }}>
 
@@ -589,7 +593,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   )}
 
                   {/* 폼 패널 */}
-                  <div style={{ flex: 1, maxHeight: wide || !parsedImageUrl ? 'calc(75vh - 120px)' : 'calc(75vh - 340px)', overflowY: 'auto', padding: '16px 20px', minWidth: 0 }}>
+                  <div style={{ flex: 1, maxHeight: mobile ? 'none' : wide || !parsedImageUrl ? 'calc(75vh - 120px)' : 'calc(75vh - 340px)', overflowY: 'auto', padding: '16px 20px', minWidth: 0 }}>
 
             {/* 파싱 상태 */}
             {parsing && (
@@ -965,7 +969,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             })()}{/* 바디 끝 */}
           </div>
         </div>
-      )}
+        )
+      })()}
     </div>
   )
 }
