@@ -543,7 +543,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       {/* ───── 모달 ───── */}
       {showModal && (
         <div className="mbg">
-          <div className="mo" style={{ maxWidth: parsedImageUrl ? '960px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>
+          <div className="mo" style={{ maxWidth: parsedImageUrl ? '900px' : '540px', display: 'flex', flexDirection: 'column', gap: 0, padding: 0 }}>
 
             {/* 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '0.5px solid var(--bd)' }}>
@@ -561,29 +561,35 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               )}
             </div>
 
-            {/* 바디: 이미지가 있으면 좌우 분할 */}
-            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+            {/* 바디: 이미지가 있으면 좌우 분할 (모바일은 세로) */}
+            {(() => {
+              const wide = typeof window !== 'undefined' && window.innerWidth >= 640
+              return (
+                <div style={{ display: 'flex', flexDirection: wide && parsedImageUrl ? 'row' : 'column', flex: 1, overflow: 'hidden', minHeight: 0 }}>
 
-              {/* 이미지 패널 */}
-              {parsedImageUrl && (
-                <div style={{
-                  width: '380px', flexShrink: 0,
-                  borderRight: '0.5px solid var(--bd)',
-                  overflowY: 'auto',
-                  padding: '16px',
-                  background: 'var(--bg2)',
-                }}>
-                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>원본 이미지</div>
-                  <img
-                    src={parsedImageUrl}
-                    alt="workout"
-                    style={{ width: '100%', borderRadius: 'var(--r)', border: '0.5px solid var(--bd)', display: 'block' }}
-                  />
-                </div>
-              )}
+                  {/* 이미지 패널 */}
+                  {parsedImageUrl && (
+                    <div style={{
+                      width: wide ? '380px' : '100%',
+                      maxHeight: wide ? undefined : '220px',
+                      flexShrink: 0,
+                      borderRight: wide ? '0.5px solid var(--bd)' : 'none',
+                      borderBottom: wide ? 'none' : '0.5px solid var(--bd)',
+                      overflowY: 'auto',
+                      padding: '16px',
+                      background: 'var(--bg2)',
+                    }}>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>원본 이미지</div>
+                      <img
+                        src={parsedImageUrl}
+                        alt="workout"
+                        style={{ width: '100%', borderRadius: 'var(--r)', border: '0.5px solid var(--bd)', display: 'block' }}
+                      />
+                    </div>
+                  )}
 
-              {/* 폼 패널 */}
-              <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '16px 20px' }}>
+                  {/* 폼 패널 */}
+                  <div style={{ flex: 1, maxHeight: wide || !parsedImageUrl ? 'calc(75vh - 120px)' : 'calc(75vh - 340px)', overflowY: 'auto', padding: '16px 20px', minWidth: 0 }}>
 
             {/* 파싱 상태 */}
             {parsing && (
@@ -953,8 +959,10 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               <button className="btn btn-p" onClick={save}>{editingId ? 'Update' : 'Save'}</button>
             </div>
 
-            </div>{/* 폼 패널 끝 */}
-            </div>{/* 바디 끝 */}
+                  </div>{/* 폼 패널 끝 */}
+                </div>
+              )
+            })()}{/* 바디 끝 */}
           </div>
         </div>
       )}
