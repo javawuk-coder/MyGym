@@ -24,7 +24,7 @@ const STD_FIELDS: { key: StdField; labelKey: string; unit: string; required?: bo
   { key: 'bodyFatPct',     labelKey: 'bodyFatPct',         unit: '%',     color: '#E8892B' },
   { key: 'visceralFat',    labelKey: 'bodyVisceralFat',    unit: 'level', color: '#9B59B6' },
   { key: 'waist',          labelKey: 'bodyWaist',          unit: 'cm',    color: '#E67E22' },
-  { key: 'trunkFat',       labelKey: 'bodyTrunkFat',       unit: '%',     color: '#BA7517' },
+  { key: 'trunkFat',       labelKey: 'bodyTrunkFat',       unit: 'kg',    color: '#BA7517' },
 ]
 
 const CUSTOM_COLORS = ['#06B6D4', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316']
