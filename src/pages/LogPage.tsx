@@ -221,10 +221,14 @@ export default function LogPage({
   const summarizeEntry = (entry: LogEntry): string => {
     const lt = entry.log_type || 'weight_reps'
     const sets = entry.sets || []
+    const R = tr(lang, 'reps')
+    const S = tr(lang, 'sets')
+    const SEC = tr(lang, 'sec')
+    const MIN = tr(lang, 'minUnit')
     if (lt === 'cardio') {
       const parts: string[] = []
       if (entry.dist) parts.push(`${entry.dist}km`)
-      if (entry.time) parts.push(`${entry.time}분`)
+      if (entry.time) parts.push(`${entry.time}${MIN}`)
       if (entry.cal) parts.push(`${entry.cal}kcal`)
       return parts.join(' · ') || '—'
     }
@@ -233,17 +237,17 @@ export default function LogPage({
       const ws = sets.map(s => s.weight || 0)
       const rs = sets.map(s => s.reps || 0)
       if (ws.every(w => w === ws[0]) && rs.every(r => r === rs[0])) {
-        return `${fromKg(ws[0], unit)}${unit} × ${rs[0]}회 × ${sets.length}set`
+        return `${fromKg(ws[0], unit)}${unit} × ${rs[0]}${R} × ${sets.length}${S}`
       }
-      return sets.map(s => `${fromKg(s.weight || 0, unit)}${unit}×${s.reps}회`).join(', ')
+      return sets.map(s => `${fromKg(s.weight || 0, unit)}${unit}×${s.reps}${R}`).join(', ')
     }
     if (lt === 'reps_only') {
       const rs = sets.map(s => s.reps || 0)
-      return rs.every(r => r === rs[0]) ? `${rs[0]}회 × ${sets.length}set` : rs.map(r => `${r}회`).join(', ')
+      return rs.every(r => r === rs[0]) ? `${rs[0]}${R} × ${sets.length}${S}` : rs.map(r => `${r}${R}`).join(', ')
     }
     if (lt === 'time') {
       const ds = sets.map(s => s.duration || 0)
-      return ds.every(d => d === ds[0]) ? `${ds[0]}초 × ${sets.length}set` : ds.map(d => `${d}초`).join(', ')
+      return ds.every(d => d === ds[0]) ? `${ds[0]}${SEC} × ${sets.length}${S}` : ds.map(d => `${d}${SEC}`).join(', ')
     }
     return '—'
   }
@@ -513,7 +517,7 @@ export default function LogPage({
             <div style={{ fontSize: '12px', color: 'var(--tm)', marginTop: '3px', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
               <span>{Math.round(fromKg(summary.vol, unit)).toLocaleString()} {unit}</span>
               <span style={{ opacity: 0.4 }}>·</span>
-              <span>{summary.exCount} {lang === 'ko' ? '종목' : lang === 'vi' ? 'bài' : 'ex'}</span>
+              <span>{summary.exCount} {tr(lang, 'exUnit')}</span>
               <span style={{ opacity: 0.4 }}>·</span>
               <span>{summary.sets} {tr(lang, 'sets')}</span>
               <span style={{ opacity: 0.4 }}>·</span>
@@ -601,7 +605,7 @@ export default function LogPage({
                         onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
                         onMouseLeave={e => (e.currentTarget.style.background = '')}>
                         <div style={{ fontWeight: 500, fontSize: '14px' }}>{r.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>{r.exercises.length}개 운동</div>
+                        <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>{r.exercises.length} {tr(lang, 'exerciseCount')}</div>
                       </div>
                     ))
                   }

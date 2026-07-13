@@ -74,23 +74,24 @@ function formatSummary(raw: WorkoutFormat): string {
 }
 
 // 운동 목록에서 reps 레이블
-function repsLabel(fmt: WorkoutFormat, ex: Exercise, re: RoutineExercise): string {
+function repsLabel(fmt: WorkoutFormat, ex: Exercise, re: RoutineExercise, lang: Lang): string {
   if (re.maxReps) return 'MAX'
   const isTime = ex.log_type === 'time'
   const isCardio = ex.log_type === 'cardio'
   if (isCardio) return 'cardio'
+  const R = tr(lang, 'reps'), S = tr(lang, 'sets'), SEC = tr(lang, 'sec')
   switch (fmt.type) {
     case 'sets_reps':
-      return `${re.sets}세트 × ${isTime ? `${re.reps}초` : `${re.reps}회`}`
+      return `${re.sets}${S} × ${isTime ? `${re.reps}${SEC}` : `${re.reps}${R}`}`
     case 'for_time':
     case 'amrap':
-      return `${isTime ? `${re.reps}초` : `${re.reps}회`}/round`
+      return `${isTime ? `${re.reps}${SEC}` : `${re.reps}${R}`}/round`
     case 'emom':
-      return `${isTime ? `${re.reps}초` : `${re.reps}회`}/min`
+      return `${isTime ? `${re.reps}${SEC}` : `${re.reps}${R}`}/min`
     case 'tabata':
-      return `target ${isTime ? `${re.reps}초` : `${re.reps}회`}`
+      return `target ${isTime ? `${re.reps}${SEC}` : `${re.reps}${R}`}`
     case 'interval':
-      return isTime ? `${re.reps}초` : `${re.reps}회`
+      return isTime ? `${re.reps}${SEC}` : `${re.reps}${R}`
     default: return ''
   }
 }
@@ -114,12 +115,13 @@ function defaultFormat(): WorkoutFormat { return { type: 'sets_reps' } }
 // 포맷별 sets 열 표시 여부
 function showSetsCol(fmt: WorkoutFormat) { return fmt.type === 'sets_reps' }
 // 포맷별 reps 레이블
-function repsColLabel(fmt: WorkoutFormat) {
+function repsColLabel(fmt: WorkoutFormat, lang: Lang) {
+  const R = tr(lang, 'reps'), SEC = tr(lang, 'sec')
   switch (fmt.type) {
-    case 'for_time': case 'amrap': return '회/round'
-    case 'emom': return '회/min'
+    case 'for_time': case 'amrap': return `${R}/round`
+    case 'emom': return `${R}/min`
     case 'tabata': return 'target'
-    default: return '횟수/초'
+    default: return `${R}/${SEC}`
   }
 }
 
@@ -384,7 +386,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       for (const ex of parsed.exercises ?? []) {
         const match = matchExercise(ex.name)
         if (!match) {
-          warnings.push(`"${ex.name}" — DB에서 찾지 못했습니다`)
+          warnings.push(`"${ex.name}" — ${tr(lang, 'routineNotFound')}`)
           continue
         }
         newSelected.push({
@@ -435,8 +437,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   }
 
   const save = async () => {
-    if (!routineName.trim()) { alert('루틴 이름을 입력하세요'); return }
-    if (!selected.length) { alert('운동을 하나 이상 추가하세요'); return }
+    if (!routineName.trim()) { alert(tr(lang, 'routineNameRequired')); return }
+    if (!selected.length) { alert(tr(lang, 'routineExRequired')); return }
 
     // Firestore는 undefined 값을 거부 — undefined 필드 제거
     const cleanExercises = selected.map(s => {
@@ -453,7 +455,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       else await onAddRoutine(data)
       setShowModal(false)
     } catch (err) {
-      alert(`저장 실패: ${String(err)}`)
+      alert(`${tr(lang, 'routineSaveFailed')}: ${String(err)}`)
     }
   }
 
@@ -474,7 +476,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       {!routines.length ? (
         <div className="emp">
           <IconLayoutList size={36} style={{ display: 'block', margin: '0 auto 12px' }} />
-          루틴을 추가해보세요
+          {tr(lang, 'routineEmptyHint')}
         </div>
       ) : (
         routines.map(r => {
@@ -529,7 +531,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>@ {reObj.note}</span>}
                       </span>
                       <span style={{ color: reObj.maxReps ? '#E24B4A' : 'var(--tm)', fontSize: '12px', flexShrink: 0, fontWeight: reObj.maxReps ? 700 : 400 }}>
-                        {repsLabel(fmt, ex, reObj)}
+                        {repsLabel(fmt, ex, reObj, lang)}
                       </span>
                     </div>
                   )
@@ -559,7 +561,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     disabled={parsing}
                     style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px' }}>
                     <IconPhoto size={15} />
-                    {parsing ? '분석 중...' : '이미지 업로드 / Ctrl+V'}
+                    {parsing ? tr(lang, 'routineParsing') : tr(lang, 'routineUpload')}
                   </button>
                 </>
               )}
@@ -583,7 +585,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       padding: '16px',
                       background: 'var(--bg2)',
                     }}>
-                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>원본 이미지</div>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr(lang, 'routineOrigImage')}</div>
                       <img
                         src={parsedImageUrl}
                         alt="workout"
@@ -598,17 +600,17 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {/* 파싱 상태 */}
             {parsing && (
               <div style={{ background: '#1D9E7522', border: '0.5px solid #1D9E75', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: '#1D9E75' }}>
-                🤖 Gemini가 워크아웃을 분석 중입니다...
+                {tr(lang, 'routineAnalyzing')}
               </div>
             )}
             {parseError && (
               <div style={{ background: '#E24B4A22', border: '0.5px solid #E24B4A', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: '#E24B4A' }}>
-                ⚠ 파싱 오류: {parseError}
+                ⚠ {tr(lang, 'routineParseError')}: {parseError}
               </div>
             )}
             {parseWarnings.length > 0 && (
               <div style={{ background: '#EF9F2722', border: '0.5px solid #EF9F27', borderRadius: 'var(--r)', padding: '10px 14px', marginBottom: '12px', fontSize: '12px', color: '#EF9F27' }}>
-                <div style={{ fontWeight: 600, marginBottom: '4px' }}>일부 운동을 DB에서 찾지 못했습니다:</div>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>{tr(lang, 'routinePartialNotFound')}:</div>
                 {parseWarnings.map((w, i) => <div key={i}>• {w}</div>)}
               </div>
             )}
@@ -636,13 +638,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {format.type === 'tabata' && (
               <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  Tabata: 운동 블록을 work/rest 인터벌로 반복합니다
+                  {tr(lang, 'routineTabataDesc')}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                   {[
-                    { label: 'Work (초)', key: 'workSec', def: 20 },
-                    { label: 'Rest (초)', key: 'restSec', def: 10 },
-                    { label: '운동당 반복 횟수', key: 'tabataRounds', def: 8 },
+                    { label: tr(lang, 'routineTabataWorkSec'), key: 'workSec', def: 20 },
+                    { label: tr(lang, 'routineTabataRestSec'), key: 'restSec', def: 10 },
+                    { label: tr(lang, 'routineTabataRoundsPerEx'), key: 'tabataRounds', def: 8 },
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
@@ -655,8 +657,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   {[
-                    { label: 'Sets (전체 반복)', key: 'tabataSets', def: 1 },
-                    { label: 'Set 간 휴식 (초)', key: 'setRestSec', def: 120 },
+                    { label: tr(lang, 'routineTabataSets'), key: 'tabataSets', def: 1 },
+                    { label: tr(lang, 'routineTabataSetRest'), key: 'setRestSec', def: 120 },
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
@@ -668,7 +670,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   ))}
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  예: 45s/15s × 2회/운동 → 운동 하나당 2라운드. Sets는 전체 블록 반복
+                  {tr(lang, 'routineTabataHint')}
                 </div>
               </div>
             )}
@@ -676,24 +678,24 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {format.type === 'for_time' && (
               <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  For Time: 정해진 운동량을 최대한 빠르게 완료. 점수 = 완료 시간
+                  {tr(lang, 'routineForTimeDesc')}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rounds (circuit 반복)</div>
+                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineForTimeRounds')}</div>
                     <input type="number" min="1" value={format.formatRounds ?? 1}
                       onChange={e => updateFormat({ formatRounds: parseInt(e.target.value) || 1 })}
                       style={{ textAlign: 'center', padding: '5px' }} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Time Cap (분, 선택)</div>
+                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineForTimeTimeCap')}</div>
                     <input type="number" min="1" value={format.timeCap ?? ''}
                       onChange={e => updateFormat({ timeCap: parseInt(e.target.value) || undefined })}
-                      placeholder="없음" style={{ textAlign: 'center', padding: '5px' }} />
+                      placeholder={tr(lang, 'routineForTimeNoCap')} style={{ textAlign: 'center', padding: '5px' }} />
                   </div>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  아래 운동별 reps = 라운드당 횟수. 총 운동량 = reps × rounds
+                  {tr(lang, 'routineForTimeHint')}
                 </div>
               </div>
             )}
@@ -701,16 +703,16 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {format.type === 'amrap' && (
               <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                  AMRAP: 정해진 시간 안에 circuit를 최대한 반복. 점수 = rounds + reps
+                  {tr(lang, 'routineAmrapDesc')}
                 </div>
                 <div style={{ maxWidth: '180px' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Duration (분)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineAmrapDuration')}</div>
                   <input type="number" min="1" value={format.duration ?? 20}
                     onChange={e => updateFormat({ duration: parseInt(e.target.value) || 20 })}
                     style={{ textAlign: 'center', padding: '5px' }} />
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                  아래 운동별 reps = 1라운드당 횟수
+                  {tr(lang, 'routineAmrapHint')}
                 </div>
               </div>
             )}
@@ -722,11 +724,11 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               return (
                 <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                    EMOM: 매 X분 시작에 정해진 reps 수행, 나머지는 휴식. 점수 = 완료율
+                    {tr(lang, 'routineEmomDesc')}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', alignItems: 'end' }}>
                     <div>
-                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Every X분 (E<strong>X</strong>MOM)</div>
+                      <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineEmomEvery')} (E<strong>X</strong>MOM)</div>
                       <input type="number" min="1" max="10" value={ev}
                         onChange={e => updateFormat({ every: parseInt(e.target.value) || 1 })}
                         style={{ textAlign: 'center', padding: '5px' }} />
@@ -743,7 +745,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     </div>
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                    E{ev > 1 ? ev : ''}MOM × {sets}sets = {totalMin}분. 아래 reps = 인터벌당 횟수
+                    E{ev > 1 ? ev : ''}MOM × {sets}sets = {totalMin}{tr(lang, 'minUnit')}. {tr(lang, 'routineAmrapHint')}
                   </div>
                 </div>
               )
@@ -754,7 +756,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
               return (
                 <div style={{ background: 'var(--s1)', borderRadius: 'var(--r)', padding: '12px', marginBottom: '14px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '10px', fontWeight: 500 }}>
-                    Interval: 자유 형식 work / rest 반복 — 운동별 ODD/EVEN 라운드 지정 가능
+                    {tr(lang, 'routineIntervalDesc')}
                   </div>
                   {/* 단위 전환 */}
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
@@ -765,20 +767,20 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         background: (!isSec && u === 'min' || isSec && u === 'sec') ? '#D4537E22' : 'transparent',
                         color: (!isSec && u === 'min' || isSec && u === 'sec') ? '#D4537E' : 'var(--tm)',
                         fontWeight: (!isSec && u === 'min' || isSec && u === 'sec') ? 700 : 400,
-                      }}>{u === 'min' ? '분 (min)' : '초 (sec)'}</button>
+                      }}>{u === 'min' ? tr(lang, 'routineIntervalMin') : tr(lang, 'routineIntervalSec')}</button>
                     ))}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                     {isSec ? (
                       <>
                         <div>
-                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Work (초)</div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalWorkSec')}</div>
                           <input type="number" min="1" value={format.workSec2 ?? 45}
                             onChange={e => updateFormat({ workSec2: parseInt(e.target.value) || 45 })}
                             style={{ textAlign: 'center', padding: '5px' }} />
                         </div>
                         <div>
-                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rest (초)</div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalRestSec')}</div>
                           <input type="number" min="1" value={format.restSec2 ?? 15}
                             onChange={e => updateFormat({ restSec2: parseInt(e.target.value) || 15 })}
                             style={{ textAlign: 'center', padding: '5px' }} />
@@ -787,13 +789,13 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     ) : (
                       <>
                         <div>
-                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Work (분)</div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalWorkMin')}</div>
                           <input type="number" min="1" value={format.workMin ?? 2}
                             onChange={e => updateFormat({ workMin: parseInt(e.target.value) || 2 })}
                             style={{ textAlign: 'center', padding: '5px' }} />
                         </div>
                         <div>
-                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rest (분)</div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalRestMin')}</div>
                           <input type="number" min="1" value={format.restMin ?? 1}
                             onChange={e => updateFormat({ restMin: parseInt(e.target.value) || 1 })}
                             style={{ textAlign: 'center', padding: '5px' }} />
@@ -808,18 +810,18 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     </div>
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
-                    아래 운동별로 ODD/EVEN 라운드 지정 및 MAX 플래그, 메모 입력 가능
+                    {tr(lang, 'routineIntervalHint')}
                   </div>
                 </div>
               )
             })()}
 
             {/* ── 운동 검색 ── */}
-            <div className="stitle" style={{ marginBottom: '8px' }}>운동 추가</div>
+            <div className="stitle" style={{ marginBottom: '8px' }}>{tr(lang, 'routineAddExLabel')}</div>
             <div className="sw" style={{ marginBottom: '6px' }}>
               <IconSearch size={16} className="si" />
               <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search... (단어 순서 무관)" style={{ paddingLeft: '36px' }} />
+                placeholder={tr(lang, 'routineSearchPlaceholder')} style={{ paddingLeft: '36px' }} />
             </div>
             <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '8px' }}>
               {muscles.map(m => (
@@ -854,14 +856,14 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             {/* ── 선택된 운동 ── */}
             {selected.length > 0 && (
               <div style={{ marginBottom: '14px' }}>
-                <div className="stitle" style={{ marginBottom: '8px' }}>선택된 운동 ({selected.length})</div>
+                <div className="stitle" style={{ marginBottom: '8px' }}>{tr(lang, 'routineSelectedLabel')} ({selected.length})</div>
                 <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
                   {/* 헤더 */}
                   <div style={{ display: 'grid', gridTemplateColumns: gridColsHeader, gap: '4px', padding: '6px 10px', background: 'var(--s1)', fontSize: '11px', color: 'var(--tm)' }}>
                     <span></span>
-                    <span>운동</span>
-                    {hasSets && <span style={{ textAlign: 'center' }}>세트</span>}
-                    <span style={{ textAlign: 'center' }}>{repsColLabel(format)}</span>
+                    <span>{tr(lang, 'tabExercises')}</span>
+                    {hasSets && <span style={{ textAlign: 'center' }}>{tr(lang, 'sets')}</span>}
+                    <span style={{ textAlign: 'center' }}>{repsColLabel(format, lang)}</span>
                     <span></span>
                   </div>
                   {selected.map((s, i) => {
@@ -906,7 +908,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               : <input type="number" min="1" value={s.reps}
                                   onChange={e => updateSetsReps(i, 'reps', e.target.value)}
                                   style={{ textAlign: 'center', padding: '4px 6px', fontSize: '13px' }}
-                                  placeholder={isTime ? '초' : '회'} />
+                                  placeholder={isTime ? tr(lang, 'sec') : tr(lang, 'reps')} />
                           }
                           <button className="idb" onClick={() => removeFromSelected(i)}><IconX size={14} /></button>
                         </div>
@@ -934,7 +936,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                             }}>MAX</button>
                             {/* 메모 (@ weight 등) */}
                             <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
-                              placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
+                              placeholder={tr(lang, 'routineNotePlaceholder')} style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
                         {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM, Tabata, For Time) */}
@@ -948,7 +950,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               fontWeight: s.maxReps ? 700 : 400,
                             }}>MAX</button>
                             <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
-                              placeholder="메모 (예: @ 55/75 lb)" style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
+                              placeholder={tr(lang, 'routineNotePlaceholder')} style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
                       </div>
