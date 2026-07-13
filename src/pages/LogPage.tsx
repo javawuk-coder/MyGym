@@ -49,10 +49,18 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[]): DraftEx[]
   })
 }
 
-function dayVolume(log: DayLog | undefined): number {
-  if (!log) return 0
-  return log.exercises.reduce((a, e) =>
-    a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
+function daySummary(log: DayLog | undefined) {
+  if (!log) return null
+  let vol = 0, sets = 0, reps = 0, pr = 0
+  for (const e of log.exercises) {
+    for (const s of (e.sets || [])) {
+      sets++
+      reps += s.reps || 0
+      vol += (s.weight || 0) * (s.reps || 0)
+      if (s.pr) pr++
+    }
+  }
+  return { vol, sets, reps, pr, exCount: log.exercises.length }
 }
 
 interface Props {
@@ -82,6 +90,20 @@ export default function LogPage({
   const [routineSearch, setRoutineSearch] = useState('')
   const [showAddExInFill, setShowAddExInFill] = useState(false)
   const [addExSearch, setAddExSearch] = useState('')
+
+  // ── Screen Wake Lock ─────────────────────────────────────────
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  const acquireWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen')
+      }
+    } catch { /* 권한 거부 시 무시 */ }
+  }
+  const releaseWakeLock = () => {
+    wakeLockRef.current?.release()
+    wakeLockRef.current = null
+  }
 
   // ── Timer state ───────────────────────────────────────────────
   // timerPhase: 'idle' | 'working' | 'resting'
@@ -159,7 +181,7 @@ export default function LogPage({
     setFillTitle(initialRoutine.name)
     setDraftExes(draftFromRoutine(initialRoutine, allExercises))
     setModal('fill')
-    startWorkout()
+    startWorkout(); acquireWakeLock()
     onConsumedInitial?.()
   }, [initialRoutine]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -175,7 +197,7 @@ export default function LogPage({
   // 이달 최대 볼륨 (색 정규화용)
   const monthVolumes = Array.from({ length: daysInMonth }, (_, i) => {
     const d = `${calMonth}-${String(i + 1).padStart(2, '0')}`
-    return dayVolume(logMap[d])
+    return daySummary(logMap[d])?.vol ?? 0
   })
   const maxMonthVol = Math.max(...monthVolumes, 1)
 
@@ -271,11 +293,11 @@ export default function LogPage({
 
   const openRoutineFill = (r: Routine & { id: string }) => {
     setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises)); setModal('fill')
-    startWorkout()
+    startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
     setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }]); setModal('fill')
-    startWorkout()
+    startWorkout(); acquireWakeLock()
   }
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
@@ -283,6 +305,7 @@ export default function LogPage({
     setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel('')
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
+    releaseWakeLock()
   }
 
   const save = async () => {
@@ -417,7 +440,7 @@ export default function LogPage({
   }
 
   // ── Render ────────────────────────────────────────────────────
-  const totalDayVol = Math.round(dayVolume(selectedLog))
+  const summary = daySummary(selectedLog)
 
   return (
     <div>
@@ -486,10 +509,19 @@ export default function LogPage({
           <span style={{ fontWeight: 600, fontSize: '15px' }}>
             {selectedDate === todayStr ? tr(lang, 'today') : formatDateHeader(selectedDate, LOCALE_MAP[lang])}
           </span>
-          {totalDayVol > 0 && (
-            <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '10px' }}>
-              Total {Math.round(fromKg(totalDayVol, unit)).toLocaleString()} {unit}
-            </span>
+          {summary && summary.sets > 0 && (
+            <div style={{ fontSize: '12px', color: 'var(--tm)', marginTop: '3px', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <span>{Math.round(fromKg(summary.vol, unit)).toLocaleString()} {unit}</span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>{summary.exCount} {lang === 'ko' ? '종목' : lang === 'vi' ? 'bài' : 'ex'}</span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>{summary.sets} {tr(lang, 'sets')}</span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>{summary.reps.toLocaleString()} {tr(lang, 'reps')}</span>
+              {summary.pr > 0 && (
+                <><span style={{ opacity: 0.4 }}>·</span><span style={{ color: '#E24B4A', fontWeight: 600 }}>PR {summary.pr}</span></>
+              )}
+            </div>
           )}
         </div>
         <button className="btn btn-p" onClick={() => setModal('pick')}>
