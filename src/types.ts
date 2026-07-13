@@ -20,6 +20,18 @@ export interface ExerciseSet {
   rir?: number    // Reps In Reserve (0~5)
 }
 
+export interface BodyEntry {
+  date: string        // YYYY-MM-DD (document ID)
+  weight: number      // 체중 (kg) — 필수
+  skeletalMuscle?: number  // 골격근량 (kg)
+  bodyFatMass?: number     // 체지방량 (kg)
+  bodyFatPct?: number      // 체지방률 (%)
+  visceralFat?: number     // 내장지방 레벨
+  waist?: number           // 허리둘레 (cm)
+  trunkFat?: number        // 체간지방률 (%)
+  createdAt?: unknown
+}
+
 export interface LogEntry {
   exId: string
   log_type: LogType

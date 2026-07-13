@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconLayoutList, IconPencil, IconBarbell, IconChartBar } from '@tabler/icons-react'
+import { IconLayoutList, IconPencil, IconBarbell, IconChartBar, IconScale } from '@tabler/icons-react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
 import AdminPage from './pages/AdminPage'
@@ -8,15 +8,17 @@ import RoutinePage from './pages/RoutinePage'
 import LogPage from './pages/LogPage'
 import ExercisesPage from './pages/ExercisesPage'
 import StatsPage from './pages/StatsPage'
+import BodyPage from './pages/BodyPage'
 import { useRoutines } from './hooks/useRoutines'
 import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
+import { useBodyLogs } from './hooks/useBodyLogs'
 import type { Routine, Exercise } from './types'
 import DB from './data/full_db.json'
 import { tr, type Lang } from './lib/i18n'
 import './index.css'
 
-type Tab = 'routine' | 'log' | 'exercises' | 'stats'
+type Tab = 'routine' | 'log' | 'exercises' | 'stats' | 'body'
 
 function MainApp() {
   const { user, profile } = useAuth()
@@ -35,11 +37,13 @@ function MainApp() {
     { id: 'log',       label: tr(lang, 'tabLog'),       Icon: IconPencil },
     { id: 'exercises', label: tr(lang, 'tabExercises'), Icon: IconBarbell },
     { id: 'stats',     label: tr(lang, 'tabStats'),     Icon: IconChartBar },
+    { id: 'body',      label: tr(lang, 'tabBody'),      Icon: IconScale },
   ]
 
   const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
+  const { bodyLogs, saveBodyEntry, deleteBodyEntry } = useBodyLogs(uid)
 
   const allExercises = [...(DB as Exercise[]), ...customExercises]
 
@@ -58,13 +62,13 @@ function MainApp() {
             key={id}
             onClick={() => setTab(id)}
             style={{
-              flex: 1, padding: '12px 0', textAlign: 'center', cursor: 'pointer',
-              fontSize: '14px', background: 'none', border: 'none', fontFamily: 'inherit',
+              flex: 1, padding: '10px 0', textAlign: 'center', cursor: 'pointer',
+              fontSize: '12px', background: 'none', border: 'none', fontFamily: 'inherit',
               color: tab === id ? 'var(--tp)' : 'var(--ts)',
               borderBottom: tab === id ? '2px solid var(--tp)' : '2px solid transparent',
               fontWeight: tab === id ? 500 : 400,
               transition: 'all .15s',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
             }}
           >
             <Icon size={15} />{label}
@@ -106,6 +110,9 @@ function MainApp() {
       )}
       {tab === 'stats' && (
         <StatsPage logs={logs} allExercises={allExercises} unit={unit} lang={lang} />
+      )}
+      {tab === 'body' && (
+        <BodyPage bodyLogs={bodyLogs} lang={lang} onSave={saveBodyEntry} onDelete={deleteBodyEntry} />
       )}
     </div>
   )

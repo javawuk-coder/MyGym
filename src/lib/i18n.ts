@@ -38,6 +38,15 @@ const strings = {
     start: 'Start', edit: 'Edit', delete: '삭제',
     // reps labels
     sets: '세트', reps: '회', sec: '초',
+    // body composition
+    tabBody: '바디',
+    bodyWeight: '체중', bodySkeletalMuscle: '골격근량', bodyFatMass: '체지방량',
+    bodyFatPct: '체지방률', bodyVisceralFat: '내장지방', bodyWaist: '허리둘레', bodyTrunkFat: 'Trunk Fat',
+    bodyAddRecord: '기록 추가', bodyNoData: '체성분 기록이 없어요',
+    bodyLatest: '최근 측정값', bodyTrend: '변화 추이',
+    bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: '레벨',
+    bodyDeleteConfirm: '이 기록을 삭제하시겠습니까?',
+    bodyHistory: '기록 히스토리',
   },
   en: {
     tabRoutine: 'Routine', tabLog: 'Log', tabExercises: 'Exercises', tabStats: 'Stats',
@@ -68,6 +77,14 @@ const strings = {
     noRoutinesList: 'No routines saved', newRoutine: 'New routine',
     start: 'Start', edit: 'Edit', delete: 'Delete',
     sets: 'sets', reps: 'reps', sec: 's',
+    tabBody: 'Body',
+    bodyWeight: 'Weight', bodySkeletalMuscle: 'Skeletal Muscle', bodyFatMass: 'Body Fat Mass',
+    bodyFatPct: 'Body Fat %', bodyVisceralFat: 'Visceral Fat', bodyWaist: 'Waist', bodyTrunkFat: 'Trunk Fat',
+    bodyAddRecord: 'Add Record', bodyNoData: 'No body composition data',
+    bodyLatest: 'Latest', bodyTrend: 'Trend',
+    bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: 'level',
+    bodyDeleteConfirm: 'Delete this record?',
+    bodyHistory: 'History',
   },
   vi: {
     tabRoutine: 'Lịch tập', tabLog: 'Nhật ký', tabExercises: 'Bài tập', tabStats: 'Thống kê',
@@ -98,6 +115,14 @@ const strings = {
     noRoutinesList: 'Chưa có lịch tập nào', newRoutine: 'Lịch tập mới',
     start: 'Bắt đầu', edit: 'Chỉnh sửa', delete: 'Xóa',
     sets: 'sets', reps: 'reps', sec: 's',
+    tabBody: 'Thân thể',
+    bodyWeight: 'Cân nặng', bodySkeletalMuscle: 'Cơ xương', bodyFatMass: 'Khối mỡ',
+    bodyFatPct: '% Mỡ cơ thể', bodyVisceralFat: 'Mỡ nội tạng', bodyWaist: 'Vòng eo', bodyTrunkFat: 'Trunk Fat',
+    bodyAddRecord: 'Thêm chỉ số', bodyNoData: 'Chưa có dữ liệu thành phần cơ thể',
+    bodyLatest: 'Gần nhất', bodyTrend: 'Xu hướng',
+    bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: 'mức',
+    bodyDeleteConfirm: 'Xóa bản ghi này?',
+    bodyHistory: 'Lịch sử',
   },
 } as const
 
