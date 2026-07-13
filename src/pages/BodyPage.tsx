@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react'
-import { IconPlus, IconTrash, IconChevronDown, IconChevronUp, IconUpload, IconDownload } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconChevronDown, IconChevronUp, IconUpload, IconDownload, IconTrendingUp, IconTrendingDown, IconMinus } from '@tabler/icons-react'
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend,
+  CartesianGrid, Tooltip,
 } from 'recharts'
 import type { BodyEntry, CustomBodyField } from '../types'
 import { tr, type Lang } from '../lib/i18n'
@@ -44,6 +44,75 @@ function collectCustomNames(logs: BodyEntry[]): string[] {
 
 function customColor(name: string, allNames: string[]) {
   return CUSTOM_COLORS[allNames.indexOf(name) % CUSTOM_COLORS.length]
+}
+
+// 감소가 좋은 지표 (체중, 체지방 계열)
+const LOWER_IS_BETTER = new Set<string>(['weight', 'bodyFatMass', 'bodyFatPct', 'visceralFat', 'waist', 'trunkFat'])
+
+function metricDomain(values: number[]): [number, number] {
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const pad = (max - min) * 0.15 || max * 0.05
+  return [Math.max(0, min - pad), max + pad]
+}
+
+interface MiniChartProps {
+  data: { date: string; value: number | undefined }[]
+  color: string
+  unit: string
+  label: string
+  fieldKey: string
+}
+
+function MiniChart({ data, color, unit, label, fieldKey }: MiniChartProps) {
+  const pts = data.filter(d => d.value != null) as { date: string; value: number }[]
+  if (pts.length < 2) return null
+
+  const first = pts[0].value
+  const last = pts[pts.length - 1].value
+  const change = last - first
+  const pct = Math.abs(change / first * 100)
+  const lowerIsBetter = LOWER_IS_BETTER.has(fieldKey)
+  const isGood = lowerIsBetter ? change < 0 : change > 0
+  const isFlat = Math.abs(change) < 0.05
+  const changeColor = isFlat ? 'var(--tm)' : isGood ? '#1D9E75' : '#E24B4A'
+  const domain = metricDomain(pts.map(p => p.value))
+
+  return (
+    <div className="card" style={{ padding: '12px 14px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+        <div>
+          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '2px' }}>{label}</div>
+          <div style={{ fontSize: '22px', fontWeight: 700, color, lineHeight: 1 }}>
+            {last}<span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--tm)', marginLeft: '2px' }}>{unit}</span>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', justifyContent: 'flex-end', color: changeColor, fontSize: '12px', fontWeight: 600 }}>
+            {isFlat ? <IconMinus size={13} /> : isGood ? <IconTrendingDown size={13} /> : <IconTrendingUp size={13} />}
+            {change > 0 ? '+' : ''}{change.toFixed(1)}{unit}
+          </div>
+          <div style={{ fontSize: '10px', color: 'var(--tm)', marginTop: '1px' }}>
+            {pct.toFixed(1)}% ({pts.length}회 측정)
+          </div>
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={90}>
+        <LineChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--bd)" vertical={false} />
+          <XAxis dataKey="date" tick={false} axisLine={false} tickLine={false} />
+          <YAxis domain={domain} tick={{ fontSize: 9, fill: 'var(--tm)' }} tickCount={3} width={36} />
+          <Tooltip
+            contentStyle={{ background: 'var(--bg2)', border: '0.5px solid var(--bd)', borderRadius: '8px', fontSize: '11px', padding: '4px 8px' }}
+            labelStyle={{ color: 'var(--tm)', fontSize: '10px' }}
+            formatter={(v: number) => [`${v} ${unit}`, label]}
+          />
+          <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2}
+            dot={{ r: 2, fill: color, strokeWidth: 0 }} activeDot={{ r: 4 }} connectNulls />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  )
 }
 
 // ── CSV 파싱 ──────────────────────────────────────────────────────────────────
@@ -100,7 +169,7 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
     visceralFat: '', waist: '', trunkFat: '',
   })
   const [customDraft, setCustomDraft] = useState<{ name: string; value: string; unit: string }[]>([])
-  const [activeLines, setActiveLines] = useState<Set<string>>(new Set(['weight', 'skeletalMuscle', 'bodyFatPct']))
+  // (activeLines 제거 — 지표별 개별 차트로 대체)
 
   // CSV import state
   const fileRef = useRef<HTMLInputElement>(null)
@@ -156,34 +225,12 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
     setCustomDraft(p => p.map((r, j) => j === i ? { ...r, [field]: val } : r))
   const removeCustom = (i: number) => setCustomDraft(p => p.filter((_, j) => j !== i))
 
-  // ── Chart ─────────────────────────────────────────────────────
-  const toggleLine = (key: string) => {
-    setActiveLines(prev => {
-      const next = new Set(prev)
-      if (next.has(key)) { if (next.size > 1) next.delete(key) }
-      else next.add(key)
-      return next
-    })
-  }
+  // ── Chart data per metric ─────────────────────────────────────
+  const miniData = (key: StdField) =>
+    bodyLogs.map(l => ({ date: fmtDate(l.date), value: l[key] }))
 
-  const chartData = bodyLogs.map(l => {
-    const { date: _d, customFields, ...rest } = l
-    const row: Record<string, unknown> = { date: fmtDate(l.date), ...rest }
-    for (const f of (customFields || [])) row[f.name] = f.value
-    return row
-  })
-
-  const activeStd = STD_FIELDS.filter(f => activeLines.has(f.key))
-  const activeCustom = allCustomNames.filter(n => activeLines.has(n))
-  const allActiveUnits = [
-    ...activeStd.map(f => f.unit),
-    ...activeCustom.map(n => {
-      const entry = bodyLogs.findLast(l => l.customFields?.some(c => c.name === n))
-      return entry?.customFields?.find(c => c.name === n)?.unit || ''
-    }),
-  ]
-  const uniqueUnits = [...new Set(allActiveUnits.filter(Boolean))]
-  const yUnit = uniqueUnits.length === 1 ? uniqueUnits[0] : ''
+  const miniCustomData = (name: string) =>
+    bodyLogs.map(l => ({ date: fmtDate(l.date), value: l.customFields?.find(f => f.name === name)?.value }))
 
   // ── CSV import ────────────────────────────────────────────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,98 +277,42 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
         <div className="emp">{tr(lang, 'bodyNoData')}</div>
       ) : (
         <>
-          {/* 최근 측정값 */}
+          {/* 최근 측정일 표시 */}
           {latest && (
-            <div className="card" style={{ padding: '14px 16px', marginBottom: '16px' }}>
-              <div style={{ fontSize: '12px', color: 'var(--tm)', marginBottom: '10px' }}>
-                {tr(lang, 'bodyLatest')} — {latest.date}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
-                {STD_FIELDS.map(f => {
-                  const val = latest[f.key]
-                  if (val == null) return null
-                  return (
-                    <div key={f.key}>
-                      <div style={{ fontSize: '10px', color: 'var(--tm)', marginBottom: '2px' }}>{tr(lang, f.labelKey as Parameters<typeof tr>[1])}</div>
-                      <div style={{ fontSize: '18px', fontWeight: 700, color: f.color }}>
-                        {val}<span style={{ fontSize: '11px', fontWeight: 400, color: 'var(--tm)', marginLeft: '2px' }}>{f.unit}</span>
-                      </div>
-                    </div>
-                  )
-                })}
-                {(latest.customFields || []).map(f => (
-                  <div key={f.name}>
-                    <div style={{ fontSize: '10px', color: 'var(--tm)', marginBottom: '2px' }}>{f.name}</div>
-                    <div style={{ fontSize: '18px', fontWeight: 700, color: customColor(f.name, allCustomNames) }}>
-                      {f.value}<span style={{ fontSize: '11px', fontWeight: 400, color: 'var(--tm)', marginLeft: '2px' }}>{f.unit}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div style={{ fontSize: '12px', color: 'var(--tm)', marginBottom: '10px' }}>
+              {tr(lang, 'bodyLatest')} — {latest.date}
             </div>
           )}
 
-          {/* 차트 */}
-          <div className="card" style={{ padding: '14px 16px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>{tr(lang, 'bodyTrend')}</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
-              {STD_FIELDS.map(f => {
-                if (!bodyLogs.some(l => l[f.key] != null)) return null
-                const active = activeLines.has(f.key)
-                return (
-                  <button key={f.key} onClick={() => toggleLine(f.key)} style={{
-                    padding: '4px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer',
-                    border: `1.5px solid ${f.color}`,
-                    background: active ? f.color : 'transparent',
-                    color: active ? '#fff' : f.color,
-                    fontFamily: 'inherit', fontWeight: 500,
-                  }}>
-                    {tr(lang, f.labelKey as Parameters<typeof tr>[1])}
-                  </button>
-                )
-              })}
-              {allCustomNames.map(name => {
-                const color = customColor(name, allCustomNames)
-                const active = activeLines.has(name)
-                return (
-                  <button key={name} onClick={() => toggleLine(name)} style={{
-                    padding: '4px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer',
-                    border: `1.5px solid ${color}`,
-                    background: active ? color : 'transparent',
-                    color: active ? '#fff' : color,
-                    fontFamily: 'inherit', fontWeight: 500,
-                  }}>
-                    {name}
-                  </button>
-                )
-              })}
-            </div>
-
-            {uniqueUnits.length > 1 && (
-              <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px' }}>
-                단위가 다른 지표를 함께 선택하면 상대적 변화 추이로 비교됩니다
-              </div>
-            )}
-
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--bd)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--tm)' }} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--tm)' }} unit={yUnit} />
-                <Tooltip contentStyle={{ background: 'var(--bg2)', border: '0.5px solid var(--bd)', borderRadius: '8px', fontSize: '12px' }} labelStyle={{ color: 'var(--tm)' }} />
-                <Legend wrapperStyle={{ fontSize: '11px' }} />
-                {STD_FIELDS.filter(f => activeLines.has(f.key)).map(f => (
-                  <Line key={f.key} type="monotone" dataKey={f.key}
-                    name={tr(lang, f.labelKey as Parameters<typeof tr>[1])}
-                    stroke={f.color} strokeWidth={2} dot={{ r: 3, fill: f.color }} activeDot={{ r: 5 }} connectNulls />
-                ))}
-                {allCustomNames.filter(n => activeLines.has(n)).map(name => (
-                  <Line key={name} type="monotone" dataKey={name} name={name}
-                    stroke={customColor(name, allCustomNames)} strokeWidth={2}
-                    dot={{ r: 3, fill: customColor(name, allCustomNames) }} activeDot={{ r: 5 }} connectNulls />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+          {/* 지표별 개별 차트 그리드 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            {STD_FIELDS.map(f => {
+              if (!bodyLogs.some(l => l[f.key] != null)) return null
+              return (
+                <MiniChart
+                  key={f.key}
+                  fieldKey={f.key}
+                  label={tr(lang, f.labelKey as Parameters<typeof tr>[1])}
+                  unit={f.unit}
+                  color={f.color}
+                  data={miniData(f.key)}
+                />
+              )
+            })}
+            {allCustomNames.map(name => {
+              const unit = bodyLogs.findLast(l => l.customFields?.some(c => c.name === name))
+                ?.customFields?.find(c => c.name === name)?.unit || ''
+              return (
+                <MiniChart
+                  key={name}
+                  fieldKey={name}
+                  label={name}
+                  unit={unit}
+                  color={customColor(name, allCustomNames)}
+                  data={miniCustomData(name)}
+                />
+              )
+            })}
           </div>
 
           {/* 히스토리 */}
