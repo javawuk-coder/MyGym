@@ -167,8 +167,9 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
   }
 
   const chartData = bodyLogs.map(l => {
-    const row: Record<string, unknown> = { date: fmtDate(l.date), ...l }
-    for (const f of (l.customFields || [])) row[f.name] = f.value
+    const { date: _d, customFields, ...rest } = l
+    const row: Record<string, unknown> = { date: fmtDate(l.date), ...rest }
+    for (const f of (customFields || [])) row[f.name] = f.value
     return row
   })
 
