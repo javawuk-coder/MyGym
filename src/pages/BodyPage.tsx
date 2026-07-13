@@ -105,7 +105,7 @@ function MiniChart({ data, color, unit, label, fieldKey }: MiniChartProps) {
           <Tooltip
             contentStyle={{ background: 'var(--bg2)', border: '0.5px solid var(--bd)', borderRadius: '8px', fontSize: '11px', padding: '4px 8px' }}
             labelStyle={{ color: 'var(--tm)', fontSize: '10px' }}
-            formatter={(v: number) => [`${v} ${unit}`, label]}
+            formatter={(v) => [`${v} ${unit}`, label]}
           />
           <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2}
             dot={{ r: 2, fill: color, strokeWidth: 0 }} activeDot={{ r: 4 }} connectNulls />
