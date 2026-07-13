@@ -62,9 +62,10 @@ interface MiniChartProps {
   unit: string
   label: string
   fieldKey: string
+  lang: Lang
 }
 
-function MiniChart({ data, color, unit, label, fieldKey }: MiniChartProps) {
+function MiniChart({ data, color, unit, label, fieldKey, lang }: MiniChartProps) {
   const pts = data.filter(d => d.value != null) as { date: string; value: number }[]
   if (pts.length < 2) return null
 
@@ -93,7 +94,7 @@ function MiniChart({ data, color, unit, label, fieldKey }: MiniChartProps) {
             {change > 0 ? '+' : ''}{change.toFixed(1)}{unit}
           </div>
           <div style={{ fontSize: '10px', color: 'var(--tm)', marginTop: '1px' }}>
-            {pct.toFixed(1)}% ({pts.length}회 측정)
+            {pct.toFixed(1)}% ({pts.length} {tr(lang, 'bodyMeasurements')})
           </div>
         </div>
       </div>
@@ -261,10 +262,10 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
         <span style={{ fontWeight: 700, fontSize: '16px' }}>{tr(lang, 'tabBody')}</span>
         <div style={{ display: 'flex', gap: '6px' }}>
           <button className="btn" onClick={downloadTemplate} style={{ fontSize: '12px' }}>
-            <IconDownload size={13} style={{ marginRight: 3 }} />CSV 템플릿
+            <IconDownload size={13} style={{ marginRight: 3 }} />{tr(lang, 'bodyCsvTemplate')}
           </button>
           <button className="btn" onClick={() => fileRef.current?.click()} style={{ fontSize: '12px' }}>
-            <IconUpload size={13} style={{ marginRight: 3 }} />가져오기
+            <IconUpload size={13} style={{ marginRight: 3 }} />{tr(lang, 'bodyImportBtn')}
           </button>
           <input ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileChange} />
           <button className="btn btn-p" onClick={openForm}>
@@ -296,6 +297,7 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
                   unit={f.unit}
                   color={f.color}
                   data={miniData(f.key)}
+                  lang={lang}
                 />
               )
             })}
@@ -310,6 +312,7 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
                   unit={unit}
                   color={customColor(name, allCustomNames)}
                   data={miniCustomData(name)}
+                  lang={lang}
                 />
               )
             })}
@@ -378,7 +381,7 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
                   </div>
                   <input type="number" value={stdValues[f.key]}
                     onChange={e => setStdValues(v => ({ ...v, [f.key]: e.target.value }))}
-                    placeholder={f.required ? '필수' : '선택'} min="0" step="0.1" />
+                    placeholder={f.required ? tr(lang, 'bodyRequired') : tr(lang, 'bodyOptional')} min="0" step="0.1" />
                 </div>
               ))}
             </div>
@@ -386,7 +389,7 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
             {/* 커스텀 필드 */}
             {customDraft.length > 0 && (
               <div style={{ borderTop: '0.5px solid var(--bd)', paddingTop: '10px', marginBottom: '10px' }}>
-                <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600 }}>커스텀 필드</div>
+                <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '8px', fontWeight: 600 }}>{tr(lang, 'bodyCustomSection')}</div>
                 {customDraft.map((row, i) => (
                   <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px 24px', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
                     <input value={row.name} onChange={e => updateCustom(i, 'name', e.target.value)}
@@ -421,11 +424,11 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
       {importPreview && (
         <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setImportPreview(null) }}>
           <div className="mo" style={{ maxWidth: '480px' }}>
-            <div className="mt2">CSV 가져오기</div>
+            <div className="mt2">{tr(lang, 'bodyImportTitle')}</div>
             <div style={{ fontSize: '13px', marginBottom: '12px' }}>
-              <span style={{ color: '#1D9E75', fontWeight: 600 }}>{importPreview.entries.length}건</span> 가져올 수 있습니다.
+              <span style={{ color: '#1D9E75', fontWeight: 600 }}>{importPreview.entries.length}</span> {tr(lang, 'bodyImportFound')}.
               {importPreview.skipped > 0 && (
-                <span style={{ color: 'var(--tm)', marginLeft: '8px' }}>({importPreview.skipped}건 스킵 — 체중 0 또는 날짜 없음)</span>
+                <span style={{ color: 'var(--tm)', marginLeft: '8px' }}>({importPreview.skipped} {tr(lang, 'bodyImportSkipped')})</span>
               )}
             </div>
 
@@ -436,8 +439,8 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
                     <span style={{ fontWeight: 600 }}>{e.date}</span>
                     <span style={{ color: 'var(--tm)' }}>
                       {e.weight}kg
-                      {e.skeletalMuscle != null && ` · 근육 ${e.skeletalMuscle}kg`}
-                      {e.bodyFatPct != null && ` · 체지방 ${e.bodyFatPct}%`}
+                      {e.skeletalMuscle != null && ` · ${tr(lang, 'bodySkeletalMuscle')} ${e.skeletalMuscle}kg`}
+                      {e.bodyFatPct != null && ` · ${tr(lang, 'bodyFatPct')} ${e.bodyFatPct}%`}
                     </span>
                   </div>
                 ))}
@@ -445,12 +448,12 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
             )}
 
             <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '16px' }}>
-              기존 같은 날짜 기록은 덮어씁니다.
+              {tr(lang, 'bodyImportOverwrite')}
             </div>
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <button className="btn" onClick={() => setImportPreview(null)} disabled={importing}>{tr(lang, 'cancel')}</button>
               <button className="btn btn-p" onClick={confirmImport} disabled={importing || !importPreview.entries.length}>
-                {importing ? '저장 중...' : `${importPreview.entries.length}건 저장`}
+                {importing ? tr(lang, 'bodyImportSaving') : `${importPreview.entries.length} ${tr(lang, 'bodyImportSave')}`}
               </button>
             </div>
           </div>
