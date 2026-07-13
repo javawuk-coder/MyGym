@@ -29,10 +29,23 @@ export function useBodyLogs(uid: string | undefined) {
     await setDoc(ref, clean)
   }
 
+  const saveBodyEntryBatch = async (entries: BodyEntry[]) => {
+    if (!uid) return
+    await Promise.all(entries.map(entry => {
+      const ref = doc(db, 'users', uid!, 'bodyLogs', entry.date)
+      const { date, ...rest } = entry
+      const clean: Record<string, unknown> = { date }
+      for (const [k, v] of Object.entries(rest)) {
+        if (v !== undefined && v !== '') clean[k] = v
+      }
+      return setDoc(ref, clean)
+    }))
+  }
+
   const deleteBodyEntry = async (date: string) => {
     if (!uid) return
     await deleteDoc(doc(db, 'users', uid, 'bodyLogs', date))
   }
 
-  return { bodyLogs, saveBodyEntry, deleteBodyEntry }
+  return { bodyLogs, saveBodyEntry, saveBodyEntryBatch, deleteBodyEntry }
 }

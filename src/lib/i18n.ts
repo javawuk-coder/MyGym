@@ -47,6 +47,9 @@ const strings = {
     bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: '레벨',
     bodyDeleteConfirm: '이 기록을 삭제하시겠습니까?',
     bodyHistory: '기록 히스토리',
+    bodyCustomField: '커스텀 필드 추가',
+    bodyCustomName: '항목 이름 (예: BMI)',
+    bodyCustomUnit: '단위 (선택)',
   },
   en: {
     tabRoutine: 'Routine', tabLog: 'Log', tabExercises: 'Exercises', tabStats: 'Stats',
@@ -85,6 +88,9 @@ const strings = {
     bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: 'level',
     bodyDeleteConfirm: 'Delete this record?',
     bodyHistory: 'History',
+    bodyCustomField: 'Add custom field',
+    bodyCustomName: 'Field name (e.g. BMI)',
+    bodyCustomUnit: 'Unit (optional)',
   },
   vi: {
     tabRoutine: 'Lịch tập', tabLog: 'Nhật ký', tabExercises: 'Bài tập', tabStats: 'Thống kê',
@@ -123,6 +129,9 @@ const strings = {
     bodyKg: 'kg', bodyPct: '%', bodyCm: 'cm', bodyLevel: 'mức',
     bodyDeleteConfirm: 'Xóa bản ghi này?',
     bodyHistory: 'Lịch sử',
+    bodyCustomField: 'Thêm chỉ số tùy chỉnh',
+    bodyCustomName: 'Tên chỉ số (vd: BMI)',
+    bodyCustomUnit: 'Đơn vị (tùy chọn)',
   },
 } as const
 

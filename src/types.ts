@@ -20,6 +20,12 @@ export interface ExerciseSet {
   rir?: number    // Reps In Reserve (0~5)
 }
 
+export interface CustomBodyField {
+  name: string    // 사용자 정의 이름 (e.g. "BMI", "목둘레")
+  value: number
+  unit?: string   // e.g. "kg/m²", "cm"
+}
+
 export interface BodyEntry {
   date: string        // YYYY-MM-DD (document ID)
   weight: number      // 체중 (kg) — 필수
@@ -29,6 +35,7 @@ export interface BodyEntry {
   visceralFat?: number     // 내장지방 레벨
   waist?: number           // 허리둘레 (cm)
   trunkFat?: number        // 체간지방률 (%)
+  customFields?: CustomBodyField[]
   createdAt?: unknown
 }
 

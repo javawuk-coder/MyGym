@@ -43,7 +43,7 @@ function MainApp() {
   const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
-  const { bodyLogs, saveBodyEntry, deleteBodyEntry } = useBodyLogs(uid)
+  const { bodyLogs, saveBodyEntry, saveBodyEntryBatch, deleteBodyEntry } = useBodyLogs(uid)
 
   const allExercises = [...(DB as Exercise[]), ...customExercises]
 
@@ -112,7 +112,7 @@ function MainApp() {
         <StatsPage logs={logs} allExercises={allExercises} unit={unit} lang={lang} />
       )}
       {tab === 'body' && (
-        <BodyPage bodyLogs={bodyLogs} lang={lang} onSave={saveBodyEntry} onDelete={deleteBodyEntry} />
+        <BodyPage bodyLogs={bodyLogs} lang={lang} onSave={saveBodyEntry} onSaveBatch={saveBodyEntryBatch} onDelete={deleteBodyEntry} />
       )}
     </div>
   )
