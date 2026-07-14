@@ -657,7 +657,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
           </button>
         </div>
       )}
-    </div>,
+    </div>
   )
 }
 
