@@ -83,12 +83,12 @@ function GoalEditModal({ lang, profile, onSave, onClose }: {
   ]
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#0008', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: 'var(--bg1)', borderRadius: '18px 18px 0 0', width: '100%', maxWidth: '500px', padding: '20px 18px 40px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+    <div style={{ minHeight: '100vh', padding: '0 0 40px' }}>
         {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ts)', padding: '4px', display: 'flex', alignItems: 'center' }}><IconChevronLeft size={22} /></button>
           <div style={{ fontSize: '17px', fontWeight: 800 }}>{lang === 'ko' ? '목표 편집' : 'Edit Goals'}</div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ts)', padding: '4px' }}><IconX size={20} /></button>
+          <div style={{ width: 30 }} />
         </div>
 
         {/* 목표 선택 */}
@@ -153,7 +153,6 @@ function GoalEditModal({ lang, profile, onSave, onClose }: {
         <button onClick={handleSave} disabled={saving} style={{ width: '100%', padding: '14px', background: 'var(--green)', color: '#fff', border: 'none', borderRadius: 'var(--r)', fontSize: '15px', fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>
           {saving ? (lang === 'ko' ? '저장 중...' : 'Saving...') : (lang === 'ko' ? '저장' : 'Save')}
         </button>
-      </div>
     </div>
   )
 }
@@ -916,11 +915,14 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
     setShowWeightBanner(false)
   }
 
+  if (showGoalEdit) {
+    return (
+      <GoalEditModal lang={lang} profile={profile} onSave={onSaveProfile} onClose={() => setShowGoalEdit(false)} />
+    )
+  }
+
   return (
     <div style={{ position: 'relative' }}>
-      {showGoalEdit && (
-        <GoalEditModal lang={lang} profile={profile} onSave={onSaveProfile} onClose={() => setShowGoalEdit(false)} />
-      )}
       {/* Date nav */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
         <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ts)' }}><IconChevronLeft size={20} /></button>
