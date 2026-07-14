@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
 import { buildProfile, calcMacros, MEAL_SLOTS } from '../lib/dietCalc'
@@ -427,8 +428,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const inputStyle = { width: '100%', padding: '11px 13px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }
   const labelStyle = { fontSize: '11px', fontWeight: 700 as const, color: 'var(--tm)', textTransform: 'uppercase' as const, letterSpacing: '.05em', marginBottom: '5px', display: 'block' }
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', background: 'var(--bg1)' }}>
+  return createPortal(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', flexDirection: 'column', background: 'var(--bg1)' }}>
       {/* Header */}
       <div style={{ padding: '14px 18px 0', borderBottom: '.5px solid var(--bd)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -657,7 +658,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
           </button>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   )
 }
 
