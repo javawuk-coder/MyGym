@@ -3,6 +3,7 @@ import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled
 import { tr, type Lang } from '../lib/i18n'
 import { buildProfile, calcMacros, MEAL_SLOTS } from '../lib/dietCalc'
 import { searchFood, calcEntryNutrition } from '../lib/foodApi'
+import type { LocalFood } from '../lib/foodApi'
 import type {
   DietProfile, DietLog, MealSlotKey, DietEntry,
   FoodItem, FavoriteFood, CustomFood, MealTemplate, BodyEntry, ActivityLevel, FitnessGoal,
@@ -405,6 +406,9 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   }
 
   function FoodRow({ food, onSelect }: { food: FoodItem; onSelect: () => void }) {
+    const lf = food as LocalFood
+    const serving = lf.servingSize
+    const servingCal = serving ? Math.round(food.calories100g * serving / 100) : null
     return (
       <div onClick={onSelect} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 18px', borderBottom: '.5px solid var(--bd)', cursor: 'pointer' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -412,6 +416,11 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
           <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '1px' }}>
             {food.brand ? `${food.brand} · ` : ''}{macroBar(food) ?? `${food.calories100g} kcal/100g`}
           </div>
+          {lf.servingLabel && (
+            <div style={{ fontSize: '10px', color: 'var(--green)', marginTop: '2px', fontWeight: 600 }}>
+              📏 {lf.servingLabel} = {servingCal} kcal
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{ fontSize: '15px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{food.calories100g}</div>
@@ -476,13 +485,13 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
             {query && !searching && results.length > 0 && (
               <>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietSearchResults')} ({results.length}) · {tr(lang, 'dietOffNote')}</div>
-                {results.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount(100) }} />)}
+                {results.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
               </>
             )}
             {!query && recentFoods.length > 0 && (
               <>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietRecentFoods')}</div>
-                {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount(100) }} />)}
+                {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
               </>
             )}
             <div onClick={() => setCreating('food')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderTop: '.5px solid var(--bd)' }}>
@@ -497,6 +506,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
             {favorites.length === 0
               ? <div style={{ padding: '30px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoFav')}</div>
               : favorites.map(fav => <FoodRow key={fav.id} food={foodItemToFoodType(fav)} onSelect={() => { setSelected(foodItemToFoodType(fav)); setAmount(100) }} />)
+
             }
           </>
         )}
@@ -579,9 +589,14 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
               style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
             <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
           </div>
-          <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            {selected && (selected as LocalFood).servingSize && (
+              <button onClick={() => setAmount((selected as LocalFood).servingSize!)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', background: amount === (selected as LocalFood).servingSize ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--bd)'}`, color: amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--tm)', fontWeight: 600 }}>
+                {(selected as LocalFood).servingLabel}
+              </button>
+            )}
             {[50, 100, 150, 200].map(v => (
-              <button key={v} onClick={() => setAmount(v)} style={{ flex: 1, padding: '6px', textAlign: 'center', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
+              <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
             ))}
           </div>
           <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
