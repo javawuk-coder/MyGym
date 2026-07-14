@@ -790,8 +790,6 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
     setShowWeightBanner(false)
   }
 
-  const openSlotData = openSlot ? MEAL_SLOTS.find(s => s.key === openSlot) : null
-
   return (
     <div style={{ position: 'relative' }}>
       {/* Date nav */}
