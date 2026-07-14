@@ -735,7 +735,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
   // Weight sync check
   useEffect(() => {
     if (!profile || !bodyLogs.length) return
-    const latest = bodyLogs[0]?.weight
+    const latest = bodyLogs[bodyLogs.length - 1]?.weight
     if (latest && Math.abs(latest - profile.weight) >= 0.5) setShowWeightBanner(true)
   }, [profile, bodyLogs])
 
@@ -763,7 +763,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
   const range = { lo: Math.round(profile.calories * 0.9), hi: Math.round(profile.calories * 1.1) }
 
   async function handleWeightUpdate() {
-    const latest = bodyLogs[0]?.weight
+    const latest = bodyLogs[bodyLogs.length - 1]?.weight
     if (!latest || !profile) return
     const { protein, fat, carbs } = calcMacros(profile.calories, latest, profile.goal, profile.protMultiplier)
     await onSaveProfile({ ...profile, weight: latest, protein, fat, carbs })
@@ -786,7 +786,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
         <div style={{ background: '#F59E0B14', border: '.5px solid #F59E0B44', borderRadius: 'var(--r)', padding: '10px 13px', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
           <span style={{ fontSize: '16px' }}>⚖️</span>
           <div style={{ flex: 1, fontSize: '12px', lineHeight: 1.4 }}>
-            <strong>{tr(lang, 'dietWeightSync')}</strong> ({profile.weight}kg → {bodyLogs[0]?.weight}kg). {lang === 'ko' ? '칼로리 목표를 재계산할까요?' : 'Recalculate calorie target?'}
+            <strong>{tr(lang, 'dietWeightSync')}</strong> ({profile.weight}kg → {bodyLogs[bodyLogs.length - 1]?.weight}kg). {lang === 'ko' ? '칼로리 목표를 재계산할까요?' : 'Recalculate calorie target?'}
           </div>
           <button onClick={handleWeightUpdate} style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', background: '#E8930A', color: '#fff', border: 'none', borderRadius: '20px', cursor: 'pointer', fontFamily: 'inherit' }}>{tr(lang, 'dietWeightUpdate')}</button>
           <button onClick={() => setShowWeightBanner(false)} style={{ fontSize: '11px', padding: '4px 10px', background: 'var(--bg3)', color: 'var(--tm)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontFamily: 'inherit' }}>{tr(lang, 'dietWeightKeep')}</button>
