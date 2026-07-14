@@ -63,13 +63,10 @@ const KO_DB: LocalFood[] = [
 
 function searchLocal(query: string): LocalFood[] {
   const q = query.toLowerCase().trim()
-  const words = q.split(/\s+/)
+  if (!q) return []
   return KO_DB.filter(f => {
-    const name = f.name.toLowerCase()
-    const aliases = (f.aliases ?? []).map(a => a.toLowerCase())
-    const allTerms = [name, ...aliases]
-    return allTerms.some(t => t.includes(q)) ||
-      words.every(w => allTerms.some(t => t.includes(w)))
+    const allTerms = [f.name.toLowerCase(), ...(f.aliases ?? []).map(a => a.toLowerCase())]
+    return allTerms.some(t => t.includes(q) || q.includes(t) && t.length >= 2)
   })
 }
 
@@ -118,20 +115,23 @@ async function fetchOFF(query: string): Promise<FoodItem[]> {
   }
 }
 
+// 한글 포함 여부 판별
+function hasKorean(s: string) { return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(s) }
+
 export async function searchFood(query: string, _lang = 'ko'): Promise<FoodItem[]> {
   if (!query.trim()) return []
 
   // 1) 로컬 DB — 한국어·영어 aliases 모두 매칭
   const localResults = searchLocal(query)
 
-  // 2) Open Food Facts — 이름만 검색 (ingredients 제외)
+  // 2) Open Food Facts — 영문 검색어일 때만 호출 (한글 쿼리는 OFF가 엉뚱한 결과 반환)
+  if (hasKorean(query)) {
+    return localResults
+  }
+
   const offResults = await fetchOFF(query)
-
-  // 중복 제거 (id 기준)
   const seen = new Set(localResults.map(f => f.id))
-  const deduped = offResults.filter(f => !seen.has(f.id))
-
-  return [...localResults, ...deduped]
+  return [...localResults, ...offResults.filter(f => !seen.has(f.id))]
 }
 
 export function calcEntryNutrition(item: FoodItem, amountG: number) {
