@@ -659,7 +659,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         </div>
       )}
     </div>,
-    document.body
+    document.getElementById('modal-root')!
   )
 }
 
