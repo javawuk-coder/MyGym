@@ -61,12 +61,19 @@ const KO_DB: LocalFood[] = [
   { id: 'local-bibimbap', name: '비빔밥', aliases: ['bibimbap'], source: 'custom', calories100g: 110, carbs100g: 20.0, protein100g: 4.5, fat100g: 2.0, servingSize: 400, servingLabel: '1인분 (400g)' },
 ]
 
+function matchesQuery(term: string, q: string): boolean {
+  if (term === q) return true
+  if (term.startsWith(q + ' ') || term.endsWith(' ' + q) || term.includes(' ' + q + ' ')) return true
+  if (term.startsWith(q)) return true
+  return false
+}
+
 function searchLocal(query: string): LocalFood[] {
   const q = query.toLowerCase().trim()
   if (!q) return []
   return KO_DB.filter(f => {
     const allTerms = [f.name.toLowerCase(), ...(f.aliases ?? []).map(a => a.toLowerCase())]
-    return allTerms.some(t => t.includes(q) || q.includes(t) && t.length >= 2)
+    return allTerms.some(t => matchesQuery(t, q) || t.includes(q))
   })
 }
 
@@ -130,8 +137,14 @@ export async function searchFood(query: string, _lang = 'ko'): Promise<FoodItem[
   }
 
   const offResults = await fetchOFF(query)
+  const q = query.toLowerCase()
+  // OFF 결과: 제품명에 검색어가 단어로 포함될 때만 허용
+  const filteredOff = offResults.filter(f => {
+    const name = f.name.toLowerCase()
+    return name.includes(q)
+  })
   const seen = new Set(localResults.map(f => f.id))
-  return [...localResults, ...offResults.filter(f => !seen.has(f.id))]
+  return [...localResults, ...filteredOff.filter(f => !seen.has(f.id))]
 }
 
 export function calcEntryNutrition(item: FoodItem, amountG: number) {
