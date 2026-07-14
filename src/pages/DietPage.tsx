@@ -52,7 +52,7 @@ type FoodTab = 'search' | 'fav' | 'meal' | 'mine'
 function Onboarding({ lang, bodyLogs, onSave }: {
   lang: Lang; bodyLogs: BodyEntry[]; onSave: (p: DietProfile) => Promise<void>
 }) {
-  const latestWeight = bodyLogs[0]?.weight ?? 70
+  const latestWeight = bodyLogs[bodyLogs.length - 1]?.weight ?? 70
   const [step, setStep] = useState(1)
   const [gender, setGender] = useState<'male' | 'female'>('male')
   const [age, setAge] = useState(30)
@@ -96,8 +96,8 @@ function Onboarding({ lang, bodyLogs, onSave }: {
   const s = { display: 'flex', flexDirection: 'column' as const, gap: '10px', padding: '0 0 80px' }
 
   return (
-    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg1)', zIndex: 50, overflowY: 'auto' }}>
-      <div style={{ padding: '20px 20px 0' }}>
+    <div>
+      <div style={{ padding: '4px 0 0' }}>
         {/* Step indicator */}
         <div style={{ display: 'flex', gap: '5px', marginBottom: '22px' }}>
           {[1,2,3,4].map(i => (
@@ -149,9 +149,9 @@ function Onboarding({ lang, bodyLogs, onSave }: {
                   onChange={e => setWeight(Number(e.target.value))}
                   style={{ flex: 1, border: 'none', background: 'transparent', padding: '11px 13px', fontSize: '16px', fontWeight: 700, fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
                 {bodyLogs.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', background: 'var(--green-bg)', borderLeft: '.5px solid var(--green-bd)' }}>
-                    <span style={{ fontSize: '10px', color: 'var(--green)', fontWeight: 700 }}>🔗 {tr(lang, 'dietBodyLinked')}</span>
-                  </div>
+                  <button onClick={() => setWeight(latestWeight)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', background: 'var(--green-bg)', border: 'none', borderLeft: '.5px solid var(--green-bd)', cursor: 'pointer' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--green)', fontWeight: 700 }}>🔗 {tr(lang, 'dietBodyLinked')} ({latestWeight}kg)</span>
+                  </button>
                 )}
                 <span style={{ padding: '11px 12px', fontSize: '13px', color: 'var(--tm)', background: 'var(--bg3)', borderLeft: '.5px solid var(--bd)' }}>kg</span>
               </div>
@@ -749,9 +749,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
 
   if (profile === null) {
     return (
-      <div style={{ position: 'relative', minHeight: '400px' }}>
-        <Onboarding lang={lang} bodyLogs={bodyLogs} onSave={onSaveProfile} />
-      </div>
+      <Onboarding lang={lang} bodyLogs={bodyLogs} onSave={onSaveProfile} />
     )
   }
 
