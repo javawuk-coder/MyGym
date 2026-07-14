@@ -821,7 +821,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
       <div style={{ background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden', marginBottom: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 0', fontSize: '13px', fontWeight: 700 }}>
           <span>{lang === 'ko' ? '영양정보' : 'Nutrition'}</span>
-          <button onClick={() => setShowEditGoal(true)} style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}>{tr(lang, 'dietEditGoal')}</button>
+          <button onClick={() => {}} style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}>{tr(lang, 'dietEditGoal')}</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
           {[
