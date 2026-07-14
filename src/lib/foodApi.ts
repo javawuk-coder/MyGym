@@ -154,4 +154,3 @@ export function calcEntryNutrition(item: FoodItem, amountG: number) {
 }
 
 export { KO_DB }
-export type { LocalFood }
