@@ -108,3 +108,89 @@ export interface Routine {
   format?: WorkoutFormat
   createdAt?: unknown
 }
+
+// ── Diet / Nutrition ────────────────────────────────────────────────────────
+
+export interface FoodItem {
+  id: string
+  name: string
+  brand?: string
+  calories100g: number
+  carbs100g: number
+  protein100g: number
+  fat100g: number
+  source: 'openfoodfacts' | 'custom'
+}
+
+export interface DietEntry {
+  foodId?: string
+  name: string
+  brand?: string
+  amount: number         // grams (or 1 for meal template "serving")
+  unit: 'g' | 'serving'
+  calories: number
+  carbs: number
+  protein: number
+  fat: number
+  source: 'openfoodfacts' | 'custom' | 'meal'
+}
+
+export type MealSlotKey = 'breakfast' | 'snackAm' | 'lunch' | 'snackPm' | 'dinner' | 'snackEve'
+
+export interface DietLog {
+  date: string
+  meals: Record<MealSlotKey, DietEntry[]>
+}
+
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
+export type FitnessGoal = 'cut' | 'maintain' | 'bulk'
+
+export interface DietProfile {
+  calories: number
+  carbs: number
+  protein: number
+  fat: number
+  weight: number
+  height: number
+  age: number
+  gender: 'male' | 'female'
+  activityLevel: ActivityLevel
+  goal: FitnessGoal
+  protMultiplier: number
+  bodyLinked: boolean
+}
+
+export interface FavoriteFood {
+  id: string
+  name: string
+  brand?: string
+  calories100g: number
+  carbs100g: number
+  protein100g: number
+  fat100g: number
+  source: 'openfoodfacts' | 'custom'
+  createdAt?: unknown
+}
+
+export interface CustomFood {
+  id: string
+  name: string
+  brand?: string
+  calories100g: number
+  carbs100g: number
+  protein100g: number
+  fat100g: number
+  servingSize?: number
+  createdAt?: unknown
+}
+
+export interface MealTemplate {
+  id: string
+  name: string
+  entries: DietEntry[]
+  totalCalories: number
+  totalCarbs: number
+  totalProtein: number
+  totalFat: number
+  createdAt?: unknown
+}

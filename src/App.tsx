@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconLayoutList, IconPencil, IconBarbell, IconChartBar, IconScale } from '@tabler/icons-react'
+import { IconLayoutList, IconPencil, IconBarbell, IconChartBar, IconScale, IconSalad } from '@tabler/icons-react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
 import AdminPage from './pages/AdminPage'
@@ -9,16 +9,22 @@ import LogPage from './pages/LogPage'
 import ExercisesPage from './pages/ExercisesPage'
 import StatsPage from './pages/StatsPage'
 import BodyPage from './pages/BodyPage'
+import DietPage from './pages/DietPage'
 import { useRoutines } from './hooks/useRoutines'
 import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
 import { useBodyLogs } from './hooks/useBodyLogs'
+import { useDietProfile } from './hooks/useDietProfile'
+import { useDietLogs } from './hooks/useDietLogs'
+import { useFavoriteFoods } from './hooks/useFavoriteFoods'
+import { useCustomFoods } from './hooks/useCustomFoods'
+import { useMealTemplates } from './hooks/useMealTemplates'
 import type { Routine, Exercise } from './types'
 import DB from './data/full_db.json'
 import { tr, type Lang } from './lib/i18n'
 import './index.css'
 
-type Tab = 'routine' | 'log' | 'exercises' | 'stats' | 'body'
+type Tab = 'routine' | 'log' | 'exercises' | 'stats' | 'body' | 'diet'
 
 function MainApp() {
   const { user, profile } = useAuth()
@@ -38,12 +44,18 @@ function MainApp() {
     { id: 'exercises', label: tr(lang, 'tabExercises'), Icon: IconBarbell },
     { id: 'stats',     label: tr(lang, 'tabStats'),     Icon: IconChartBar },
     { id: 'body',      label: tr(lang, 'tabBody'),      Icon: IconScale },
+    { id: 'diet',      label: tr(lang, 'tabDiet'),      Icon: IconSalad },
   ]
 
   const { routines, addRoutine, updateRoutine, deleteRoutine } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
   const { bodyLogs, saveBodyEntry, saveBodyEntryBatch, deleteBodyEntry } = useBodyLogs(uid)
+  const { profile: dietProfile, saveProfile: saveDietProfile } = useDietProfile(uid)
+  const { logs: dietLogs, getLog, addEntry: addDietEntry, addEntries: addDietEntries, removeEntry: removeDietEntry } = useDietLogs(uid)
+  const { favorites, isFavorite, toggleFavorite } = useFavoriteFoods(uid)
+  const { customFoods, saveCustomFood, deleteCustomFood } = useCustomFoods(uid)
+  const { templates, saveMealTemplate, deleteMealTemplate } = useMealTemplates(uid)
 
   const allExercises = [...(DB as Exercise[]), ...customExercises]
 
@@ -113,6 +125,29 @@ function MainApp() {
       )}
       {tab === 'body' && (
         <BodyPage bodyLogs={bodyLogs} lang={lang} onSave={saveBodyEntry} onSaveBatch={saveBodyEntryBatch} onDelete={deleteBodyEntry} />
+      )}
+      {tab === 'diet' && (
+        <DietPage
+          uid={uid}
+          lang={lang}
+          bodyLogs={bodyLogs}
+          profile={dietProfile}
+          getLog={getLog}
+          logs={dietLogs}
+          favorites={favorites}
+          customFoods={customFoods}
+          templates={templates}
+          onSaveProfile={saveDietProfile}
+          onAddEntry={addDietEntry}
+          onAddEntries={addDietEntries}
+          onRemoveEntry={removeDietEntry}
+          onToggleFav={toggleFavorite}
+          isFavorite={isFavorite}
+          onSaveCustomFood={saveCustomFood}
+          onDeleteCustomFood={deleteCustomFood}
+          onSaveMealTemplate={saveMealTemplate}
+          onDeleteMealTemplate={deleteMealTemplate}
+        />
       )}
     </div>
   )
