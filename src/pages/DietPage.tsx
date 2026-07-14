@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
-import { buildProfile, calcMacros, MEAL_SLOTS } from '../lib/dietCalc'
+import { buildProfile, calcMacros, calcBMR, calcTDEE, calcGoalCalories, MEAL_SLOTS } from '../lib/dietCalc'
 import { searchFood, calcEntryNutrition } from '../lib/foodApi'
 import type { LocalFood } from '../lib/foodApi'
 import type {
@@ -47,6 +47,116 @@ interface Props {
 }
 
 type FoodTab = 'search' | 'fav' | 'meal' | 'mine'
+
+// ── GOAL EDIT MODAL ──────────────────────────────────────────────────────────
+
+function GoalEditModal({ lang, profile, onSave, onClose }: {
+  lang: Lang; profile: DietProfile; onSave: (p: DietProfile) => Promise<void>; onClose: () => void
+}) {
+  const [goal, setGoal] = useState<FitnessGoal>(profile.goal)
+  const [activity, setActivity] = useState<ActivityLevel>(profile.activityLevel)
+  const [protMult, setProtMult] = useState(profile.protMultiplier)
+  const [saving, setSaving] = useState(false)
+
+  const bmr = calcBMR(profile.weight, profile.height, profile.age, profile.gender)
+  const previewCals = calcGoalCalories(calcTDEE(bmr, activity), goal)
+
+  async function handleSave() {
+    setSaving(true)
+    await onSave(buildProfile(profile.weight, profile.height, profile.age, profile.gender, activity, goal, protMult))
+    setSaving(false)
+    onClose()
+  }
+
+  const GOALS: { key: FitnessGoal; icon: string; labelKo: string; labelEn: string; desc: string }[] = [
+    { key: 'cut',      icon: '🔥', labelKo: '다이어트', labelEn: 'Cut',      desc: '-400 kcal' },
+    { key: 'maintain', icon: '⚖️', labelKo: '유지',    labelEn: 'Maintain', desc: 'TDEE' },
+    { key: 'bulk',     icon: '💪', labelKo: '벌크업',  labelEn: 'Bulk',     desc: '+275 kcal' },
+  ]
+
+  const ACTIVITIES: { key: ActivityLevel; labelKo: string; labelEn: string; mult: string }[] = [
+    { key: 'sedentary',   labelKo: '거의 없음',   labelEn: 'Sedentary',   mult: '×1.2' },
+    { key: 'light',       labelKo: '가벼운 활동', labelEn: 'Light',       mult: '×1.375' },
+    { key: 'moderate',    labelKo: '보통 활동',   labelEn: 'Moderate',    mult: '×1.55' },
+    { key: 'active',      labelKo: '활발한 활동', labelEn: 'Active',      mult: '×1.725' },
+    { key: 'very_active', labelKo: '매우 활발',   labelEn: 'Very Active', mult: '×1.9' },
+  ]
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: '#0008', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
+      <div style={{ background: 'var(--bg1)', borderRadius: '18px 18px 0 0', width: '100%', maxWidth: '500px', padding: '20px 18px 40px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+        {/* 헤더 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{ fontSize: '17px', fontWeight: 800 }}>{lang === 'ko' ? '목표 편집' : 'Edit Goals'}</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ts)', padding: '4px' }}><IconX size={20} /></button>
+        </div>
+
+        {/* 목표 선택 */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            {lang === 'ko' ? '목표' : 'Goal'}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+            {GOALS.map(g => {
+              const active = goal === g.key
+              return (
+                <button key={g.key} onClick={() => setGoal(g.key)} style={{ padding: '11px 6px', border: `.5px solid ${active ? 'var(--green)' : 'var(--bd)'}`, background: active ? '#22c55e18' : 'var(--bg2)', borderRadius: 'var(--r)', cursor: 'pointer', textAlign: 'center', transition: 'all .15s' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '3px' }}>{g.icon}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: active ? 'var(--green)' : 'var(--ts)' }}>{lang === 'ko' ? g.labelKo : g.labelEn}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--tm)', marginTop: '2px' }}>{g.desc}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 활동량 */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            {lang === 'ko' ? '활동량' : 'Activity'}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {ACTIVITIES.map(a => {
+              const active = activity === a.key
+              return (
+                <button key={a.key} onClick={() => setActivity(a.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: `.5px solid ${active ? 'var(--blue)' : 'var(--bd)'}`, background: active ? '#3b82f618' : 'var(--bg2)', borderRadius: 'var(--r)', cursor: 'pointer', transition: 'all .15s' }}>
+                  <span style={{ fontSize: '13px', fontWeight: active ? 700 : 400, color: active ? 'var(--blue)' : 'var(--ts)' }}>{lang === 'ko' ? a.labelKo : a.labelEn}</span>
+                  <span style={{ fontSize: '11px', color: 'var(--tm)' }}>{a.mult}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 단백질 배율 슬라이더 */}
+        <div style={{ marginBottom: '22px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            {lang === 'ko' ? `단백질 목표 — ${protMult.toFixed(1)}g/kg` : `Protein target — ${protMult.toFixed(1)}g/kg`}
+          </div>
+          <input type="range" min="1.2" max="2.4" step="0.1" value={protMult}
+            onChange={e => setProtMult(parseFloat(e.target.value))}
+            style={{ width: '100%', accentColor: 'var(--blue)', cursor: 'pointer' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--tm)', marginTop: '4px' }}>
+            <span>1.2 g/kg</span><span>2.4 g/kg</span>
+          </div>
+        </div>
+
+        {/* 예상 칼로리 미리보기 */}
+        <div style={{ background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '14px', marginBottom: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '4px' }}>
+            {lang === 'ko' ? '예상 목표 칼로리' : 'Est. Target Calories'}
+          </div>
+          <div style={{ fontSize: '30px', fontWeight: 900, color: '#E8930A', fontVariantNumeric: 'tabular-nums' }}>{previewCals.toLocaleString()}</div>
+          <div style={{ fontSize: '11px', color: 'var(--tm)' }}>kcal / day</div>
+        </div>
+
+        <button onClick={handleSave} disabled={saving} style={{ width: '100%', padding: '14px', background: 'var(--green)', color: '#fff', border: 'none', borderRadius: 'var(--r)', fontSize: '15px', fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>
+          {saving ? (lang === 'ko' ? '저장 중...' : 'Saving...') : (lang === 'ko' ? '저장' : 'Save')}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 // ── ONBOARDING ───────────────────────────────────────────────────────────────
 
@@ -744,6 +854,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
   const [date, setDate] = useState(today)
   const [openSlot, setOpenSlot] = useState<MealSlotKey | null>(null)
   const [showWeightBanner, setShowWeightBanner] = useState(false)
+  const [showGoalEdit, setShowGoalEdit] = useState(false)
 
   const log = getLog(date)
 
@@ -807,6 +918,9 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
 
   return (
     <div style={{ position: 'relative' }}>
+      {showGoalEdit && (
+        <GoalEditModal lang={lang} profile={profile} onSave={onSaveProfile} onClose={() => setShowGoalEdit(false)} />
+      )}
       {/* Date nav */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
         <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ts)' }}><IconChevronLeft size={20} /></button>
@@ -852,7 +966,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
       <div style={{ background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden', marginBottom: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 0', fontSize: '13px', fontWeight: 700 }}>
           <span>{lang === 'ko' ? '영양정보' : 'Nutrition'}</span>
-          <button onClick={() => {}} style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}>{tr(lang, 'dietEditGoal')}</button>
+          <button onClick={() => setShowGoalEdit(true)} style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}>{tr(lang, 'dietEditGoal')}</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
           {[
