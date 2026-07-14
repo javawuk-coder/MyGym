@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { IconChevronLeft, IconChevronRight, IconSettings, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash, IconCheck } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
-import { buildProfile, calcMacros, MEAL_SLOTS, sumEntries } from '../lib/dietCalc'
+import { buildProfile, calcMacros, MEAL_SLOTS } from '../lib/dietCalc'
 import { searchFood, calcEntryNutrition } from '../lib/foodApi'
 import type {
   DietProfile, DietLog, MealSlotKey, DietEntry,
@@ -282,9 +282,8 @@ function Onboarding({ lang, bodyLogs, onSave }: {
 
 // ── FOOD SEARCH MODAL ────────────────────────────────────────────────────────
 
-function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templates, isFavorite, onToggleFav, onAdd, onAddAll, onSaveCustomFood, onSaveMealTemplate, onClose }: {
+function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, isFavorite, onToggleFav, onAdd, onAddAll, onSaveCustomFood, onSaveMealTemplate, onClose }: {
   lang: Lang
-  slot: MealSlotKey
   slotLabel: string
   favorites: FavoriteFood[]
   customFoods: CustomFood[]
@@ -320,7 +319,7 @@ function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templa
   const [cFat, setCFat] = useState('')
   const [cServing, setCServing] = useState('100')
 
-  const searchTimer = useRef<ReturnType<typeof setTimeout>>()
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     clearTimeout(searchTimer.current)
@@ -334,7 +333,7 @@ function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templa
     return () => clearTimeout(searchTimer.current)
   }, [query, lang])
 
-  const mealSearchTimer = useRef<ReturnType<typeof setTimeout>>()
+  const mealSearchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   useEffect(() => {
     clearTimeout(mealSearchTimer.current)
     if (!mealSearch.trim()) { setMealResults([]); return }
@@ -450,7 +449,6 @@ function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templa
             <button key={key} onClick={() => { setTab(key); setSelected(null) }} style={{
               flex: 1, padding: '8px 4px', textAlign: 'center', fontSize: '11px', fontWeight: 600,
               color: tab === key ? 'var(--green)' : 'var(--tm)',
-              borderBottom: `2px solid ${tab === key ? 'var(--green)' : 'transparent'}`,
               background: 'none', border: 'none', borderBottom: `2px solid ${tab === key ? 'var(--green)' : 'transparent'}`,
               cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
             }}>
@@ -529,7 +527,7 @@ function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templa
                     </div>
                   ))}
                 </div>
-                <button onClick={() => handleAddTemplate(tpl)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '9px', borderTop: '.5px solid var(--bd)', fontSize: '13px', fontWeight: 700, color: 'var(--green)', background: 'none', border: 'none', borderTop: '.5px solid var(--bd)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <button onClick={() => handleAddTemplate(tpl)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '9px', fontSize: '13px', fontWeight: 700, color: 'var(--green)', background: 'none', border: 'none', borderTop: '.5px solid var(--bd)', cursor: 'pointer', fontFamily: 'inherit' }}>
                   <IconPlus size={14} />{tr(lang, 'dietAddAll')}
                 </button>
               </div>
@@ -583,7 +581,7 @@ function FoodSearchModal({ lang, slot, slotLabel, favorites, customFoods, templa
           </div>
           <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
             {[50, 100, 150, 200].map(v => (
-              <button key={v} onClick={() => setAmount(v)} style={{ flex: 1, padding: '6px', textAlign: 'center', border: '.5px solid var(--bd)', borderRadius: '20px', fontSize: '12px', color: 'var(--tm)', cursor: 'pointer', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', fontFamily: 'inherit', borderColor: amount === v ? 'var(--green)' : 'var(--bd)', color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
+              <button key={v} onClick={() => setAmount(v)} style={{ flex: 1, padding: '6px', textAlign: 'center', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
             ))}
           </div>
           <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -726,12 +724,11 @@ function CalChart({ logs, today, target, lang }: { logs: DietLog[]; today: strin
 
 // ── MAIN PAGE ────────────────────────────────────────────────────────────────
 
-export default function DietPage({ uid, lang, bodyLogs, profile, getLog, logs, favorites, customFoods, templates, onSaveProfile, onAddEntry, onAddEntries, onRemoveEntry, onToggleFav, isFavorite, onSaveCustomFood, onDeleteCustomFood, onSaveMealTemplate, onDeleteMealTemplate }: Props) {
+export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favorites, customFoods, templates, onSaveProfile, onAddEntry, onAddEntries, onRemoveEntry, onToggleFav, isFavorite, onSaveCustomFood, onSaveMealTemplate }: Props) {
   const today = fmtDate(new Date())
   const [date, setDate] = useState(today)
   const [openSlot, setOpenSlot] = useState<MealSlotKey | null>(null)
   const [showWeightBanner, setShowWeightBanner] = useState(false)
-  const [showEditGoal, setShowEditGoal] = useState(false)
 
   const log = getLog(date)
 
@@ -920,7 +917,6 @@ export default function DietPage({ uid, lang, bodyLogs, profile, getLog, logs, f
       {openSlot && openSlotData && (
         <FoodSearchModal
           lang={lang}
-          slot={openSlot}
           slotLabel={tr(lang, openSlotData.labelKey as Parameters<typeof tr>[1])}
           favorites={favorites}
           customFoods={customFoods}
