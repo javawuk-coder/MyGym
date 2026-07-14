@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { createPortal } from 'react-dom'
 import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
 import { buildProfile, calcMacros, MEAL_SLOTS } from '../lib/dietCalc'
@@ -428,8 +427,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const inputStyle = { width: '100%', padding: '11px 13px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }
   const labelStyle = { fontSize: '11px', fontWeight: 700 as const, color: 'var(--tm)', textTransform: 'uppercase' as const, letterSpacing: '.05em', marginBottom: '5px', display: 'block' }
 
-  return createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', flexDirection: 'column', background: 'var(--bg1)' }}>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh' }}>
       {/* Header */}
       <div style={{ padding: '14px 18px 0', borderBottom: '.5px solid var(--bd)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -659,7 +658,6 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         </div>
       )}
     </div>,
-    document.getElementById('modal-root')!
   )
 }
 
@@ -752,6 +750,26 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
   if (profile === null) {
     return (
       <Onboarding lang={lang} bodyLogs={bodyLogs} onSave={onSaveProfile} />
+    )
+  }
+
+  const openSlotData = openSlot ? MEAL_SLOTS.find(s => s.key === openSlot) : null
+  if (openSlot && openSlotData) {
+    return (
+      <FoodSearchModal
+        lang={lang}
+        slotLabel={tr(lang, openSlotData.labelKey as Parameters<typeof tr>[1])}
+        favorites={favorites}
+        customFoods={customFoods}
+        templates={templates}
+        isFavorite={isFavorite}
+        onToggleFav={onToggleFav}
+        onAdd={entry => onAddEntry(date, openSlot, entry)}
+        onAddAll={entries => onAddEntries(date, openSlot, entries)}
+        onSaveCustomFood={onSaveCustomFood}
+        onSaveMealTemplate={onSaveMealTemplate}
+        onClose={() => setOpenSlot(null)}
+      />
     )
   }
 
@@ -913,23 +931,6 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
         <CalChart logs={logs} today={today} target={profile.calories} lang={lang} />
       </div>
 
-      {/* Food search modal */}
-      {openSlot && openSlotData && (
-        <FoodSearchModal
-          lang={lang}
-          slotLabel={tr(lang, openSlotData.labelKey as Parameters<typeof tr>[1])}
-          favorites={favorites}
-          customFoods={customFoods}
-          templates={templates}
-          isFavorite={isFavorite}
-          onToggleFav={onToggleFav}
-          onAdd={entry => onAddEntry(date, openSlot, entry)}
-          onAddAll={entries => onAddEntries(date, openSlot, entries)}
-          onSaveCustomFood={onSaveCustomFood}
-          onSaveMealTemplate={onSaveMealTemplate}
-          onClose={() => setOpenSlot(null)}
-        />
-      )}
     </div>
   )
 }
