@@ -245,6 +245,8 @@ function hasKorean(s: string) { return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(s) }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type KFoodRow = Record<string, any>
 
+const KFOOD_KEY = import.meta.env.VITE_FOOD_API_KEY as string | undefined
+
 function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
   const name: string = row.FOOD_NM_KR ?? row.FOOD_NM ?? ''
   if (!name) return null
@@ -269,23 +271,39 @@ function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
   }
 }
 
+function parseKFoodResponse(data: unknown): FoodItem[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows: KFoodRow[] = (data as any)?.I2790?.row ?? []
+  return rows.map(normalizeKFoodRow).filter(Boolean) as FoodItem[]
+}
+
 async function fetchKFood(query: string): Promise<FoodItem[]> {
+  const encoded = encodeURIComponent(query)
+
+  // 1) 브라우저 직접 호출 (한국 IP → 식약처 API 직접 접근, 해외 IP 차단 우회)
+  if (KFOOD_KEY) {
+    try {
+      const url = `https://openapi.foodsafetykorea.go.kr/api/${KFOOD_KEY}/I2790/json/1/30/FOOD_NM_KR=${encoded}`
+      const resp = await fetch(url, { signal: AbortSignal.timeout(10000) })
+      if (resp.ok) {
+        const data = await resp.json()
+        const items = parseKFoodResponse(data)
+        if (items.length > 0) return items
+      }
+    } catch {
+      // CORS 차단 또는 네트워크 오류 → serverless 폴백
+    }
+  }
+
+  // 2) Vercel serverless 폴백 (CORS 차단 시)
   try {
-    const resp = await fetch(`/api/search-food?query=${encodeURIComponent(query)}`, {
+    const resp = await fetch(`/api/search-food?query=${encoded}`, {
       signal: AbortSignal.timeout(10000),
     })
-    if (!resp.ok) {
-      const errBody = await resp.text().catch(() => '')
-      console.warn('[kfood] serverless error:', resp.status, errBody)
-      return []
-    }
+    if (!resp.ok) return []
     const data = await resp.json()
-    console.log('[kfood] raw response:', JSON.stringify(data).slice(0, 400))
-    const rows: KFoodRow[] = data?.I2790?.row ?? []
-    console.log('[kfood] rows count:', rows.length, rows[0] ? Object.keys(rows[0]).join(',') : 'no rows')
-    return rows.map(normalizeKFoodRow).filter(Boolean) as FoodItem[]
-  } catch (e) {
-    console.warn('[kfood] fetch failed:', e)
+    return parseKFoodResponse(data)
+  } catch {
     return []
   }
 }
