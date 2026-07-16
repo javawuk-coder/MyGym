@@ -241,26 +241,26 @@ function hasKorean(s: string) { return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(s) }
 
 // ── 식품의약품안전처 식품영양성분 DB ──────────────────────────────────────────
 
-interface KFoodRow {
-  FOOD_CD: string
-  FOOD_NM_KR: string
-  SERVING_WT?: string   // 1회 제공량(g)
-  NUTR_CONT1?: string   // 에너지(kcal) per 100g
-  NUTR_CONT3?: string   // 단백질(g) per 100g
-  NUTR_CONT4?: string   // 지방(g) per 100g
-  NUTR_CONT6?: string   // 탄수화물(g) per 100g
-}
+// 식약처 I2790 API는 버전/서비스에 따라 NUTR_CONT 또는 AMT_NUM 필드명을 사용
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type KFoodRow = Record<string, any>
 
 function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
-  const cal = parseFloat(row.NUTR_CONT1 ?? '0')
-  const protein = parseFloat(row.NUTR_CONT3 ?? '0')
-  const fat = parseFloat(row.NUTR_CONT4 ?? '0')
-  const carbs = parseFloat(row.NUTR_CONT6 ?? '0')
-  if (!row.FOOD_NM_KR) return null
+  const name: string = row.FOOD_NM_KR ?? row.FOOD_NM ?? ''
+  if (!name) return null
+  const id: string = row.FOOD_CD ?? row.FOOD_NO ?? ''
+
+  // NUTR_CONT 방식 (에너지, 단백질, 지방, 탄수화물)
+  // AMT_NUM 방식 (AMT_NUM1=에너지, AMT_NUM7=탄수화물, AMT_NUM8=단백질, AMT_NUM9=지방)
+  const cal     = parseFloat(row.NUTR_CONT1 ?? row.AMT_NUM1 ?? '0')
+  const protein = parseFloat(row.NUTR_CONT3 ?? row.AMT_NUM8 ?? '0')
+  const fat     = parseFloat(row.NUTR_CONT4 ?? row.AMT_NUM9 ?? '0')
+  const carbs   = parseFloat(row.NUTR_CONT6 ?? row.AMT_NUM7 ?? '0')
+
   if (cal <= 0 && protein <= 0 && carbs <= 0) return null
   return {
-    id: 'kfood-' + row.FOOD_CD,
-    name: row.FOOD_NM_KR,
+    id: 'kfood-' + id,
+    name,
     calories100g: Math.round(cal),
     carbs100g: Math.round(carbs * 10) / 10,
     protein100g: Math.round(protein * 10) / 10,

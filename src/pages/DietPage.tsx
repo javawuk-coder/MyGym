@@ -591,12 +591,30 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
             </div>
             {searching && <div style={{ padding: '12px 18px', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietSearching')}</div>}
             {query && !searching && results.length === 0 && <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoResults')}</div>}
-            {query && !searching && results.length > 0 && (
-              <>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietSearchResults')} ({results.length}) · {tr(lang, 'dietOffNote')}</div>
-                {results.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
-              </>
-            )}
+            {query && !searching && results.length > 0 && (() => {
+              const localResults = results.filter(f => f.source === 'custom' || f.source === 'kfood')
+              const offResults = results.filter(f => f.source === 'openfoodfacts')
+              return (
+                <>
+                  {localResults.length > 0 && (
+                    <>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
+                        {tr(lang, 'dietSearchResults')} ({localResults.length}) · {lang === 'ko' ? '식약처 / 로컬 DB' : 'MFDS / Local DB'}
+                      </div>
+                      {localResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
+                    </>
+                  )}
+                  {offResults.length > 0 && (
+                    <>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
+                        {tr(lang, 'dietOffNote')} ({offResults.length})
+                      </div>
+                      {offResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount(100) }} />)}
+                    </>
+                  )}
+                </>
+              )
+            })()}
             {!query && recentFoods.length > 0 && (
               <>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietRecentFoods')}</div>
