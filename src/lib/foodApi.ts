@@ -239,24 +239,67 @@ async function fetchOFF(query: string): Promise<FoodItem[]> {
 // 한글 포함 여부 판별
 function hasKorean(s: string) { return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(s) }
 
+// ── 식품의약품안전처 식품영양성분 DB ──────────────────────────────────────────
+
+interface KFoodRow {
+  FOOD_CD: string
+  FOOD_NM_KR: string
+  SERVING_WT?: string   // 1회 제공량(g)
+  NUTR_CONT1?: string   // 에너지(kcal) per 100g
+  NUTR_CONT3?: string   // 단백질(g) per 100g
+  NUTR_CONT4?: string   // 지방(g) per 100g
+  NUTR_CONT6?: string   // 탄수화물(g) per 100g
+}
+
+function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
+  const cal = parseFloat(row.NUTR_CONT1 ?? '0')
+  const protein = parseFloat(row.NUTR_CONT3 ?? '0')
+  const fat = parseFloat(row.NUTR_CONT4 ?? '0')
+  const carbs = parseFloat(row.NUTR_CONT6 ?? '0')
+  if (!row.FOOD_NM_KR) return null
+  if (cal <= 0 && protein <= 0 && carbs <= 0) return null
+  return {
+    id: 'kfood-' + row.FOOD_CD,
+    name: row.FOOD_NM_KR,
+    calories100g: Math.round(cal),
+    carbs100g: Math.round(carbs * 10) / 10,
+    protein100g: Math.round(protein * 10) / 10,
+    fat100g: Math.round(fat * 10) / 10,
+    source: 'kfood',
+  }
+}
+
+async function fetchKFood(query: string): Promise<FoodItem[]> {
+  try {
+    const resp = await fetch(`/api/search-food?query=${encodeURIComponent(query)}`, {
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!resp.ok) return []
+    const data = await resp.json()
+    const rows: KFoodRow[] = data?.I2790?.row ?? []
+    return rows.map(normalizeKFoodRow).filter(Boolean) as FoodItem[]
+  } catch {
+    return []
+  }
+}
+
 export async function searchFood(query: string, _lang = 'ko'): Promise<FoodItem[]> {
   if (!query.trim()) return []
 
-  // 1) 로컬 DB — 한국어·영어 aliases 모두 매칭
+  // 1) 로컬 DB — 항상 먼저 (한국어·영어 aliases 모두)
   const localResults = searchLocal(query)
 
-  // 2) Open Food Facts — 영문 검색어일 때만 호출 (한글 쿼리는 OFF가 엉뚱한 결과 반환)
+  // 2) 한글 검색: 식약처 API 병렬 호출
   if (hasKorean(query)) {
-    return localResults
+    const kfoodResults = await fetchKFood(query)
+    const seen = new Set(localResults.map(f => f.id))
+    return [...localResults, ...kfoodResults.filter(f => !seen.has(f.id))]
   }
 
+  // 3) 영문 검색: Open Food Facts
   const offResults = await fetchOFF(query)
   const q = query.toLowerCase()
-  // OFF 결과: 제품명에 검색어가 단어로 포함될 때만 허용
-  const filteredOff = offResults.filter(f => {
-    const name = f.name.toLowerCase()
-    return name.includes(q)
-  })
+  const filteredOff = offResults.filter(f => f.name.toLowerCase().includes(q))
   const seen = new Set(localResults.map(f => f.id))
   return [...localResults, ...filteredOff.filter(f => !seen.has(f.id))]
 }

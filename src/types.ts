@@ -119,7 +119,7 @@ export interface FoodItem {
   carbs100g: number
   protein100g: number
   fat100g: number
-  source: 'openfoodfacts' | 'custom'
+  source: 'openfoodfacts' | 'custom' | 'kfood'
 }
 
 export interface DietEntry {
@@ -132,7 +132,7 @@ export interface DietEntry {
   carbs: number
   protein: number
   fat: number
-  source: 'openfoodfacts' | 'custom' | 'meal'
+  source: 'openfoodfacts' | 'custom' | 'kfood' | 'meal'
 }
 
 export type MealSlotKey = 'breakfast' | 'snackAm' | 'lunch' | 'snackPm' | 'dinner' | 'snackEve'
@@ -168,7 +168,7 @@ export interface FavoriteFood {
   carbs100g: number
   protein100g: number
   fat100g: number
-  source: 'openfoodfacts' | 'custom'
+  source: 'openfoodfacts' | 'custom' | 'kfood'
   createdAt?: unknown
 }
 
