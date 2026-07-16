@@ -275,7 +275,8 @@ async function fetchKFood(query: string): Promise<FoodItem[]> {
       signal: AbortSignal.timeout(10000),
     })
     if (!resp.ok) {
-      console.warn('[kfood] serverless error:', resp.status)
+      const errBody = await resp.text().catch(() => '')
+      console.warn('[kfood] serverless error:', resp.status, errBody)
       return []
     }
     const data = await resp.json()
