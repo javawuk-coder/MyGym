@@ -272,13 +272,19 @@ function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
 async function fetchKFood(query: string): Promise<FoodItem[]> {
   try {
     const resp = await fetch(`/api/search-food?query=${encodeURIComponent(query)}`, {
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(10000),
     })
-    if (!resp.ok) return []
+    if (!resp.ok) {
+      console.warn('[kfood] serverless error:', resp.status)
+      return []
+    }
     const data = await resp.json()
+    console.log('[kfood] raw response:', JSON.stringify(data).slice(0, 400))
     const rows: KFoodRow[] = data?.I2790?.row ?? []
+    console.log('[kfood] rows count:', rows.length, rows[0] ? Object.keys(rows[0]).join(',') : 'no rows')
     return rows.map(normalizeKFoodRow).filter(Boolean) as FoodItem[]
-  } catch {
+  } catch (e) {
+    console.warn('[kfood] fetch failed:', e)
     return []
   }
 }
