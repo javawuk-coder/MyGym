@@ -245,8 +245,6 @@ function hasKorean(s: string) { return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(s) }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type KFoodRow = Record<string, any>
 
-const KFOOD_KEY = import.meta.env.VITE_FOOD_API_KEY as string | undefined
-
 function normalizeKFoodRow(row: KFoodRow): FoodItem | null {
   const name: string = row.FOOD_NM_KR ?? row.FOOD_NM ?? ''
   if (!name) return null
@@ -278,26 +276,8 @@ function parseKFoodResponse(data: unknown): FoodItem[] {
 }
 
 async function fetchKFood(query: string): Promise<FoodItem[]> {
-  const encoded = encodeURIComponent(query)
-
-  // 1) 브라우저 직접 호출 (한국 IP → 식약처 API 직접 접근, 해외 IP 차단 우회)
-  if (KFOOD_KEY) {
-    try {
-      const url = `https://openapi.foodsafetykorea.go.kr/api/${KFOOD_KEY}/I2790/json/1/30/FOOD_NM_KR=${encoded}`
-      const resp = await fetch(url, { signal: AbortSignal.timeout(10000) })
-      if (resp.ok) {
-        const data = await resp.json()
-        const items = parseKFoodResponse(data)
-        if (items.length > 0) return items
-      }
-    } catch {
-      // CORS 차단 또는 네트워크 오류 → serverless 폴백
-    }
-  }
-
-  // 2) Vercel serverless 폴백 (CORS 차단 시)
   try {
-    const resp = await fetch(`/api/search-food?query=${encoded}`, {
+    const resp = await fetch(`/api/search-food?query=${encodeURIComponent(query)}`, {
       signal: AbortSignal.timeout(10000),
     })
     if (!resp.ok) return []
