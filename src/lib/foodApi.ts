@@ -280,10 +280,13 @@ async function fetchKFood(query: string): Promise<FoodItem[]> {
     const resp = await fetch(`/api/search-food?query=${encodeURIComponent(query)}`, {
       signal: AbortSignal.timeout(10000),
     })
+    const text = await resp.text()
+    console.log('[kfood] status:', resp.status, 'body:', text.slice(0, 500))
     if (!resp.ok) return []
-    const data = await resp.json()
+    const data = JSON.parse(text)
     return parseKFoodResponse(data)
-  } catch {
+  } catch (e) {
+    console.warn('[kfood] error:', e)
     return []
   }
 }
