@@ -173,6 +173,96 @@ const KO_DB: LocalFood[] = [
   { id: 'local-butter', name: '버터', aliases: ['butter'], source: 'custom', calories100g: 717, carbs100g: 0.6, protein100g: 0.9, fat100g: 81.0, servingSize: 10, servingLabel: '1조각 (10g)' },
   { id: 'local-honey', name: '꿀', aliases: ['honey'], source: 'custom', calories100g: 304, carbs100g: 82.4, protein100g: 0.3, fat100g: 0, servingSize: 21, servingLabel: '1큰술 (21g)' },
   { id: 'local-mayonnaise', name: '마요네즈', aliases: ['mayonnaise', 'mayo'], source: 'custom', calories100g: 680, carbs100g: 2.5, protein100g: 1.1, fat100g: 74.9, servingSize: 15, servingLabel: '1큰술 (15g)' },
+  { id: 'local-ketchup', name: '케첩', aliases: ['ketchup', 'tomato ketchup'], source: 'custom', calories100g: 105, carbs100g: 25.0, protein100g: 1.5, fat100g: 0.1, servingSize: 17, servingLabel: '1큰술 (17g)' },
+  { id: 'local-soy-sauce', name: '간장', aliases: ['soy sauce'], source: 'custom', calories100g: 60, carbs100g: 7.5, protein100g: 5.5, fat100g: 0, servingSize: 15, servingLabel: '1큰술 (15g)' },
+  { id: 'local-doenjang', name: '된장', aliases: ['doenjang', 'soybean paste', 'miso'], source: 'custom', calories100g: 180, carbs100g: 21.0, protein100g: 12.0, fat100g: 4.5, servingSize: 15, servingLabel: '1큰술 (15g)' },
+  { id: 'local-gochujang', name: '고추장', aliases: ['gochujang', 'red pepper paste'], source: 'custom', calories100g: 183, carbs100g: 36.0, protein100g: 5.5, fat100g: 1.5, servingSize: 15, servingLabel: '1큰술 (15g)' },
+  // ── 밑반찬/나물 ──────────────────────────────────────────────────────────────
+  { id: 'local-gyeranmari', name: '계란말이', aliases: ['rolled egg', 'egg roll', '계란말이'], source: 'custom', calories100g: 170, carbs100g: 3.5, protein100g: 11.0, fat100g: 12.5, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-spinach-namul', name: '시금치나물', aliases: ['spinach namul', 'spinach side dish'], source: 'custom', calories100g: 45, carbs100g: 5.5, protein100g: 3.0, fat100g: 1.5, servingSize: 80, servingLabel: '1회분 (80g)' },
+  { id: 'local-kongnamul-muchim', name: '콩나물무침', aliases: ['beansprout side dish'], source: 'custom', calories100g: 30, carbs100g: 4.5, protein100g: 2.5, fat100g: 0.5, servingSize: 80, servingLabel: '1회분 (80g)' },
+  { id: 'local-myeolchi-bokkeum', name: '멸치볶음', aliases: ['stir fried anchovies', 'myeolchi'], source: 'custom', calories100g: 280, carbs100g: 20.0, protein100g: 28.0, fat100g: 8.0, servingSize: 40, servingLabel: '1회분 (40g)' },
+  { id: 'local-dubu-jorim', name: '두부조림', aliases: ['braised tofu', 'dubu jorim'], source: 'custom', calories100g: 120, carbs100g: 8.0, protein100g: 8.5, fat100g: 5.5, servingSize: 120, servingLabel: '1회분 (120g)' },
+  { id: 'local-gamja-jorim', name: '감자조림', aliases: ['braised potato', 'gamja jorim'], source: 'custom', calories100g: 100, carbs100g: 18.5, protein100g: 1.8, fat100g: 2.0, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-kkakdugi', name: '깍두기', aliases: ['kkakdugi', 'radish kimchi', '깍두기'], source: 'custom', calories100g: 25, carbs100g: 5.5, protein100g: 1.0, fat100g: 0.1, servingSize: 80, servingLabel: '1회분 (80g)' },
+  { id: 'local-gaji-namul', name: '가지나물', aliases: ['eggplant namul', 'eggplant side'], source: 'custom', calories100g: 50, carbs100g: 7.0, protein100g: 1.5, fat100g: 1.5, servingSize: 80, servingLabel: '1회분 (80g)' },
+  { id: 'local-gosari-namul', name: '고사리나물', aliases: ['fernbrake namul', 'gosari'], source: 'custom', calories100g: 55, carbs100g: 8.0, protein100g: 3.0, fat100g: 1.0, servingSize: 80, servingLabel: '1회분 (80g)' },
+  { id: 'local-japchae-small', name: '잡채 (소)', aliases: ['japchae small'], source: 'custom', calories100g: 145, carbs100g: 22.0, protein100g: 4.5, fat100g: 4.5, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-spam', name: '스팸 (햄통조림)', aliases: ['spam', 'canned ham', 'luncheon meat'], source: 'custom', calories100g: 310, carbs100g: 4.5, protein100g: 13.5, fat100g: 27.0, servingSize: 90, servingLabel: '1/3캔 (90g)' },
+  { id: 'local-sausage', name: '소시지 (프랑크)', aliases: ['sausage', 'frankfurter', 'hot dog'], source: 'custom', calories100g: 298, carbs100g: 5.0, protein100g: 12.0, fat100g: 25.5, servingSize: 50, servingLabel: '1개 (50g)' },
+  { id: 'local-vienna-sausage', name: '비엔나 소시지', aliases: ['vienna sausage', 'cocktail sausage', '비엔나'], source: 'custom', calories100g: 265, carbs100g: 4.0, protein100g: 11.5, fat100g: 22.5, servingSize: 15, servingLabel: '1개 (15g)' },
+  // ── 볶음밥/덮밥 ─────────────────────────────────────────────────────────────
+  { id: 'local-kimchi-bokkeumbap', name: '김치볶음밥', aliases: ['kimchi fried rice', 'kimchi bokkeumbap'], source: 'custom', calories100g: 155, carbs100g: 27.0, protein100g: 5.0, fat100g: 3.0, servingSize: 350, servingLabel: '1인분 (350g)' },
+  { id: 'local-saeu-bokkeumbap', name: '새우볶음밥', aliases: ['shrimp fried rice'], source: 'custom', calories100g: 162, carbs100g: 26.5, protein100g: 7.5, fat100g: 3.5, servingSize: 350, servingLabel: '1인분 (350g)' },
+  { id: 'local-omurice', name: '오므라이스', aliases: ['omurice', 'omelette rice'], source: 'custom', calories100g: 160, carbs100g: 24.0, protein100g: 7.0, fat100g: 4.5, servingSize: 400, servingLabel: '1인분 (400g)' },
+  { id: 'local-curry-rice', name: '카레라이스', aliases: ['curry rice', 'japanese curry'], source: 'custom', calories100g: 140, carbs100g: 24.0, protein100g: 4.5, fat100g: 3.0, servingSize: 450, servingLabel: '1인분 (450g)' },
+  { id: 'local-gyudon', name: '규동 (소고기덮밥)', aliases: ['gyudon', 'beef rice bowl'], source: 'custom', calories100g: 155, carbs100g: 24.0, protein100g: 8.0, fat100g: 3.5, servingSize: 400, servingLabel: '1인분 (400g)' },
+  { id: 'local-jeyuk-bap', name: '제육볶음밥', aliases: ['spicy pork rice'], source: 'custom', calories100g: 168, carbs100g: 24.5, protein100g: 8.5, fat100g: 4.0, servingSize: 380, servingLabel: '1인분 (380g)' },
+  // ── 패스트푸드/버거 ──────────────────────────────────────────────────────────
+  { id: 'local-bigmac', name: '빅맥', aliases: ['big mac', 'bigmac', 'mcdonalds'], source: 'custom', calories100g: 232, carbs100g: 25.5, protein100g: 12.5, fat100g: 10.0, servingSize: 219, servingLabel: '1개 (219g)' },
+  { id: 'local-hamburger', name: '햄버거 (일반)', aliases: ['hamburger', 'burger'], source: 'custom', calories100g: 265, carbs100g: 28.0, protein100g: 13.5, fat100g: 11.0, servingSize: 160, servingLabel: '1개 (160g)' },
+  { id: 'local-chicken-burger', name: '치킨버거', aliases: ['chicken burger', 'chicken sandwich'], source: 'custom', calories100g: 255, carbs100g: 27.0, protein100g: 13.0, fat100g: 11.0, servingSize: 190, servingLabel: '1개 (190g)' },
+  { id: 'local-french-fries', name: '감자튀김', aliases: ['french fries', 'fries', '감자튀김'], source: 'custom', calories100g: 312, carbs100g: 41.0, protein100g: 3.5, fat100g: 15.0, servingSize: 115, servingLabel: '미디움 (115g)' },
+  { id: 'local-chicken-nugget', name: '치킨너겟', aliases: ['chicken nugget', 'nugget', 'mcnugget'], source: 'custom', calories100g: 245, carbs100g: 16.0, protein100g: 15.0, fat100g: 13.0, servingSize: 96, servingLabel: '6조각 (96g)' },
+  // ── 피자 ────────────────────────────────────────────────────────────────────
+  { id: 'local-pizza-cheese', name: '피자 (치즈)', aliases: ['pizza', 'cheese pizza'], source: 'custom', calories100g: 266, carbs100g: 30.0, protein100g: 12.5, fat100g: 11.0, servingSize: 110, servingLabel: '1조각 (110g)' },
+  { id: 'local-pizza-combination', name: '피자 (콤비네이션)', aliases: ['combination pizza', 'supreme pizza'], source: 'custom', calories100g: 250, carbs100g: 27.0, protein100g: 11.5, fat100g: 11.5, servingSize: 120, servingLabel: '1조각 (120g)' },
+  // ── 과자/스낵 ────────────────────────────────────────────────────────────────
+  { id: 'local-saeukkang', name: '새우깡', aliases: ['saeukkang', 'shrimp crackers', '새우깡'], source: 'custom', calories100g: 500, carbs100g: 64.0, protein100g: 6.0, fat100g: 24.0, servingSize: 65, servingLabel: '1봉지 (65g)' },
+  { id: 'local-poka-chip', name: '포카칩', aliases: ['poka chip', 'potato chips', '포카칩'], source: 'custom', calories100g: 518, carbs100g: 57.0, protein100g: 6.0, fat100g: 29.0, servingSize: 66, servingLabel: '1봉지 (66g)' },
+  { id: 'local-pringles', name: '프링글스 (오리지날)', aliases: ['pringles', 'original pringles'], source: 'custom', calories100g: 519, carbs100g: 57.0, protein100g: 5.5, fat100g: 29.0, servingSize: 40, servingLabel: '1/3통 (40g)' },
+  { id: 'local-choco-pie', name: '초코파이', aliases: ['choco pie', 'chocopie'], source: 'custom', calories100g: 404, carbs100g: 63.0, protein100g: 4.5, fat100g: 15.0, servingSize: 35, servingLabel: '1개 (35g)' },
+  { id: 'local-pepero', name: '빼빼로 (오리지날)', aliases: ['pepero', 'pocky'], source: 'custom', calories100g: 484, carbs100g: 69.0, protein100g: 7.0, fat100g: 20.0, servingSize: 39, servingLabel: '1갑 (39g)' },
+  { id: 'local-oreo', name: '오레오', aliases: ['oreo', 'oreo cookie'], source: 'custom', calories100g: 476, carbs100g: 68.0, protein100g: 5.0, fat100g: 20.0, servingSize: 39, servingLabel: '3개 (39g)' },
+  { id: 'local-kkokkalkon', name: '꼬깔콘', aliases: ['kkokkalkon', 'corn snack'], source: 'custom', calories100g: 520, carbs100g: 64.0, protein100g: 5.5, fat100g: 27.0, servingSize: 72, servingLabel: '1봉지 (72g)' },
+  { id: 'local-custard', name: '카스타드', aliases: ['custard cake', '카스타드'], source: 'custom', calories100g: 408, carbs100g: 57.0, protein100g: 6.5, fat100g: 17.5, servingSize: 35, servingLabel: '1개 (35g)' },
+  { id: 'local-homerun-ball', name: '홈런볼', aliases: ['homerun ball', 'chocolate ball'], source: 'custom', calories100g: 503, carbs100g: 60.0, protein100g: 7.5, fat100g: 25.5, servingSize: 50, servingLabel: '1봉지 (50g)' },
+  { id: 'local-honey-butter-chip', name: '허니버터칩', aliases: ['honey butter chip', 'honey butter'], source: 'custom', calories100g: 525, carbs100g: 62.0, protein100g: 5.5, fat100g: 29.0, servingSize: 60, servingLabel: '1봉지 (60g)' },
+  // ── 아이스크림 ───────────────────────────────────────────────────────────────
+  { id: 'local-melona', name: '메로나', aliases: ['melona', 'melon bar'], source: 'custom', calories100g: 125, carbs100g: 22.0, protein100g: 1.0, fat100g: 3.5, servingSize: 80, servingLabel: '1개 (80g)' },
+  { id: 'local-screwbar', name: '스크류바', aliases: ['screwbar', 'screw bar'], source: 'custom', calories100g: 94, carbs100g: 21.0, protein100g: 0.5, fat100g: 0.5, servingSize: 85, servingLabel: '1개 (85g)' },
+  { id: 'local-bbang-tto-a', name: '빵또아', aliases: ['bbang tto a', 'ice cream sandwich'], source: 'custom', calories100g: 253, carbs100g: 37.0, protein100g: 4.0, fat100g: 10.0, servingSize: 105, servingLabel: '1개 (105g)' },
+  { id: 'local-gugukon', name: '구구콘', aliases: ['gugukon', 'cone ice cream'], source: 'custom', calories100g: 290, carbs100g: 37.0, protein100g: 4.5, fat100g: 13.5, servingSize: 75, servingLabel: '1개 (75g)' },
+  { id: 'local-seolleim', name: '설레임', aliases: ['seolleim', 'milk ice bar'], source: 'custom', calories100g: 145, carbs100g: 22.5, protein100g: 2.5, fat100g: 5.0, servingSize: 90, servingLabel: '1개 (90g)' },
+  { id: 'local-ice-cream-bar', name: '아이스크림 바 (바닐라)', aliases: ['vanilla ice cream bar'], source: 'custom', calories100g: 210, carbs100g: 27.0, protein100g: 3.0, fat100g: 10.0, servingSize: 60, servingLabel: '1개 (60g)' },
+  // ── 음료 추가 ────────────────────────────────────────────────────────────────
+  { id: 'local-mix-coffee', name: '믹스커피 (맥심)', aliases: ['mix coffee', 'instant coffee', 'maxim', '믹스커피'], source: 'custom', calories100g: 458, carbs100g: 67.0, protein100g: 5.5, fat100g: 18.5, servingSize: 12, servingLabel: '1봉지 (12g)' },
+  { id: 'local-banana-milk', name: '바나나맛 우유', aliases: ['banana milk', '바나나우유', 'banana flavored milk'], source: 'custom', calories100g: 67, carbs100g: 12.5, protein100g: 2.5, fat100g: 1.2, servingSize: 240, servingLabel: '1개 (240ml)' },
+  { id: 'local-sikhye', name: '식혜', aliases: ['sikhye', 'sweet rice drink'], source: 'custom', calories100g: 67, carbs100g: 16.5, protein100g: 0.3, fat100g: 0.1, servingSize: 240, servingLabel: '1캔 (240ml)' },
+  { id: 'local-pocari', name: '포카리스웨트', aliases: ['pocari sweat', 'pocari', 'sports drink korea'], source: 'custom', calories100g: 27, carbs100g: 6.7, protein100g: 0, fat100g: 0, servingSize: 500, servingLabel: '1병 (500ml)' },
+  { id: 'local-hot-choco', name: '핫초코', aliases: ['hot chocolate', 'cocoa', '핫초코'], source: 'custom', calories100g: 55, carbs100g: 8.5, protein100g: 2.5, fat100g: 1.5, servingSize: 250, servingLabel: '1잔 (250ml)' },
+  { id: 'local-iced-tea', name: '아이스티 (복숭아)', aliases: ['iced tea', 'peach tea'], source: 'custom', calories100g: 22, carbs100g: 5.5, protein100g: 0, fat100g: 0, servingSize: 500, servingLabel: '1병 (500ml)' },
+  { id: 'local-protein-shake', name: '단백질 쉐이크 (완제품)', aliases: ['protein shake', 'ready to drink protein'], source: 'custom', calories100g: 42, carbs100g: 3.5, protein100g: 5.5, fat100g: 0.5, servingSize: 250, servingLabel: '1병 (250ml)' },
+  // ── 빵 추가 ──────────────────────────────────────────────────────────────────
+  { id: 'local-soboro-bread', name: '소보로빵', aliases: ['soboro bread', 'streusel bun'], source: 'custom', calories100g: 350, carbs100g: 55.0, protein100g: 7.5, fat100g: 11.0, servingSize: 80, servingLabel: '1개 (80g)' },
+  { id: 'local-cream-bread', name: '크림빵', aliases: ['cream bread', 'cream bun'], source: 'custom', calories100g: 318, carbs100g: 47.0, protein100g: 7.0, fat100g: 11.5, servingSize: 85, servingLabel: '1개 (85g)' },
+  { id: 'local-hotdog-bread', name: '핫도그 (빵 소시지)', aliases: ['corn dog bread', 'hotdog bun'], source: 'custom', calories100g: 272, carbs100g: 35.5, protein100g: 8.5, fat100g: 11.0, servingSize: 110, servingLabel: '1개 (110g)' },
+  { id: 'local-red-bean-bread', name: '단팥빵', aliases: ['red bean bread', 'anpan'], source: 'custom', calories100g: 268, carbs100g: 49.0, protein100g: 6.5, fat100g: 5.5, servingSize: 95, servingLabel: '1개 (95g)' },
+  { id: 'local-castella', name: '카스텔라', aliases: ['castella', 'sponge cake'], source: 'custom', calories100g: 315, carbs100g: 56.0, protein100g: 8.5, fat100g: 6.5, servingSize: 60, servingLabel: '1조각 (60g)' },
+  // ── 고기/해산물 추가 ─────────────────────────────────────────────────────────
+  { id: 'local-duck', name: '오리고기', aliases: ['duck', 'duck meat'], source: 'custom', calories100g: 202, carbs100g: 0, protein100g: 18.3, fat100g: 14.2, servingSize: 150, servingLabel: '1인분 (150g)' },
+  { id: 'local-lamb', name: '양고기', aliases: ['lamb', 'mutton'], source: 'custom', calories100g: 235, carbs100g: 0, protein100g: 18.0, fat100g: 18.0, servingSize: 150, servingLabel: '1인분 (150g)' },
+  { id: 'local-abalone', name: '전복', aliases: ['abalone'], source: 'custom', calories100g: 105, carbs100g: 7.0, protein100g: 17.5, fat100g: 0.8, servingSize: 100, servingLabel: '1개 (100g)' },
+  { id: 'local-clam', name: '바지락', aliases: ['clam', 'short-neck clam'], source: 'custom', calories100g: 86, carbs100g: 5.0, protein100g: 13.5, fat100g: 1.5, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-mussel', name: '홍합', aliases: ['mussel', 'blue mussel'], source: 'custom', calories100g: 82, carbs100g: 4.5, protein100g: 12.5, fat100g: 1.8, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-octopus', name: '낙지', aliases: ['octopus', 'nakji'], source: 'custom', calories100g: 73, carbs100g: 1.5, protein100g: 14.9, fat100g: 0.9, servingSize: 150, servingLabel: '1마리 (150g)' },
+  { id: 'local-seaweed', name: '미역 (생)', aliases: ['seaweed', 'wakame', '미역'], source: 'custom', calories100g: 16, carbs100g: 3.0, protein100g: 1.5, fat100g: 0.1, servingSize: 30, servingLabel: '1회분 (30g)' },
+  { id: 'local-laver', name: '김 (구운)', aliases: ['laver', 'nori', 'dried seaweed', '김'], source: 'custom', calories100g: 187, carbs100g: 30.0, protein100g: 22.5, fat100g: 2.5, servingSize: 5, servingLabel: '1장 (5g)' },
+  // ── 채소 추가 ────────────────────────────────────────────────────────────────
+  { id: 'local-garlic', name: '마늘', aliases: ['garlic'], source: 'custom', calories100g: 149, carbs100g: 33.0, protein100g: 6.4, fat100g: 0.5, servingSize: 5, servingLabel: '1쪽 (5g)' },
+  { id: 'local-ginger', name: '생강', aliases: ['ginger'], source: 'custom', calories100g: 80, carbs100g: 17.8, protein100g: 1.8, fat100g: 0.8, servingSize: 10, servingLabel: '1조각 (10g)' },
+  { id: 'local-green-onion', name: '파 (대파)', aliases: ['green onion', 'spring onion', 'scallion'], source: 'custom', calories100g: 34, carbs100g: 7.5, protein100g: 1.5, fat100g: 0.2, servingSize: 50, servingLabel: '1회분 (50g)' },
+  { id: 'local-zucchini', name: '애호박', aliases: ['zucchini', 'courgette', '호박'], source: 'custom', calories100g: 17, carbs100g: 3.5, protein100g: 1.0, fat100g: 0.2, servingSize: 150, servingLabel: '1/2개 (150g)' },
+  { id: 'local-radish', name: '무', aliases: ['radish', 'daikon', 'korean radish'], source: 'custom', calories100g: 27, carbs100g: 6.0, protein100g: 0.9, fat100g: 0.1, servingSize: 100, servingLabel: '1회분 (100g)' },
+  { id: 'local-eggplant', name: '가지', aliases: ['eggplant', 'aubergine'], source: 'custom', calories100g: 24, carbs100g: 5.5, protein100g: 0.9, fat100g: 0.2, servingSize: 150, servingLabel: '1개 (150g)' },
+  { id: 'local-celery', name: '셀러리', aliases: ['celery'], source: 'custom', calories100g: 16, carbs100g: 3.0, protein100g: 0.7, fat100g: 0.2, servingSize: 80, servingLabel: '1대 (80g)' },
+  { id: 'local-leek', name: '부추', aliases: ['chive', 'leek', '부추'], source: 'custom', calories100g: 35, carbs100g: 6.0, protein100g: 2.5, fat100g: 0.4, servingSize: 50, servingLabel: '1회분 (50g)' },
+  // ── 유제품/단백질 추가 ───────────────────────────────────────────────────────
+  { id: 'local-cream-cheese', name: '크림치즈', aliases: ['cream cheese'], source: 'custom', calories100g: 342, carbs100g: 4.1, protein100g: 6.2, fat100g: 33.2, servingSize: 28, servingLabel: '2큰술 (28g)' },
+  { id: 'local-whole-milk-yogurt', name: '요거트 (일반)', aliases: ['yogurt plain', 'plain yogurt'], source: 'custom', calories100g: 61, carbs100g: 6.5, protein100g: 3.5, fat100g: 3.3, servingSize: 100, servingLabel: '1팩 (100g)' },
+  { id: 'local-peanut', name: '땅콩', aliases: ['peanut', 'groundnut'], source: 'custom', calories100g: 567, carbs100g: 16.1, protein100g: 25.8, fat100g: 49.2, servingSize: 30, servingLabel: '1줌 (30g)' },
+  { id: 'local-pistachio', name: '피스타치오', aliases: ['pistachio'], source: 'custom', calories100g: 560, carbs100g: 27.5, protein100g: 20.2, fat100g: 45.3, servingSize: 30, servingLabel: '1줌 (30g)' },
+  { id: 'local-chia-seed', name: '치아씨드', aliases: ['chia seed', 'chia'], source: 'custom', calories100g: 486, carbs100g: 42.1, protein100g: 16.5, fat100g: 30.7, servingSize: 15, servingLabel: '1큰술 (15g)' },
 ]
 
 function matchesQuery(term: string, q: string): boolean {
@@ -281,7 +371,6 @@ async function fetchKFood(query: string): Promise<FoodItem[]> {
       signal: AbortSignal.timeout(10000),
     })
     const text = await resp.text()
-    console.log('[kfood] status:', resp.status, 'body:', text.slice(0, 500))
     if (!resp.ok) return []
     const data = JSON.parse(text)
     return parseKFoodResponse(data)
