@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash, IconArrowLeft } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
 import { buildProfile, calcMacros, calcBMR, calcTDEE, calcGoalCalories, MEAL_SLOTS } from '../lib/dietCalc'
 import { searchFood, calcEntryNutrition } from '../lib/foodApi'
@@ -545,42 +545,113 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const inputStyle = { width: '100%', padding: '11px 13px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }
   const labelStyle = { fontSize: '11px', fontWeight: 700 as const, color: 'var(--tm)', textTransform: 'uppercase' as const, letterSpacing: '.05em', marginBottom: '5px', display: 'block' }
 
+  const creatingTitle = creating === 'food' ? tr(lang, 'dietNewFood') : creating === 'meal' ? tr(lang, 'dietNewMeal') : null
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh' }}>
       {/* Header */}
       <div style={{ padding: '14px 18px 0', borderBottom: '.5px solid var(--bd)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <div>
-            <div style={{ fontSize: '11px', color: 'var(--tm)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em' }}>{slotLabel}</div>
-            <div style={{ fontSize: '17px', fontWeight: 800 }}>{tr(lang, 'dietAddFood')}</div>
-          </div>
+          {creating ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button onClick={() => setCreating(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)', display: 'flex', padding: '2px' }}><IconArrowLeft size={20} /></button>
+              <div style={{ fontSize: '17px', fontWeight: 800 }}>{creatingTitle}</div>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--tm)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em' }}>{slotLabel}</div>
+              <div style={{ fontSize: '17px', fontWeight: 800 }}>{tr(lang, 'dietAddFood')}</div>
+            </div>
+          )}
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)' }}><IconX size={22} /></button>
         </div>
-        {/* 4 tabs */}
-        <div style={{ display: 'flex', marginTop: '8px' }}>
-          {([
-            { key: 'search' as FoodTab, label: tr(lang, 'dietFoodSearch'), icon: '🔍' },
-            { key: 'fav'    as FoodTab, label: tr(lang, 'dietFoodFav'),    icon: '⭐' },
-            { key: 'meal'   as FoodTab, label: tr(lang, 'dietFoodMeal'),   icon: '🍽️' },
-            { key: 'mine'   as FoodTab, label: tr(lang, 'dietFoodMine'),   icon: '✏️' },
-          ]).map(({ key, label, icon }) => (
-            <button key={key} onClick={() => { setTab(key); setSelected(null) }} style={{
-              flex: 1, padding: '8px 4px', textAlign: 'center', fontSize: '11px', fontWeight: 600,
-              color: tab === key ? 'var(--green)' : 'var(--tm)',
-              background: 'none', border: 'none', borderBottom: `2px solid ${tab === key ? 'var(--green)' : 'transparent'}`,
-              cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-            }}>
-              <span style={{ fontSize: '14px' }}>{icon}</span>{label}
-            </button>
-          ))}
-        </div>
+        {/* 탭: creating 상태에서는 숨김 */}
+        {!creating && (
+          <div style={{ display: 'flex', marginTop: '8px' }}>
+            {([
+              { key: 'search' as FoodTab, label: tr(lang, 'dietFoodSearch'), icon: '🔍' },
+              { key: 'fav'    as FoodTab, label: tr(lang, 'dietFoodFav'),    icon: '⭐' },
+              { key: 'meal'   as FoodTab, label: tr(lang, 'dietFoodMeal'),   icon: '🍽️' },
+              { key: 'mine'   as FoodTab, label: tr(lang, 'dietFoodMine'),   icon: '✏️' },
+            ]).map(({ key, label, icon }) => (
+              <button key={key} onClick={() => { setTab(key); setSelected(null) }} style={{
+                flex: 1, padding: '8px 4px', textAlign: 'center', fontSize: '11px', fontWeight: 600,
+                color: tab === key ? 'var(--green)' : 'var(--tm)',
+                background: 'none', border: 'none', borderBottom: `2px solid ${tab === key ? 'var(--green)' : 'transparent'}`,
+                cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+              }}>
+                <span style={{ fontSize: '14px' }}>{icon}</span>{label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Body */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
 
+        {/* Create meal template form */}
+        {creating === 'meal' && (
+          <div style={{ padding: '20px' }}>
+            <label style={labelStyle}>{tr(lang, 'dietMealNameLabel')}</label>
+            <input value={mealName} onChange={e => setMealName(e.target.value)} placeholder="e.g. 아침식사 1" style={{ ...inputStyle, marginBottom: '16px' }} />
+            <label style={labelStyle}>{tr(lang, 'dietFoodSearch')}</label>
+            <input value={mealSearch} onChange={e => setMealSearch(e.target.value)} placeholder={tr(lang, 'dietSearchPlaceholder')} style={{ ...inputStyle, marginBottom: '8px' }} />
+            {mealResults.slice(0, 5).map(f => (
+              <div key={f.id} onClick={() => { setMealFoods(prev => [...prev, { food: f, amount: 100 }]); setMealSearch(''); setMealResults([]) }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '6px', cursor: 'pointer' }}>
+                <div style={{ flex: 1, fontSize: '14px', fontWeight: 600 }}>{f.name}</div>
+                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{f.calories100g} kcal/100g</div>
+                <IconPlus size={14} style={{ color: 'var(--green)' }} />
+              </div>
+            ))}
+            {mealFoods.length > 0 && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--tm)', marginBottom: '8px' }}>추가된 음식</div>
+                {mealFoods.map(({ food, amount }, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span style={{ flex: 1, fontSize: '13px' }}>{food.name}</span>
+                    <input type="number" value={amount} min={1} onChange={e => setMealFoods(prev => prev.map((m, j) => j === i ? { ...m, amount: Number(e.target.value) } : m))}
+                      style={{ width: '60px', padding: '6px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--rsm)', textAlign: 'center', fontSize: '13px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
+                    <span style={{ fontSize: '12px', color: 'var(--tm)' }}>g</span>
+                    <button onClick={() => setMealFoods(prev => prev.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--red)' }}><IconX size={14} /></button>
+                  </div>
+                ))}
+                <div style={{ fontSize: '12px', color: 'var(--green)', fontWeight: 700, marginTop: '8px' }}>
+                  총 {mealFoods.reduce((a, { food, amount }) => a + Math.round(food.calories100g * amount / 100), 0)} kcal
+                </div>
+              </div>
+            )}
+            <button onClick={handleSaveMeal} disabled={!mealName.trim() || mealFoods.length === 0} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit', marginTop: '16px', opacity: (!mealName.trim() || mealFoods.length === 0) ? .5 : 1 }}>
+              {tr(lang, 'dietSaveMeal')}
+            </button>
+          </div>
+        )}
+
+        {/* Create custom food form */}
+        {creating === 'food' && (
+          <div style={{ padding: '20px' }}>
+            {[
+              { label: tr(lang, 'dietFoodName'), val: cName, set: setCName, type: 'text', placeholder: 'e.g. 단백질 쉐이크' },
+              { label: tr(lang, 'dietCal100'), val: cCal, set: setCCal, type: 'number', placeholder: '165' },
+              { label: tr(lang, 'dietCarbs100'), val: cCarbs, set: setCCarbs, type: 'number', placeholder: '0' },
+              { label: tr(lang, 'dietProtein100'), val: cProt, set: setCProt, type: 'number', placeholder: '31' },
+              { label: tr(lang, 'dietFat100'), val: cFat, set: setCFat, type: 'number', placeholder: '4' },
+              { label: tr(lang, 'dietServingSize'), val: cServing, set: setCServing, type: 'number', placeholder: '100' },
+            ].map(({ label, val, set, type, placeholder }) => (
+              <div key={label} style={{ marginBottom: '12px' }}>
+                <label style={labelStyle}>{label}</label>
+                <input type={type} value={val} onChange={e => set(e.target.value)} placeholder={placeholder} style={inputStyle} />
+              </div>
+            ))}
+            <button onClick={handleSaveFood} disabled={!cName.trim() || !cCal} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit', marginTop: '4px', opacity: (!cName.trim() || !cCal) ? .5 : 1 }}>
+              {tr(lang, 'dietSaveFood')}
+            </button>
+          </div>
+        )}
+
         {/* Search tab */}
-        {tab === 'search' && (
+        {!creating && tab === 'search' && (
           <>
             <div style={{ margin: '10px 16px', display: 'flex', alignItems: 'center', gap: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: '30px', padding: '10px 15px' }}>
               <IconSearch size={16} style={{ color: 'var(--tm)', flexShrink: 0 }} />
@@ -628,7 +699,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         )}
 
         {/* Favorites tab */}
-        {tab === 'fav' && (
+        {!creating && tab === 'fav' && (
           <>
             {favorites.length === 0
               ? <div style={{ padding: '30px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoFav')}</div>
@@ -639,7 +710,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         )}
 
         {/* Meal templates tab */}
-        {tab === 'meal' && (
+        {!creating && tab === 'meal' && (
           <>
             <div onClick={() => setCreating('meal')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderBottom: '.5px solid var(--bd)' }}>
               <IconPlus size={16} />{tr(lang, 'dietNewMeal')}
@@ -673,7 +744,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         )}
 
         {/* My foods tab */}
-        {tab === 'mine' && (
+        {!creating && tab === 'mine' && (
           <>
             <div onClick={() => setCreating('food')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderBottom: '.5px solid var(--bd)' }}>
               <IconPlus size={16} />{tr(lang, 'dietNewFood')}
@@ -686,7 +757,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
       </div>
 
       {/* Amount panel (when food selected) */}
-      {selected && calcSelected && (
+      {!creating && selected && calcSelected && (
         <div style={{ background: 'var(--bg1)', borderTop: '1.5px solid var(--bd)', padding: '16px 18px', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div>
@@ -732,73 +803,6 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         </div>
       )}
 
-      {/* Create meal template modal */}
-      {creating === 'meal' && (
-        <div style={{ position: 'absolute', inset: 0, background: 'var(--bg1)', zIndex: 10, overflowY: 'auto', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800 }}>{tr(lang, 'dietNewMeal')}</div>
-            <button onClick={() => setCreating(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)' }}><IconX size={20} /></button>
-          </div>
-          <label style={labelStyle}>{tr(lang, 'dietMealNameLabel')}</label>
-          <input value={mealName} onChange={e => setMealName(e.target.value)} placeholder="e.g. 아침식사 1" style={{ ...inputStyle, marginBottom: '16px' }} />
-          <label style={labelStyle}>{tr(lang, 'dietFoodSearch')}</label>
-          <input value={mealSearch} onChange={e => setMealSearch(e.target.value)} placeholder={tr(lang, 'dietSearchPlaceholder')} style={{ ...inputStyle, marginBottom: '8px' }} />
-          {mealResults.slice(0, 5).map(f => (
-            <div key={f.id} onClick={() => { setMealFoods(prev => [...prev, { food: f, amount: 100 }]); setMealSearch(''); setMealResults([]) }}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '6px', cursor: 'pointer' }}>
-              <div style={{ flex: 1, fontSize: '14px', fontWeight: 600 }}>{f.name}</div>
-              <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{f.calories100g} kcal/100g</div>
-              <IconPlus size={14} style={{ color: 'var(--green)' }} />
-            </div>
-          ))}
-          {mealFoods.length > 0 && (
-            <div style={{ marginTop: '12px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--tm)', marginBottom: '8px' }}>추가된 음식</div>
-              {mealFoods.map(({ food, amount }, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <span style={{ flex: 1, fontSize: '13px' }}>{food.name}</span>
-                  <input type="number" value={amount} min={1} onChange={e => setMealFoods(prev => prev.map((m, j) => j === i ? { ...m, amount: Number(e.target.value) } : m))}
-                    style={{ width: '60px', padding: '6px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--rsm)', textAlign: 'center', fontSize: '13px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
-                  <span style={{ fontSize: '12px', color: 'var(--tm)' }}>g</span>
-                  <button onClick={() => setMealFoods(prev => prev.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--red)' }}><IconX size={14} /></button>
-                </div>
-              ))}
-              <div style={{ fontSize: '12px', color: 'var(--green)', fontWeight: 700, marginTop: '8px' }}>
-                총 {mealFoods.reduce((a, { food, amount }) => a + Math.round(food.calories100g * amount / 100), 0)} kcal
-              </div>
-            </div>
-          )}
-          <button onClick={handleSaveMeal} disabled={!mealName.trim() || mealFoods.length === 0} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit', marginTop: '16px', opacity: (!mealName.trim() || mealFoods.length === 0) ? .5 : 1 }}>
-            {tr(lang, 'dietSaveMeal')}
-          </button>
-        </div>
-      )}
-
-      {/* Create custom food modal */}
-      {creating === 'food' && (
-        <div style={{ position: 'absolute', inset: 0, background: 'var(--bg1)', zIndex: 10, overflowY: 'auto', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <div style={{ fontSize: '18px', fontWeight: 800 }}>{tr(lang, 'dietNewFood')}</div>
-            <button onClick={() => setCreating(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)' }}><IconX size={20} /></button>
-          </div>
-          {[
-            { label: tr(lang, 'dietFoodName'), val: cName, set: setCName, type: 'text', placeholder: 'e.g. 단백질 쉐이크' },
-            { label: tr(lang, 'dietCal100'), val: cCal, set: setCCal, type: 'number', placeholder: '165' },
-            { label: tr(lang, 'dietCarbs100'), val: cCarbs, set: setCCarbs, type: 'number', placeholder: '0' },
-            { label: tr(lang, 'dietProtein100'), val: cProt, set: setCProt, type: 'number', placeholder: '31' },
-            { label: tr(lang, 'dietFat100'), val: cFat, set: setCFat, type: 'number', placeholder: '4' },
-            { label: tr(lang, 'dietServingSize'), val: cServing, set: setCServing, type: 'number', placeholder: '100' },
-          ].map(({ label, val, set, type, placeholder }) => (
-            <div key={label} style={{ marginBottom: '12px' }}>
-              <label style={labelStyle}>{label}</label>
-              <input type={type} value={val} onChange={e => set(e.target.value)} placeholder={placeholder} style={inputStyle} />
-            </div>
-          ))}
-          <button onClick={handleSaveFood} disabled={!cName.trim() || !cCal} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit', marginTop: '4px', opacity: (!cName.trim() || !cCal) ? .5 : 1 }}>
-            {tr(lang, 'dietSaveFood')}
-          </button>
-        </div>
-      )}
     </div>
   )
 }
