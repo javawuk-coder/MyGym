@@ -546,7 +546,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const labelStyle = { fontSize: '11px', fontWeight: 700 as const, color: 'var(--tm)', textTransform: 'uppercase' as const, letterSpacing: '.05em', marginBottom: '5px', display: 'block' }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', position: 'relative' }}>
       {/* Header */}
       <div style={{ padding: '14px 18px 0', borderBottom: '.5px solid var(--bd)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
