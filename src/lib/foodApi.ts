@@ -380,17 +380,57 @@ async function fetchKFood(query: string): Promise<FoodItem[]> {
   }
 }
 
+// ── 정적 kfoods.json (식약처 DB 36k건) lazy-load ────────────────────────────
+
+let _kfCache: FoodItem[] | null = null
+let _kfLoading: Promise<FoodItem[]> | null = null
+
+async function loadKFoodDB(): Promise<FoodItem[]> {
+  if (_kfCache) return _kfCache
+  if (_kfLoading) return _kfLoading
+  _kfLoading = fetch('/kfoods.json')
+    .then(r => r.json() as Promise<FoodItem[]>)
+    .then(items => { _kfCache = items; _kfLoading = null; return items })
+    .catch(() => { _kfLoading = null; return [] })
+  return _kfLoading
+}
+
+function rankKFoodResults(items: FoodItem[], q: string): FoodItem[] {
+  const exact: FoodItem[] = [], sw: FoodItem[] = [], rest: FoodItem[] = []
+  for (const item of items) {
+    const n = item.name.toLowerCase()
+    if (n === q) exact.push(item)
+    else if (n.startsWith(q)) sw.push(item)
+    else rest.push(item)
+  }
+  return [...exact, ...sw, ...rest].slice(0, 40)
+}
+
+async function searchStaticKFoodDB(query: string): Promise<FoodItem[]> {
+  const db = await loadKFoodDB()
+  const q = query.toLowerCase().trim()
+  if (!q || !db.length) return []
+  return rankKFoodResults(db.filter(f => f.name.toLowerCase().includes(q)), q)
+}
+
 export async function searchFood(query: string, _lang = 'ko'): Promise<FoodItem[]> {
   if (!query.trim()) return []
 
-  // 1) 로컬 DB — 항상 먼저 (한국어·영어 aliases 모두)
+  // 1) 로컬 KO_DB — 항상 먼저 (aliases 포함)
   const localResults = searchLocal(query)
 
-  // 2) 한글 검색: 식약처 API 병렬 호출
+  // 2) 한글 검색: 정적 DB + 식약처 API 병렬 호출
   if (hasKorean(query)) {
-    const kfoodResults = await fetchKFood(query)
+    const [staticResults, apiResults] = await Promise.all([
+      searchStaticKFoodDB(query),
+      fetchKFood(query),
+    ])
     const seen = new Set(localResults.map(f => f.id))
-    return [...localResults, ...kfoodResults.filter(f => !seen.has(f.id))]
+    const merged: FoodItem[] = []
+    for (const f of [...staticResults, ...apiResults]) {
+      if (!seen.has(f.id)) { seen.add(f.id); merged.push(f) }
+    }
+    return [...localResults, ...merged]
   }
 
   // 3) 영문 검색: Open Food Facts
