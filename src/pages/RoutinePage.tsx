@@ -446,6 +446,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       if (s.maxReps) e.maxReps = true
       if (s.roundType && s.roundType !== 'all') e.roundType = s.roundType
       if (s.note) e.note = s.note
+      if (s.defaultWeight != null && s.defaultWeight > 0) e.defaultWeight = s.defaultWeight
       return e as unknown as RoutineExercise
     })
 
@@ -528,7 +529,8 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       <span style={{ flex: 1, fontSize: '13px' }}>
                         <span style={{ fontWeight: 500 }}>{exName(ex, lang).main}</span>
                         {exName(ex, lang).sub && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>({exName(ex, lang).sub})</span>}
-                        {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>@ {reObj.note}</span>}
+                        {reObj.defaultWeight != null && reObj.defaultWeight > 0 && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>{reObj.defaultWeight}kg</span>}
+                        {reObj.note && <span style={{ color: 'var(--tm)', fontSize: '11px', marginLeft: '5px' }}>· {reObj.note}</span>}
                       </span>
                       <span style={{ color: reObj.maxReps ? '#E24B4A' : 'var(--tm)', fontSize: '12px', flexShrink: 0, fontWeight: reObj.maxReps ? 700 : 400 }}>
                         {repsLabel(fmt, ex, reObj, lang)}
@@ -916,7 +918,6 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         {/* 2행: Interval 전용 — ODD/EVEN/ALL + MAX + note */}
                         {isInterval && (
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px', paddingLeft: '24px', flexWrap: 'wrap' }}>
-                            {/* ODD / EVEN / ALL 선택 */}
                             {(['odd', 'even', 'all'] as const).map(v => (
                               <button key={v} onClick={() => updateExercise(i, { roundType: v })} style={{
                                 padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
@@ -926,7 +927,6 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                                 fontWeight: rt === v ? 700 : 400,
                               }}>{ROUND_TYPE_LABELS[v]}</button>
                             ))}
-                            {/* MAX 토글 */}
                             <button onClick={() => updateExercise(i, { maxReps: !s.maxReps })} style={{
                               padding: '3px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit',
                               border: `1px solid ${s.maxReps ? '#E24B4A' : 'var(--bd)'}`,
@@ -934,12 +934,11 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                               color: s.maxReps ? '#E24B4A' : 'var(--tm)',
                               fontWeight: s.maxReps ? 700 : 400,
                             }}>MAX</button>
-                            {/* 메모 (@ weight 등) */}
                             <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
                               placeholder={tr(lang, 'routineNotePlaceholder')} style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
-                        {/* non-interval에서도 MAX 토글 제공 (AMRAP, EMOM, Tabata, For Time) */}
+                        {/* non-interval AMRAP/EMOM/Tabata/For Time — MAX + note */}
                         {!isInterval && (format.type === 'amrap' || format.type === 'emom' || format.type === 'tabata' || format.type === 'for_time') && (
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px', flexWrap: 'wrap' }}>
                             <button onClick={() => updateExercise(i, { maxReps: !s.maxReps })} style={{
@@ -951,6 +950,25 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                             }}>MAX</button>
                             <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
                               placeholder={tr(lang, 'routineNotePlaceholder')} style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
+                          </div>
+                        )}
+                        {/* Sets & Reps — 기본 무게 + note */}
+                        {!isInterval && format.type === 'sets_reps' && !isCardio && (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '5px', paddingLeft: '24px', flexWrap: 'wrap' }}>
+                            {!isCardio && ex.log_type === 'weight_reps' && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '11px', color: 'var(--tm)', whiteSpace: 'nowrap' }}>기본 무게</span>
+                                <input type="number" min="0" step="0.5"
+                                  value={s.defaultWeight ?? ''}
+                                  onChange={e => updateExercise(i, { defaultWeight: parseFloat(e.target.value) || undefined })}
+                                  placeholder="—"
+                                  style={{ width: '58px', fontSize: '12px', padding: '3px 6px', textAlign: 'center' }} />
+                                <span style={{ fontSize: '11px', color: 'var(--tm)' }}>kg</span>
+                              </div>
+                            )}
+                            <input value={s.note ?? ''} onChange={e => updateExercise(i, { note: e.target.value || undefined })}
+                              placeholder="Note (e.g. 템포 3-1-1, 그립 넓게)"
+                              style={{ flex: 1, minWidth: '120px', fontSize: '12px', padding: '3px 8px' }} />
                           </div>
                         )}
                       </div>

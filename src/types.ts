@@ -61,6 +61,7 @@ export interface RoutineExercise {
   maxReps?: boolean          // 고정 reps 대신 max 수행 (Max Cal, Max Wall Walk 등)
   roundType?: 'all' | 'odd' | 'even'  // Interval even/odd split
   note?: string              // 추가 메모 (e.g. "@ 55/75 lb")
+  defaultWeight?: number     // 기본 무게 (kg) — 로깅 시 pre-fill
 }
 
 export type WorkoutFormatType = 'sets_reps' | 'tabata' | 'for_time' | 'amrap' | 'emom' | 'interval'

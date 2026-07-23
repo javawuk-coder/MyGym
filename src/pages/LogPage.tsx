@@ -34,18 +34,32 @@ interface DraftEx {
   exId: string
   rows: SetRow[]
   cardio: { dist: string; time: string; cal: string }
+  routineNote?: string
 }
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
 
-function makeRows(count: number, reps?: number): SetRow[] {
-  return Array.from({ length: count }, () => ({ weight: '', reps: reps != null ? String(reps) : '', duration: '', note: '', pr: false, rir: '' }))
+function makeRows(count: number, reps?: number, weight?: number): SetRow[] {
+  return Array.from({ length: count }, () => ({
+    weight: weight != null ? String(weight) : '',
+    reps: reps != null ? String(reps) : '',
+    duration: '', note: '', pr: false, rir: '',
+  }))
 }
-function draftFromRoutine(routine: Routine, allExercises: Exercise[]): DraftEx[] {
+function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg' | 'lb'): DraftEx[] {
   return routine.exercises.map(re => {
     const ex = allExercises.find(e => e.id === re.exId)
     const lt = ex?.log_type || 'weight_reps'
-    if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' } }
-    return { exId: re.exId, rows: makeRows(re.sets || 3, lt !== 'weight_reps' ? re.reps : undefined), cardio: { dist: '', time: '', cal: '' } }
+    if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, routineNote: re.note }
+    const displayWeight = lt === 'weight_reps' && re.defaultWeight != null && re.defaultWeight > 0
+      ? fromKg(re.defaultWeight, unit)
+      : undefined
+    const prefilledReps = lt !== 'weight_reps' ? re.reps : undefined
+    return {
+      exId: re.exId,
+      rows: makeRows(re.sets || 3, prefilledReps, displayWeight),
+      cardio: { dist: '', time: '', cal: '' },
+      routineNote: re.note,
+    }
   })
 }
 
@@ -179,7 +193,7 @@ export default function LogPage({
   useEffect(() => {
     if (!initialRoutine) return
     setFillTitle(initialRoutine.name)
-    setDraftExes(draftFromRoutine(initialRoutine, allExercises))
+    setDraftExes(draftFromRoutine(initialRoutine, allExercises, unit))
     setModal('fill')
     startWorkout(); acquireWakeLock()
     onConsumedInitial?.()
@@ -296,7 +310,7 @@ export default function LogPage({
   }
 
   const openRoutineFill = (r: Routine & { id: string }) => {
-    setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises)); setModal('fill')
+    setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises, unit)); setModal('fill')
     startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
@@ -359,9 +373,14 @@ export default function LogPage({
       <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '10px', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
-            {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)', marginLeft: '6px' }}>{nm.sub}</span>}
-            {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ marginLeft: '6px', fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+              <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
+              {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</span>}
+              {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
+            </div>
+            {d.routineNote && (
+              <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>📌 {d.routineNote}</div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
             <button className="idb" onClick={() => moveExUp(di)} disabled={di === 0} style={{ opacity: di === 0 ? 0.3 : 1 }}><IconArrowUp size={13} /></button>
