@@ -1242,6 +1242,15 @@
     "log_type": "weight_reps"
   },
   {
+    "id": "shoulder_33",
+    "name": "Chest Supported DB Lateral Raise",
+    "ko": "체스트 서포티드 덤벨 레터럴 레이즈",
+    "muscle": "shoulder",
+    "equipment": "dumbbell",
+    "type": "isolation",
+    "log_type": "weight_reps"
+  },
+  {
     "id": "arm_01",
     "name": "Barbell Curl",
     "ko": "바벨 컬",
