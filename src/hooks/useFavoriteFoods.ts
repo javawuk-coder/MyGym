@@ -25,10 +25,11 @@ export function useFavoriteFoods(uid: string | undefined) {
       await deleteDoc(ref)
     } else {
       const fav: Omit<FavoriteFood, 'id'> = {
-        name: food.name, brand: food.brand,
+        name: food.name,
         calories100g: food.calories100g, carbs100g: food.carbs100g,
         protein100g: food.protein100g, fat100g: food.fat100g,
         source: food.source,
+        ...(food.brand != null && { brand: food.brand }),
       }
       await setDoc(ref, fav)
     }
