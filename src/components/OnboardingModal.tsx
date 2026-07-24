@@ -371,7 +371,7 @@ function VisualBody() {
         <g key={x as number}>
           <rect x={x as number} y="10" width="68" height="50" rx="9" fill="var(--s2)" stroke="var(--bd)" strokeWidth="1"/>
           <text x={(x as number)+34} y="26" fill="var(--tm)" fontSize="8" fontFamily="-apple-system,sans-serif" fontWeight="700" textAnchor="middle" letterSpacing=".05em">{label}</text>
-          <text x={(x as number)+34} y="46" fill={color as string} fontSize="17" fontFamily="-apple-system,sans-serif" fontWeight="800" textAnchor="middle" fontVariantNumeric="tabular-nums">{val}</text>
+          <text x={(x as number)+34} y="46" fill={color as string} fontSize="17" fontFamily="-apple-system,sans-serif" fontWeight="800" textAnchor="middle" style={{ fontVariantNumeric: 'tabular-nums' }}>{val}</text>
           <text x={(x as number)+34} y="57" fill="var(--tm)" fontSize="8" fontFamily="-apple-system,sans-serif" textAnchor="middle">{unit}</text>
         </g>
       ))}
