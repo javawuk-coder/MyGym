@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, doc, onSnapshot, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore'
+import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import type { CustomFood } from '../types'
 
@@ -23,6 +23,17 @@ export function useCustomFoods(uid: string | undefined) {
   async function updateCustomFood(id: string, food: Omit<CustomFood, 'id'>) {
     if (!uid) return
     await setDoc(doc(db, 'users', uid, 'dietCustomFoods', id), { ...food })
+    // 즐겨찾기에도 같은 ID 문서가 있으면 동기화 (없으면 무시)
+    const favUpdate: Record<string, unknown> = {
+      name: food.name,
+      calories100g: food.calories100g,
+      carbs100g: food.carbs100g,
+      protein100g: food.protein100g,
+      fat100g: food.fat100g,
+      source: 'custom',
+      ...(food.brand != null && { brand: food.brand }),
+    }
+    try { await updateDoc(doc(db, 'users', uid, 'dietFavorites', id), favUpdate) } catch { /* not favorited */ }
   }
 
   async function deleteCustomFood(id: string) {
