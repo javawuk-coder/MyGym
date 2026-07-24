@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash, IconArrowLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight, IconSearch, IconStar, IconStarFilled, IconPlus, IconX, IconTrash, IconArrowLeft, IconPencil } from '@tabler/icons-react'
 import { tr, type Lang } from '../lib/i18n'
 import { buildProfile, calcMacros, calcBMR, calcTDEE, calcGoalCalories, MEAL_SLOTS } from '../lib/dietCalc'
 import { searchFood, calcEntryNutrition } from '../lib/foodApi'
@@ -41,6 +41,7 @@ interface Props {
   onToggleFav: (food: FoodItem) => Promise<void>
   isFavorite: (id: string) => boolean
   onSaveCustomFood: (food: Omit<CustomFood, 'id'>) => Promise<void>
+  onUpdateCustomFood: (id: string, food: Omit<CustomFood, 'id'>) => Promise<void>
   onDeleteCustomFood: (id: string) => Promise<void>
   onSaveMealTemplate: (name: string, entries: DietEntry[]) => Promise<void>
   onDeleteMealTemplate: (id: string) => Promise<void>
@@ -392,7 +393,7 @@ function Onboarding({ lang, bodyLogs, onSave }: {
 
 // ── FOOD SEARCH MODAL ────────────────────────────────────────────────────────
 
-function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, isFavorite, onToggleFav, onAdd, onAddAll, onSaveCustomFood, onSaveMealTemplate, onClose }: {
+function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, isFavorite, onToggleFav, onAdd, onAddAll, onSaveCustomFood, onUpdateCustomFood, onDeleteCustomFood, onSaveMealTemplate, onClose }: {
   lang: Lang
   slotLabel: string
   favorites: FavoriteFood[]
@@ -403,6 +404,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   onAdd: (entry: DietEntry) => Promise<void>
   onAddAll: (entries: DietEntry[]) => Promise<void>
   onSaveCustomFood: (f: Omit<CustomFood, 'id'>) => Promise<void>
+  onUpdateCustomFood: (id: string, f: Omit<CustomFood, 'id'>) => Promise<void>
+  onDeleteCustomFood: (id: string) => Promise<void>
   onSaveMealTemplate: (name: string, entries: DietEntry[]) => Promise<void>
   onClose: () => void
 }) {
@@ -413,6 +416,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const [selected, setSelected] = useState<FoodItem | null>(null)
   const [amount, setAmount] = useState(100)
   const [creating, setCreating] = useState<'food' | 'meal' | null>(null)
+  const [editingFood, setEditingFood] = useState<CustomFood | null>(null)
   const [recentFoods] = useState<FoodItem[]>([])
 
   // Meal creation state
@@ -490,18 +494,38 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
     setMealResults([])
   }
 
+  function resetFoodForm() {
+    setCreating(null); setEditingFood(null)
+    setCName(''); setCCal(''); setCCarbs(''); setCProt(''); setCFat(''); setCServing('100')
+  }
+
+  function openEditFood(c: CustomFood) {
+    setEditingFood(c)
+    setCName(c.name)
+    setCCal(String(c.calories100g))
+    setCCarbs(String(c.carbs100g))
+    setCProt(String(c.protein100g))
+    setCFat(String(c.fat100g))
+    setCServing(String(c.servingSize ?? 100))
+    setCreating('food')
+  }
+
   async function handleSaveFood() {
     if (!cName.trim() || !cCal) return
-    await onSaveCustomFood({
+    const data = {
       name: cName.trim(),
       calories100g: Number(cCal),
       carbs100g: Number(cCarbs) || 0,
       protein100g: Number(cProt) || 0,
       fat100g: Number(cFat) || 0,
       servingSize: Number(cServing) || 100,
-    })
-    setCreating(null)
-    setCName(''); setCCal(''); setCCarbs(''); setCProt(''); setCFat(''); setCServing('100')
+    }
+    if (editingFood) {
+      await onUpdateCustomFood(editingFood.id, data)
+    } else {
+      await onSaveCustomFood(data)
+    }
+    resetFoodForm()
   }
 
   const calcSelected = selected ? calcEntryNutrition(selected, amount) : null
@@ -545,7 +569,9 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const inputStyle = { width: '100%', padding: '11px 13px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }
   const labelStyle = { fontSize: '11px', fontWeight: 700 as const, color: 'var(--tm)', textTransform: 'uppercase' as const, letterSpacing: '.05em', marginBottom: '5px', display: 'block' }
 
-  const creatingTitle = creating === 'food' ? tr(lang, 'dietNewFood') : creating === 'meal' ? tr(lang, 'dietNewMeal') : null
+  const creatingTitle = creating === 'food'
+    ? (editingFood ? tr(lang, 'dietEditFood') : tr(lang, 'dietNewFood'))
+    : creating === 'meal' ? tr(lang, 'dietNewMeal') : null
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh' }}>
@@ -554,7 +580,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
           {creating ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button onClick={() => setCreating(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)', display: 'flex', padding: '2px' }}><IconArrowLeft size={20} /></button>
+              <button onClick={resetFoodForm} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)', display: 'flex', padding: '2px' }}><IconArrowLeft size={20} /></button>
               <div style={{ fontSize: '17px', fontWeight: 800 }}>{creatingTitle}</div>
             </div>
           ) : (
@@ -645,7 +671,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
               </div>
             ))}
             <button onClick={handleSaveFood} disabled={!cName.trim() || !cCal} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit', marginTop: '4px', opacity: (!cName.trim() || !cCal) ? .5 : 1 }}>
-              {tr(lang, 'dietSaveFood')}
+              {editingFood ? tr(lang, 'dietSaveFoodEdit') : tr(lang, 'dietSaveFood')}
             </button>
           </div>
         )}
@@ -751,7 +777,21 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
             </div>
             <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietMyFoods')} ({customFoods.length})</div>
             {customFoods.length === 0 && <div style={{ padding: '20px 18px', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoMyFoods')}</div>}
-            {customFoods.map(c => <FoodRow key={c.id} food={customToFoodType(c)} onSelect={() => { setSelected(customToFoodType(c)); setAmount(c.servingSize ?? 100) }} />)}
+            {customFoods.map(c => (
+              <div key={c.id} style={{ display: 'flex', alignItems: 'stretch', borderBottom: '.5px solid var(--bd)' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <FoodRow food={customToFoodType(c)} onSelect={() => { setSelected(customToFoodType(c)); setAmount(c.servingSize ?? 100) }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '.5px solid var(--bd)', flexShrink: 0 }}>
+                  <button onClick={() => openEditFood(c)} style={{ flex: 1, padding: '0 12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)', display: 'flex', alignItems: 'center' }}>
+                    <IconPencil size={14} />
+                  </button>
+                  <button onClick={() => { if (confirm(c.name + ' 삭제할까요?')) onDeleteCustomFood(c.id) }} style={{ flex: 1, padding: '0 12px', background: 'none', border: 'none', borderTop: '.5px solid var(--bd)', cursor: 'pointer', color: 'var(--red)', display: 'flex', alignItems: 'center' }}>
+                    <IconTrash size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </>
         )}
       </div>
@@ -870,7 +910,7 @@ function CalChart({ logs, today, target, lang }: { logs: DietLog[]; today: strin
 
 // ── MAIN PAGE ────────────────────────────────────────────────────────────────
 
-export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favorites, customFoods, templates, onSaveProfile, onAddEntry, onAddEntries, onRemoveEntry, onToggleFav, isFavorite, onSaveCustomFood, onSaveMealTemplate }: Props) {
+export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favorites, customFoods, templates, onSaveProfile, onAddEntry, onAddEntries, onRemoveEntry, onToggleFav, isFavorite, onSaveCustomFood, onUpdateCustomFood, onDeleteCustomFood, onSaveMealTemplate }: Props) {
   const today = fmtDate(new Date())
   const [date, setDate] = useState(today)
   const [openSlot, setOpenSlot] = useState<MealSlotKey | null>(null)
@@ -914,6 +954,8 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
         onAdd={entry => onAddEntry(date, openSlot, entry)}
         onAddAll={entries => onAddEntries(date, openSlot, entries)}
         onSaveCustomFood={onSaveCustomFood}
+        onUpdateCustomFood={onUpdateCustomFood}
+        onDeleteCustomFood={onDeleteCustomFood}
         onSaveMealTemplate={onSaveMealTemplate}
         onClose={() => setOpenSlot(null)}
       />

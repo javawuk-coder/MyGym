@@ -20,10 +20,15 @@ export function useCustomFoods(uid: string | undefined) {
     await setDoc(ref, { ...food, createdAt: new Date() })
   }
 
+  async function updateCustomFood(id: string, food: Omit<CustomFood, 'id'>) {
+    if (!uid) return
+    await setDoc(doc(db, 'users', uid, 'dietCustomFoods', id), { ...food })
+  }
+
   async function deleteCustomFood(id: string) {
     if (!uid) return
     await deleteDoc(doc(db, 'users', uid, 'dietCustomFoods', id))
   }
 
-  return { customFoods, saveCustomFood, deleteCustomFood }
+  return { customFoods, saveCustomFood, updateCustomFood, deleteCustomFood }
 }

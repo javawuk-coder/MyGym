@@ -54,7 +54,7 @@ function MainApp() {
   const { profile: dietProfile, saveProfile: saveDietProfile } = useDietProfile(uid)
   const { logs: dietLogs, getLog, addEntry: addDietEntry, addEntries: addDietEntries, removeEntry: removeDietEntry } = useDietLogs(uid)
   const { favorites, isFavorite, toggleFavorite } = useFavoriteFoods(uid)
-  const { customFoods, saveCustomFood, deleteCustomFood } = useCustomFoods(uid)
+  const { customFoods, saveCustomFood, updateCustomFood, deleteCustomFood } = useCustomFoods(uid)
   const { templates, saveMealTemplate, deleteMealTemplate } = useMealTemplates(uid)
 
   const allExercises = [...(DB as Exercise[]), ...customExercises]
@@ -144,6 +144,7 @@ function MainApp() {
           onToggleFav={toggleFavorite}
           isFavorite={isFavorite}
           onSaveCustomFood={saveCustomFood}
+          onUpdateCustomFood={updateCustomFood}
           onDeleteCustomFood={deleteCustomFood}
           onSaveMealTemplate={saveMealTemplate}
           onDeleteMealTemplate={deleteMealTemplate}
