@@ -53,7 +53,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
   const [newEquip, setNewEquip] = useState('')
   const [newLogType, setNewLogType] = useState<'weight_reps' | 'reps_only' | 'time' | 'cardio'>('weight_reps')
 
-  const muscles = Object.keys(ML)
+  const muscles = ['chest', 'back', 'legs', 'shoulder', 'arm', 'core', 'glute', 'hiit', 'cardio']
   const equipments = [...new Set(allExercises.map(x => x.equipment).filter(Boolean))]
 
   const filtered = allExercises.filter(x => {

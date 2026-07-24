@@ -449,7 +449,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
     }
   }
 
-  const muscles = ['all', ...Object.keys(ML)]
+  const muscles = ['all', 'chest', 'back', 'legs', 'shoulder', 'arm', 'core', 'glute', 'hiit', 'cardio']
   const hasSets = showSetsCol(format)
   const gridCols = hasSets ? '20px 1fr 52px 68px 28px' : '20px 1fr 80px 28px'
   const gridColsHeader = hasSets ? '20px 1fr 52px 68px 28px' : '20px 1fr 80px 28px'
