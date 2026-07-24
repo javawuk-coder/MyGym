@@ -1,29 +1,21 @@
 import { useState } from 'react'
 import { IconPlus, IconSearch, IconInfoCircle, IconBrandYoutube } from '@tabler/icons-react'
 import type { Exercise } from '../types'
-import { tr, exName, type Lang } from '../lib/i18n'
+import { tr, exName, muscleLabel, equipLabel, type Lang } from '../lib/i18n'
 import MUSCLE_MAP from '../data/muscle_map.json'
 
 const RC: Record<string, string> = { primary: '#E24B4A', secondary: '#EF9F27', stabilizer: '#378ADD' }
-const RL: Record<string, string> = { primary: 'Primary', secondary: 'Secondary', stabilizer: 'Stabilizer' }
 type MuscleMap = Record<string, { primary?: string[]; secondary?: string[]; stabilizer?: string[] }>
 
-const ML: Record<string, string> = {
-  chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
-  arm:'Arms', core:'Core', glute:'Glute', hiit:'HIIT', cardio:'Cardio',
-}
 const MB: Record<string, string> = {
   chest:'bc', back:'bb', legs:'bl', shoulder:'bs', arm:'ba',
   core:'bco', glute:'bg', hiit:'bhiit', cardio:'bcard', custom:'bx',
 }
-const EQ_LABELS: Record<string, string> = {
-  barbell: 'Barbell', dumbbell: 'Dumbbell', cable: 'Cable',
-  machine: 'Machine', bodyweight: 'Bodyweight', smith: 'Smith Machine',
-  band: 'Band',
-}
+const EQ_LIST = ['barbell', 'dumbbell', 'cable', 'machine', 'bodyweight', 'smith', 'band', 'sandbag', 'bulgarian_bag'] as const
 const EQ_CLASS: Record<string, string> = {
   barbell: 'esm', dumbbell: 'edb', cable: 'ecb',
   machine: 'emc', bodyweight: 'ebw', smith: 'esmt', band: 'ebg2',
+  sandbag: 'bx', bulgarian_bag: 'bx',
 }
 
 function ExerciseNameCell({ x, lang }: { x: Exercise; lang: Lang }) {
@@ -36,7 +28,7 @@ function ExerciseNameCell({ x, lang }: { x: Exercise; lang: Lang }) {
       </div>
       <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>
         {nm.sub || '—'}
-        {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{EQ_LABELS[x.equipment] || x.equipment}</span>}
+        {x.equipment && <span className={`badge ${EQ_CLASS[x.equipment] || 'bx'}`} style={{ marginLeft: '6px' }}>{equipLabel(x.equipment, lang)}</span>}
       </div>
     </div>
   )
@@ -103,11 +95,11 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <div>
-          <span className="stitle">Exercise Library</span>
-          <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '6px' }}>{filtered.length} exercises</span>
+          <span className="stitle">{tr(lang, 'exLibrary')}</span>
+          <span style={{ fontSize: '12px', color: 'var(--tm)', marginLeft: '6px' }}>{filtered.length} {tr(lang, 'exerciseCount')}</span>
         </div>
         <button className="btn btn-p" onClick={() => setShowModal(true)}>
-          <IconPlus size={14} style={{ marginRight: 4 }} />Custom
+          <IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'customExTitle')}
         </button>
       </div>
 
@@ -117,10 +109,10 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
       </div>
 
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
-        <button className={`mfb${!filterMuscle ? ' on' : ''}`} onClick={() => setFilterMuscle('')}>All</button>
+        <button className={`mfb${!filterMuscle ? ' on' : ''}`} onClick={() => setFilterMuscle('')}>{tr(lang, 'mAll')}</button>
         {muscles.map(m => (
           <button key={m} className={`mfb${filterMuscle === m ? ' on' : ''}`} onClick={() => setFilterMuscle(filterMuscle === m ? '' : m)}>
-            {ML[m]}
+            {muscleLabel(m, lang)}
           </button>
         ))}
       </div>
@@ -128,7 +120,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
         {equipments.map(e => (
           <button key={e} className={`mfb${filterEquip === e ? ' on' : ''}`} onClick={() => setFilterEquip(filterEquip === e ? '' : e)}>
-            {EQ_LABELS[e] || e}
+            {equipLabel(e, lang)}
           </button>
         ))}
       </div>
@@ -139,7 +131,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
         Object.entries(grouped).map(([m, xs]) => (
           <div key={m} style={{ marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-              <span className="stitle">{ML[m] || m}</span>
+              <span className="stitle">{muscleLabel(m, lang)}</span>
               <span style={{ fontSize: '12px', color: 'var(--tm)' }}>{xs.length}</span>
             </div>
             <div style={{ background: 'var(--s2)', border: '0.5px solid var(--bd)', borderRadius: '12px', padding: '0 8px' }}>
@@ -151,7 +143,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                     <div className="exrow" style={{ cursor: 'default' }}>
                       <ExerciseNameCell x={x} lang={lang} />
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
+                        <span className={`badge ${MB[x.muscle] || 'bx'}`}>{muscleLabel(x.muscle, lang)}</span>
                         <button
                           className="idb"
                           onClick={() => setOpenMuscleId(isOpen ? null : x.id)}
@@ -185,7 +177,7 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
                                   display: 'inline-block', fontSize: '10px', padding: '1px 8px',
                                   borderRadius: '20px', fontWeight: 500, marginBottom: '2px',
                                   background: `${RC[role]}22`, color: RC[role], border: `0.5px solid ${RC[role]}44`,
-                                }}>{RL[role]}</span>
+                                }}>{tr(lang, role === 'primary' ? 'rolePrimary' : role === 'secondary' ? 'roleSecondary' : 'roleStabilizer')}</span>
                                 <div style={{ fontSize: '12px', color: 'var(--tp)', lineHeight: 1.7 }}>
                                   {list.join(' · ')}
                                 </div>
@@ -230,21 +222,21 @@ export default function ExercisesPage({ allExercises, onAddCustom, onDeleteCusto
             <div id="cxm" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '5px' }}>
               {muscles.map(m => (
                 <button key={m} className={`mpb${newMuscle === m ? ' on' : ''}`} onClick={() => setNewMuscle(m)}>
-                  {ML[m]}
+                  {muscleLabel(m, lang)}
                 </button>
               ))}
             </div>
             <span className="fl">{tr(lang, 'equipment')}</span>
             <select value={newEquip} onChange={e => setNewEquip(e.target.value)}>
-              <option value="">— Select —</option>
-              {Object.entries(EQ_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              <option value="">{tr(lang, 'selectEquip')}</option>
+              {EQ_LIST.map(k => <option key={k} value={k}>{equipLabel(k, lang)}</option>)}
             </select>
             <span className="fl">{tr(lang, 'logType')}</span>
             <select value={newLogType} onChange={e => setNewLogType(e.target.value as typeof newLogType)}>
-              <option value="weight_reps">Weight + Reps</option>
-              <option value="reps_only">Reps only</option>
-              <option value="time">Time (seconds)</option>
-              <option value="cardio">Cardio</option>
+              <option value="weight_reps">{tr(lang, 'ltWeightReps')}</option>
+              <option value="reps_only">{tr(lang, 'ltRepsOnly')}</option>
+              <option value="time">{tr(lang, 'ltTime')}</option>
+              <option value="cardio">{tr(lang, 'mCardio')}</option>
             </select>
             <div style={{ display: 'flex', gap: '8px', marginTop: '1.2rem', justifyContent: 'flex-end' }}>
               <button className="btn" onClick={() => setShowModal(false)}>{tr(lang, 'cancel')}</button>

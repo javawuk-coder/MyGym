@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import type { DayLog, Exercise } from '../types'
-import { tr, exName, type Lang } from '../lib/i18n'
+import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
 
-const ML: Record<string, string> = {
-  chest: 'Chest', back: 'Back', legs: 'Legs', shoulder: 'Shoulder',
-  arm: 'Arms', core: 'Core', glute: 'Glute', hiit: 'HIIT', cardio: 'Cardio',
-}
 const MR: Record<string, string> = {
   chest: '#378ADD', back: '#639922', legs: '#BA7517', shoulder: '#534AB7',
   arm: '#D4537E', core: '#1D9E75', glute: '#D85A30', hiit: '#E24B4A', cardio: '#1D9E75',
@@ -100,7 +96,7 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
           Object.entries(mv).sort((a, b) => b[1] - a[1]).map(([m, v]) => (
             <div key={m} style={{ marginBottom: '10px' }}>
               <div style={{ fontSize: '12px', color: 'var(--ts)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                <span>{ML[m] || m}</span>
+                <span>{muscleLabel(m, lang)}</span>
                 <span>{Math.round(fromKg(v, unit)).toLocaleString()} {unit}</span>
               </div>
               <div className="cbg">
@@ -113,7 +109,7 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
 
       {/* Top lifts 1RM */}
       <div className="card">
-        <div className="stitle" style={{ marginBottom: '12px' }}>Top lifts — est. 1RM</div>
+        <div className="stitle" style={{ marginBottom: '12px' }}>{tr(lang, 'statsTopLifts')}</div>
         {!top6.length ? (
           <div style={{ fontSize: '13px', color: 'var(--tm)', textAlign: 'center', padding: '.5rem' }}>{tr(lang, 'noData')}</div>
         ) : (

@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
-import { tr, exName, type Lang } from '../lib/i18n'
-
-const ML: Record<string, string> = {
-  chest: 'Chest', back: 'Back', legs: 'Legs', shoulder: 'Shoulder',
-  arm: 'Arms', core: 'Core', glute: 'Glute', hiit: 'HIIT', cardio: 'Cardio',
-}
+import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
 const MB: Record<string, string> = {
   chest: 'bc', back: 'bb', legs: 'bl', shoulder: 'bs', arm: 'ba',
   core: 'bco', glute: 'bg', hiit: 'bhiit', cardio: 'bcard', custom: 'bx',
@@ -376,7 +371,7 @@ export default function LogPage({
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
               <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
               {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</span>}
-              {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[ex.muscle] || ex.muscle}</span>}
+              {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(ex.muscle, lang)}</span>}
             </div>
             {d.routineNote && (
               <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>📌 {d.routineNote}</div>
@@ -565,7 +560,7 @@ export default function LogPage({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
-                    {x && <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>}
+                    {x && <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(x.muscle, lang)}</span>}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--tm)', marginTop: '2px' }}>{summary}</div>
                 </div>
@@ -655,7 +650,7 @@ export default function LogPage({
                           <div style={{ fontSize: '13px', fontWeight: 500 }}>{nm.main}</div>
                           {nm.sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</div>}
                         </div>
-                        <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
+                        <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(x.muscle, lang)}</span>
                       </div>
                     )
                   })}
@@ -745,7 +740,7 @@ export default function LogPage({
                           onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
                           onMouseLeave={e => (e.currentTarget.style.background = '')}>
                           <span>{nm.main}</span>
-                          <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{ML[x.muscle] || x.muscle}</span>
+                          <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(x.muscle, lang)}</span>
                         </div>
                       )
                     })}

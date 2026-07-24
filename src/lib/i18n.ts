@@ -29,10 +29,10 @@ const strings = {
     searchEx: '이름 검색 (한국어/영어)...', noResults: '검색 결과 없음',
     dataLoading: '데이터 준비 중', ytLink: 'YouTube에서 폼 영상 보기',
     confirmDelete: '삭제하시겠습니까?', nameRequired: '운동 이름을 입력해주세요',
-    muscleRequired: '근육 그룹을 선택해주세요', customExTitle: 'Custom Exercise',
-    nameEn: 'Name (English)', nameKo: '한국어 이름 (선택)', muscleGroup: 'Muscle group',
-    equipment: 'Equipment', logType: 'Log type', custom: 'custom',
-    musclesWorked: 'Muscles worked',
+    muscleRequired: '근육 그룹을 선택해주세요', customExTitle: '커스텀 운동',
+    nameEn: '운동 이름 (영어)', nameKo: '한국어 이름 (선택)', muscleGroup: '근육 그룹',
+    equipment: '기구', logType: '로그 타입', custom: '커스텀',
+    musclesWorked: '사용 근육',
     // routine
     noRoutinesList: '저장된 루틴이 없습니다', newRoutine: '새 루틴',
     start: 'Start', edit: 'Edit', delete: '삭제',
@@ -144,6 +144,26 @@ const strings = {
     dietSaveFood: '음식 저장', dietSaveFoodEdit: '수정 저장', dietServingSize: '1회 제공량 (g)',
     dietDeleteEntry: '삭제', dietNoProfile: '식단 설정을 완료해주세요',
     dietSearching: '검색 중...', dietOffNote: 'Open Food Facts 데이터',
+    // muscles
+    mAll: '전체', mChest: '가슴', mBack: '등', mLegs: '하체',
+    mShoulder: '어깨', mArms: '팔', mCore: '코어', mGlute: '둔근',
+    mHiit: 'HIIT', mCardio: '유산소',
+    // equipment
+    eqBarbell: '바벨', eqDumbbell: '덤벨', eqCable: '케이블',
+    eqMachine: '머신', eqBodyweight: '맨몸', eqSmith: '스미스 머신',
+    eqBand: '밴드', eqSandbag: '샌드백', eqBulgarianBag: '불가리안 백',
+    // workout formats
+    fmtSetsReps: 'Sets & Reps', fmtTabata: 'Tabata', fmtForTime: 'For Time',
+    fmtAmrap: 'AMRAP', fmtEmom: 'EMOM', fmtInterval: '인터벌',
+    // muscle roles
+    rolePrimary: '주동근', roleSecondary: '협력근', roleStabilizer: '안정근',
+    // stats
+    statsTopLifts: '최고 기록 — 예상 1RM',
+    // exercise & routine page ui
+    exLibrary: '운동 라이브러리', selectEquip: '— 선택 —',
+    ltWeightReps: '무게 + 횟수', ltRepsOnly: '횟수만', ltTime: '시간 (초)',
+    myRoutines: '내 루틴', routineNameLabel: '루틴 이름',
+    workoutFormatLabel: '운동 포맷', editRoutine: '루틴 수정',
   },
   en: {
     tabRoutine: 'Routine', tabLog: 'Log', tabExercises: 'Exercises', tabStats: 'Stats',
@@ -279,6 +299,20 @@ const strings = {
     dietSaveFood: 'Save food', dietSaveFoodEdit: 'Save changes', dietServingSize: 'Serving size (g)',
     dietDeleteEntry: 'Delete', dietNoProfile: 'Please complete diet setup',
     dietSearching: 'Searching...', dietOffNote: 'Open Food Facts',
+    mAll: 'All', mChest: 'Chest', mBack: 'Back', mLegs: 'Legs',
+    mShoulder: 'Shoulder', mArms: 'Arms', mCore: 'Core', mGlute: 'Glute',
+    mHiit: 'HIIT', mCardio: 'Cardio',
+    eqBarbell: 'Barbell', eqDumbbell: 'Dumbbell', eqCable: 'Cable',
+    eqMachine: 'Machine', eqBodyweight: 'Bodyweight', eqSmith: 'Smith Machine',
+    eqBand: 'Band', eqSandbag: 'Sandbag', eqBulgarianBag: 'Bulgarian Bag',
+    fmtSetsReps: 'Sets & Reps', fmtTabata: 'Tabata', fmtForTime: 'For Time',
+    fmtAmrap: 'AMRAP', fmtEmom: 'EMOM', fmtInterval: 'Interval',
+    rolePrimary: 'Primary', roleSecondary: 'Secondary', roleStabilizer: 'Stabilizer',
+    statsTopLifts: 'Top lifts — est. 1RM',
+    exLibrary: 'Exercise Library', selectEquip: '— Select —',
+    ltWeightReps: 'Weight + Reps', ltRepsOnly: 'Reps only', ltTime: 'Time (seconds)',
+    myRoutines: 'My Routines', routineNameLabel: 'Routine name',
+    workoutFormatLabel: 'Workout Format', editRoutine: 'Edit Routine',
   },
   vi: {
     tabRoutine: 'Lịch tập', tabLog: 'Nhật ký', tabExercises: 'Bài tập', tabStats: 'Thống kê',
@@ -414,6 +448,20 @@ const strings = {
     dietSaveFood: 'Lưu thức ăn', dietSaveFoodEdit: 'Lưu thay đổi', dietServingSize: 'Khẩu phần (g)',
     dietDeleteEntry: 'Xóa', dietNoProfile: 'Vui lòng hoàn tất cài đặt chế độ ăn',
     dietSearching: 'Đang tìm...', dietOffNote: 'Open Food Facts',
+    mAll: 'Tất cả', mChest: 'Ngực', mBack: 'Lưng', mLegs: 'Chân',
+    mShoulder: 'Vai', mArms: 'Tay', mCore: 'Core', mGlute: 'Mông',
+    mHiit: 'HIIT', mCardio: 'Cardio',
+    eqBarbell: 'Tạ đòn', eqDumbbell: 'Tạ đơn', eqCable: 'Cáp',
+    eqMachine: 'Máy', eqBodyweight: 'Tự trọng', eqSmith: 'Máy Smith',
+    eqBand: 'Dây kháng lực', eqSandbag: 'Túi cát', eqBulgarianBag: 'Túi Bulgaria',
+    fmtSetsReps: 'Sets & Reps', fmtTabata: 'Tabata', fmtForTime: 'For Time',
+    fmtAmrap: 'AMRAP', fmtEmom: 'EMOM', fmtInterval: 'Interval',
+    rolePrimary: 'Chính', roleSecondary: 'Phụ', roleStabilizer: 'Ổn định',
+    statsTopLifts: 'Top lifts — est. 1RM',
+    exLibrary: 'Thư viện bài tập', selectEquip: '— Chọn —',
+    ltWeightReps: 'Tạ + Reps', ltRepsOnly: 'Chỉ Reps', ltTime: 'Thời gian (giây)',
+    myRoutines: 'Lịch tập của tôi', routineNameLabel: 'Tên lịch tập',
+    workoutFormatLabel: 'Định dạng tập', editRoutine: 'Chỉnh sửa lịch tập',
   },
 } as const
 
@@ -430,4 +478,29 @@ export function exName(ex: { name: string; ko?: string }, lang: Lang): { main: s
 
 export const LANG_LABELS: Record<Lang, string> = {
   ko: '한국어', en: 'English', vi: 'Tiếng Việt',
+}
+
+const M_KEYS: Partial<Record<string, TKey>> = {
+  chest: 'mChest', back: 'mBack', legs: 'mLegs', shoulder: 'mShoulder',
+  arm: 'mArms', core: 'mCore', glute: 'mGlute', hiit: 'mHiit', cardio: 'mCardio',
+}
+export function muscleLabel(m: string, lang: Lang): string {
+  const k = M_KEYS[m]; return k ? tr(lang, k) : m
+}
+
+const EQ_KEYS: Partial<Record<string, TKey>> = {
+  barbell: 'eqBarbell', dumbbell: 'eqDumbbell', cable: 'eqCable',
+  machine: 'eqMachine', bodyweight: 'eqBodyweight', smith: 'eqSmith',
+  band: 'eqBand', sandbag: 'eqSandbag', bulgarian_bag: 'eqBulgarianBag',
+}
+export function equipLabel(e: string, lang: Lang): string {
+  const k = EQ_KEYS[e]; return k ? tr(lang, k) : e
+}
+
+const FMT_KEYS: Partial<Record<string, TKey>> = {
+  sets_reps: 'fmtSetsReps', tabata: 'fmtTabata', for_time: 'fmtForTime',
+  amrap: 'fmtAmrap', emom: 'fmtEmom', interval: 'fmtInterval',
+}
+export function fmtLabel(f: string, lang: Lang): string {
+  const k = FMT_KEYS[f]; return k ? tr(lang, k) : f
 }

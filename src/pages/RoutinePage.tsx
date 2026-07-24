@@ -4,25 +4,14 @@ import {
   IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise, WorkoutFormat, WorkoutFormatType } from '../types'
-import { tr, exName, type Lang } from '../lib/i18n'
+import { tr, exName, muscleLabel, fmtLabel, type Lang } from '../lib/i18n'
 
-const ML: Record<string, string> = {
-  chest:'Chest', back:'Back', legs:'Legs', shoulder:'Shoulder',
-  arm:'Arms', core:'Core', glute:'Glute', hiit:'HIIT', cardio:'Cardio',
-}
 const MB: Record<string, string> = {
   chest:'bc', back:'bb', legs:'bl', shoulder:'bs', arm:'ba',
   core:'bco', glute:'bg', hiit:'bhiit', cardio:'bcard', custom:'bx',
 }
 
-const FORMAT_LABELS: Record<WorkoutFormatType, string> = {
-  sets_reps: 'Sets & Reps',
-  tabata:    'Tabata',
-  for_time:  'For Time',
-  amrap:     'AMRAP',
-  emom:      'EMOM',
-  interval:  'Interval',
-}
+const FORMAT_TYPES: WorkoutFormatType[] = ['sets_reps', 'tabata', 'for_time', 'amrap', 'emom', 'interval']
 const FORMAT_COLORS: Record<WorkoutFormatType, string> = {
   sets_reps: '#378ADD',
   tabata:    '#E24B4A',
@@ -468,9 +457,9 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <div className="stitle">My Routines</div>
+        <div className="stitle">{tr(lang, 'myRoutines')}</div>
         <div style={{ display: 'flex', gap: '6px' }}>
-          <button className="btn btn-p" onClick={openAdd}><IconPlus size={14} style={{ marginRight: 4 }} />New Routine</button>
+          <button className="btn btn-p" onClick={openAdd}><IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'newRoutine')}</button>
         </div>
       </div>
 
@@ -555,7 +544,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
             {/* 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '0.5px solid var(--bd)' }}>
-              <div className="mt2" style={{ margin: 0 }}>{editingId ? 'Edit Routine' : 'New Routine'}</div>
+              <div className="mt2" style={{ margin: 0 }}>{editingId ? tr(lang, 'editRoutine') : tr(lang, 'newRoutine')}</div>
               {!editingId && (
                 <>
                   <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
@@ -618,21 +607,21 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             )}
 
             {/* 루틴 이름 */}
-            <span className="fl">Routine name</span>
+            <span className="fl">{tr(lang, 'routineNameLabel')}</span>
             <input value={routineName} onChange={e => setRoutineName(e.target.value)}
               placeholder="e.g. Push Day" style={{ marginBottom: '16px' }} />
 
             {/* ── 워크아웃 포맷 선택 ── */}
-            <div className="stitle" style={{ marginBottom: '8px' }}>Workout Format</div>
+            <div className="stitle" style={{ marginBottom: '8px' }}>{tr(lang, 'workoutFormatLabel')}</div>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
-              {(Object.keys(FORMAT_LABELS) as WorkoutFormatType[]).map(ft => (
+              {FORMAT_TYPES.map(ft => (
                 <button key={ft} onClick={() => setFormatType(ft)} style={{
                   padding: '5px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer',
                   border: `1px solid ${format.type === ft ? FORMAT_COLORS[ft] : 'var(--bd)'}`,
                   background: format.type === ft ? `${FORMAT_COLORS[ft]}22` : 'transparent',
                   color: format.type === ft ? FORMAT_COLORS[ft] : 'var(--ts)',
                   fontWeight: format.type === ft ? 600 : 400, fontFamily: 'inherit',
-                }}>{FORMAT_LABELS[ft]}</button>
+                }}>{fmtLabel(ft, lang)}</button>
               ))}
             </div>
 
@@ -828,7 +817,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
             <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '8px' }}>
               {muscles.map(m => (
                 <button key={m} className={`mfb${filterMuscle === m ? ' on' : ''}`} onClick={() => setFilterMuscle(m)}>
-                  {m === 'all' ? 'All' : (ML[m] || m)}
+                  {m === 'all' ? tr(lang, 'mAll') : muscleLabel(m, lang)}
                 </button>
               ))}
             </div>
@@ -846,7 +835,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                         {x.custom && <span className="ctag" style={{ marginLeft: '4px' }}>{tr(lang, 'custom')}</span>}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)' }}>
-                        <span className={`badge ${MB[x.muscle] || 'bx'}`}>{ML[x.muscle] || x.muscle}</span>
+                        <span className={`badge ${MB[x.muscle] || 'bx'}`}>{muscleLabel(x.muscle, lang)}</span>
                       </div>
                     </div>
                     <div style={{ color: checked ? '#185FA5' : 'var(--bds)', fontSize: '18px' }}>{checked ? '✓' : '+'}</div>
