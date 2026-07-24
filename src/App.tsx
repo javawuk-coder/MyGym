@@ -10,6 +10,7 @@ import ExercisesPage from './pages/ExercisesPage'
 import StatsPage from './pages/StatsPage'
 import BodyPage from './pages/BodyPage'
 import DietPage from './pages/DietPage'
+import OnboardingModal from './components/OnboardingModal'
 import { useRoutines } from './hooks/useRoutines'
 import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
@@ -150,6 +151,7 @@ function MainApp() {
           onDeleteMealTemplate={deleteMealTemplate}
         />
       )}
+      <OnboardingModal />
     </div>
   )
 }

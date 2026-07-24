@@ -53,7 +53,7 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg'
     const displayWeight = lt === 'weight_reps' && re.defaultWeight != null && re.defaultWeight > 0
       ? fromKg(re.defaultWeight, unit)
       : undefined
-    const prefilledReps = lt !== 'weight_reps' ? re.reps : undefined
+    const prefilledReps = re.reps && re.reps > 0 ? re.reps : undefined
     return {
       exId: re.exId,
       rows: makeRows(re.sets || 3, prefilledReps, displayWeight),
