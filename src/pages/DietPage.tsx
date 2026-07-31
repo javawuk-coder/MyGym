@@ -419,6 +419,11 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const [searching, setSearching] = useState(false)
   const [selected, setSelected] = useState<FoodItem | null>(null)
   const [amount, setAmount] = useState(100)
+  const [servingCount, setServingCount] = useState(1)
+
+  useEffect(() => {
+    setServingCount(1)
+  }, [selected])
   const [creating, setCreating] = useState<'food' | 'meal' | null>(null)
   const [editingFood, setEditingFood] = useState<CustomFood | null>(null)
   const [recentFoods] = useState<FoodItem[]>([])
@@ -752,22 +757,48 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
                     </div>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{tr(lang, 'dietAmount')}</div>
-                  <input type="number" value={amount} min={1} onChange={e => setAmount(Number(e.target.value))}
-                    style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
-                  <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
-                </div>
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                  {(selected as LocalFood).servingSize && (
-                    <button onClick={() => setAmount((selected as LocalFood).servingSize!)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', background: amount === (selected as LocalFood).servingSize ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--bd)'}`, color: amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--tm)', fontWeight: 600 }}>
-                      {(selected as LocalFood).servingLabel}
-                    </button>
-                  )}
-                  {[50, 100, 150, 200].map(v => (
-                    <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
-                  ))}
-                </div>
+                {(() => {
+                  const lf = selected as LocalFood
+                  const ss = lf.servingSize
+                  if (ss) {
+                    const unit = lf.servingLabel?.replace(/^\d+/, '').replace(/\s*\(.*\)/, '').trim() ?? ''
+                    const stepBtn = (d: number) => () => {
+                      const next = Math.max(0.5, Math.round((servingCount + d) * 10) / 10)
+                      setServingCount(next)
+                      setAmount(Math.round(next * ss))
+                    }
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
+                        <button onClick={stepBtn(-0.5)} style={{ width: '48px', height: '44px', background: 'var(--bg2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <div style={{ flex: 1, textAlign: 'center', borderLeft: '.5px solid var(--bd)', borderRight: '.5px solid var(--bd)', padding: '8px' }}>
+                          <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--tp)', fontVariantNumeric: 'tabular-nums' }}>{servingCount % 1 === 0 ? servingCount : servingCount.toFixed(1)}{unit}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '1px' }}>{amount}g</div>
+                        </div>
+                        <button onClick={stepBtn(0.5)} style={{ width: '48px', height: '44px', background: 'var(--bg2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                      </div>
+                    )
+                  }
+                  return (
+                    <>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{tr(lang, 'dietAmount')}</div>
+                        <input type="number" value={amount} min={1} onChange={e => setAmount(Number(e.target.value))}
+                          style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
+                        <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                        {[50, 100, 150, 200].map(v => {
+                          const active = amount === v
+                          return <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: active ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${active ? 'var(--green)' : 'var(--bd)'}`, color: active ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
+                        })}
+                      </div>
+                    </>
+                  )
+                })()}
                 <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
                   {tr(lang, 'dietAddBtn')}
                 </button>
@@ -873,22 +904,47 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
             ))}
           </div>
           {/* Amount input */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{tr(lang, 'dietAmount')}</div>
-            <input type="number" value={amount} min={1} onChange={e => setAmount(Number(e.target.value))}
-              style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
-            <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
-          </div>
-          <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
-            {selected && (selected as LocalFood).servingSize && (
-              <button onClick={() => setAmount((selected as LocalFood).servingSize!)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', background: amount === (selected as LocalFood).servingSize ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--bd)'}`, color: amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--tm)', fontWeight: 600 }}>
-                {(selected as LocalFood).servingLabel}
-              </button>
-            )}
-            {[50, 100, 150, 200].map(v => (
-              <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
-            ))}
-          </div>
+          {selected && (() => {
+            const lf = selected as LocalFood
+            const ss = lf.servingSize
+            if (ss) {
+              const unit = lf.servingLabel?.replace(/^\d+/, '').replace(/\s*\(.*\)/, '').trim() ?? ''
+              const stepBtn = (d: number) => () => {
+                const next = Math.max(0.5, Math.round((servingCount + d) * 10) / 10)
+                setServingCount(next)
+                setAmount(Math.round(next * ss))
+              }
+              return (
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
+                  <button onClick={stepBtn(-0.5)} style={{ width: '48px', height: '44px', background: 'var(--bg2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <div style={{ flex: 1, textAlign: 'center', borderLeft: '.5px solid var(--bd)', borderRight: '.5px solid var(--bd)', padding: '8px' }}>
+                    <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--tp)', fontVariantNumeric: 'tabular-nums' }}>{servingCount % 1 === 0 ? servingCount : servingCount.toFixed(1)}{unit}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '1px' }}>{amount}g</div>
+                  </div>
+                  <button onClick={stepBtn(0.5)} style={{ width: '48px', height: '44px', background: 'var(--bg2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+              )
+            }
+            return (
+              <>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{tr(lang, 'dietAmount')}</div>
+                  <input type="number" value={amount} min={1} onChange={e => setAmount(Number(e.target.value))}
+                    style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
+                  <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                  {[50, 100, 150, 200].map(v => (
+                    <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
+                  ))}
+                </div>
+              </>
+            )
+          })()}
           <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
             {tr(lang, 'dietAddBtn')}
           </button>
