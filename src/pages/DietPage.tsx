@@ -166,9 +166,9 @@ function Onboarding({ lang, bodyLogs, onSave }: {
   const latestWeight = bodyLogs[bodyLogs.length - 1]?.weight ?? 70
   const [step, setStep] = useState(1)
   const [gender, setGender] = useState<'male' | 'female'>('male')
-  const [age, setAge] = useState(30)
-  const [height, setHeight] = useState(170)
-  const [weight, setWeight] = useState(latestWeight)
+  const [age, setAge] = useState('30')
+  const [height, setHeight] = useState('170')
+  const [weight, setWeight] = useState(String(latestWeight))
   const [activity, setActivity] = useState<ActivityLevel>('moderate')
   const [goal, setGoal] = useState<FitnessGoal>('maintain')
   const [protMult, setProtMult] = useState(1.6)
@@ -187,8 +187,12 @@ function Onboarding({ lang, bodyLogs, onSave }: {
     { key: 'bulk',     nameKey: 'dietGoalBulk',     badgeKey: 'dietGoalBulkBadge',     descKey: 'dietGoalBulkDesc',     cls: 'badge-bulk' },
   ]
 
-  const profile = buildProfile(weight, height, age, gender, activity, goal, protMult)
-  const macros = calcMacros(profile.calories, weight, goal, protMult)
+  const ageNum = parseInt(age) || 30
+  const heightNum = parseInt(height) || 170
+  const weightNum = parseFloat(weight) || latestWeight
+
+  const profile = buildProfile(weightNum, heightNum, ageNum, gender, activity, goal, protMult)
+  const macros = calcMacros(profile.calories, weightNum, goal, protMult)
 
   const protNotes: Record<string, string> = {
     '1.2': lang === 'ko' ? '최소 권장. 근손실 위험 있어요.' : 'Minimum. Risk of muscle loss.',
@@ -239,14 +243,14 @@ function Onboarding({ lang, bodyLogs, onSave }: {
             </div>
 
             {([
-              { label: tr(lang, 'dietAge'), value: age, set: setAge, unit: lang === 'ko' ? '세' : 'yr', min: 10, max: 99 },
-              { label: tr(lang, 'dietHeight'), value: height, set: setHeight, unit: 'cm', min: 100, max: 250 },
-            ] as const).map(({ label, value, set, unit, min, max }) => (
+              { label: tr(lang, 'dietAge'), value: age, set: setAge, unit: lang === 'ko' ? '세' : 'yr' },
+              { label: tr(lang, 'dietHeight'), value: height, set: setHeight, unit: 'cm' },
+            ] as { label: string; value: string; set: (v: string) => void; unit: string }[]).map(({ label, value, set, unit }) => (
               <div key={label}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '6px' }}>{label}</div>
                 <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)' }}>
-                  <input type="number" value={value} min={min} max={max}
-                    onChange={e => set(Number(e.target.value))}
+                  <input type="number" value={value}
+                    onChange={e => set(e.target.value)}
                     style={{ flex: 1, border: 'none', background: 'transparent', padding: '11px 13px', fontSize: '16px', fontWeight: 700, fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
                   <span style={{ padding: '11px 13px', fontSize: '13px', color: 'var(--tm)', background: 'var(--bg3)', borderLeft: '.5px solid var(--bd)' }}>{unit}</span>
                 </div>
@@ -256,11 +260,11 @@ function Onboarding({ lang, bodyLogs, onSave }: {
             <div>
               <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '6px' }}>{tr(lang, 'dietWeight')}</div>
               <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', overflow: 'hidden' }}>
-                <input type="number" value={weight} min={20} max={300}
-                  onChange={e => setWeight(Number(e.target.value))}
+                <input type="number" value={weight}
+                  onChange={e => setWeight(e.target.value)}
                   style={{ flex: 1, border: 'none', background: 'transparent', padding: '11px 13px', fontSize: '16px', fontWeight: 700, fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
                 {bodyLogs.length > 0 && (
-                  <button onClick={() => setWeight(latestWeight)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', background: 'var(--green-bg)', border: 'none', borderLeft: '.5px solid var(--green-bd)', cursor: 'pointer' }}>
+                  <button onClick={() => setWeight(String(latestWeight))} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', background: 'var(--green-bg)', border: 'none', borderLeft: '.5px solid var(--green-bd)', cursor: 'pointer' }}>
                     <span style={{ fontSize: '10px', color: 'var(--green)', fontWeight: 700 }}>🔗 {tr(lang, 'dietBodyLinked')} ({latestWeight}kg)</span>
                   </button>
                 )}
