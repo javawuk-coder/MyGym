@@ -204,7 +204,7 @@ function Onboarding({ lang, bodyLogs, onSave }: {
     await onSave(profile)
   }
 
-  const s = { display: 'flex', flexDirection: 'column' as const, gap: '10px', padding: '0 0 80px' }
+  const s = { display: 'flex', flexDirection: 'column' as const, gap: '10px', padding: '0 0 120px' }
 
   return (
     <div>
