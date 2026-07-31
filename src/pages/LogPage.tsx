@@ -492,7 +492,7 @@ export default function LogPage({
             const dateStr = `${calMonth}-${String(day).padStart(2, '0')}`
             const vol = monthVolumes[i]
             const hasLog = vol > 0
-            const intensity = hasLog ? 0.15 + (vol / maxMonthVol) * 0.75 : 0
+            const circleSize = hasLog ? Math.round(8 + (vol / maxMonthVol) * 22) : 0
             const isSelected = dateStr === selectedDate
             const isToday = dateStr === todayStr
             const isFuture = dateStr > todayStr
@@ -502,19 +502,21 @@ export default function LogPage({
                 style={{
                   textAlign: 'center', padding: '5px 2px', borderRadius: '6px', cursor: isFuture ? 'default' : 'pointer',
                   fontSize: '12px', fontWeight: isToday ? 700 : 400, position: 'relative',
-                  background: isSelected
-                    ? 'var(--tp)'
-                    : hasLog
-                    ? `rgba(24, 95, 165, ${intensity})`
-                    : 'transparent',
+                  background: isSelected ? 'var(--tp)' : 'transparent',
                   color: isSelected ? '#fff' : isFuture ? 'var(--bd)' : 'var(--ts)',
                   outline: isToday && !isSelected ? '1.5px solid var(--tp)' : 'none',
                   outlineOffset: '-1px',
                 }}>
-                {day}
                 {hasLog && !isSelected && (
-                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'var(--tp)', margin: '1px auto 0', opacity: 0.8 }} />
+                  <div style={{
+                    position: 'absolute', top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: `${circleSize}px`, height: `${circleSize}px`,
+                    borderRadius: '50%', background: 'rgba(24, 95, 165, 0.22)',
+                    pointerEvents: 'none',
+                  }} />
                 )}
+                <span style={{ position: 'relative', zIndex: 1 }}>{day}</span>
               </div>
             )
           })}
