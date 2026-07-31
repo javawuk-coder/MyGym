@@ -5,7 +5,7 @@ import {
   CartesianGrid, Tooltip,
 } from 'recharts'
 import type { BodyEntry, CustomBodyField, DietProfile } from '../types'
-import { tr, type Lang } from '../lib/i18n'
+import { tr, type Lang, type TKey } from '../lib/i18n'
 
 interface Props {
   bodyLogs: BodyEntry[]
@@ -171,26 +171,27 @@ function parseCSV(text: string): { entries: BodyEntry[]; skipped: number } {
 // ── Component ─────────────────────────────────────────────────────────────────
 // ── Body Index (BMI / FFMI / FMI) ────────────────────────────────────────────
 
-interface IndexZone { label: string; color: string; bg: string; min: number; max: number }
+interface IndexZone { key: TKey; range: string; color: string; bg: string; min: number; max: number }
 
-function RangeBar({ value, zones, min, max }: { value: number; zones: IndexZone[]; min: number; max: number }) {
+function RangeBar({ value, zones, min, max, lang }: { value: number; zones: IndexZone[]; min: number; max: number; lang: Lang }) {
   const clamp = (v: number) => Math.max(0, Math.min(1, (v - min) / (max - min)))
   const pct = clamp(value) * 100
+  const active = zones.find(z => value >= z.min && value < z.max) ?? zones.at(-1)!
   return (
     <div style={{ position: 'relative', marginTop: '10px' }}>
       <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '4px' }}>
         {zones.map(z => (
-          <div key={z.label} style={{ background: z.bg, flex: z.max - z.min }} />
+          <div key={z.key} style={{ background: z.bg, flex: z.max - z.min }} />
         ))}
       </div>
       <div style={{ position: 'absolute', top: '-2px', left: `${pct}%`, transform: 'translateX(-50%)' }}>
-        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid var(--s2)', background: zones.find(z => value >= z.min && value < z.max)?.color ?? zones.at(-1)!.color }} />
+        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid var(--s2)', background: active.color }} />
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
         {zones.map(z => (
-          <span key={z.label} style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '20px', background: z.bg, color: z.color, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+          <span key={z.key} style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '20px', background: z.bg, color: z.color, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
             <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: z.color, display: 'inline-block' }} />
-            {z.label}
+            {tr(lang, z.key)} {z.range}
           </span>
         ))}
       </div>
@@ -199,49 +200,44 @@ function RangeBar({ value, zones, min, max }: { value: number; zones: IndexZone[
 }
 
 const BMI_ZONES: IndexZone[] = [
-  { label: '저체중 <18.5', color: '#185FA5', bg: '#E6F1FB', min: 15, max: 18.5 },
-  { label: '정상 18.5–25', color: '#3B6D11', bg: '#EAF3DE', min: 18.5, max: 25 },
-  { label: '과체중 25–30', color: '#854F0B', bg: '#FAEEDA', min: 25, max: 30 },
-  { label: '비만 30+',     color: '#A32D2D', bg: '#FCEBEB', min: 30, max: 40 },
+  { key: 'idxUnderweight', range: '<18.5',   color: '#185FA5', bg: '#E6F1FB', min: 15,   max: 18.5 },
+  { key: 'idxNormal',      range: '18.5–25', color: '#3B6D11', bg: '#EAF3DE', min: 18.5, max: 25   },
+  { key: 'idxOverweight',  range: '25–30',   color: '#854F0B', bg: '#FAEEDA', min: 25,   max: 30   },
+  { key: 'idxObese',       range: '30+',     color: '#A32D2D', bg: '#FCEBEB', min: 30,   max: 40   },
 ]
 const FFMI_ZONES: IndexZone[] = [
-  { label: '낮음 <17',     color: '#5F5E5A', bg: '#F1EFE8', min: 15, max: 17 },
-  { label: '평균 17–20',   color: '#185FA5', bg: '#E6F1FB', min: 17, max: 20 },
-  { label: '운동인 20–22', color: '#3B6D11', bg: '#EAF3DE', min: 20, max: 22 },
-  { label: '우수 22–25',   color: '#534AB7', bg: '#EEEDFE', min: 22, max: 25 },
-  { label: '자연한계 25+', color: '#A32D2D', bg: '#FCEBEB', min: 25, max: 28 },
+  { key: 'idxLow',      range: '<17',   color: '#5F5E5A', bg: '#F1EFE8', min: 15, max: 17 },
+  { key: 'idxAvg',      range: '17–20', color: '#185FA5', bg: '#E6F1FB', min: 17, max: 20 },
+  { key: 'idxAthlete',  range: '20–22', color: '#3B6D11', bg: '#EAF3DE', min: 20, max: 22 },
+  { key: 'idxElite',    range: '22–25', color: '#534AB7', bg: '#EEEDFE', min: 22, max: 25 },
+  { key: 'idxNatLimit', range: '25+',   color: '#A32D2D', bg: '#FCEBEB', min: 25, max: 28 },
 ]
 const FMI_ZONES: IndexZone[] = [
-  { label: '낮음 <3',  color: '#185FA5', bg: '#E6F1FB', min: 0, max: 3 },
-  { label: '정상 3–6', color: '#3B6D11', bg: '#EAF3DE', min: 3, max: 6 },
-  { label: '과다 6–9', color: '#854F0B', bg: '#FAEEDA', min: 6, max: 9 },
-  { label: '비만 9+',  color: '#A32D2D', bg: '#FCEBEB', min: 9, max: 15 },
+  { key: 'idxLow',      range: '<3',  color: '#185FA5', bg: '#E6F1FB', min: 0, max: 3  },
+  { key: 'idxNormal',   range: '3–6', color: '#3B6D11', bg: '#EAF3DE', min: 3, max: 6  },
+  { key: 'idxExcess',   range: '6–9', color: '#854F0B', bg: '#FAEEDA', min: 6, max: 9  },
+  { key: 'idxObese',    range: '9+',  color: '#A32D2D', bg: '#FCEBEB', min: 9, max: 15 },
 ]
 
-function currentZoneLabel(value: number, zones: IndexZone[]): { label: string; color: string } {
-  const z = zones.find(z => value >= z.min && value < z.max) ?? zones.at(-1)!
-  return { label: z.label.split(' ')[0], color: z.color }
-}
+interface IndexCardProps { badge: string; badgeBg: string; badgeColor: string; nameKey: TKey; value: number; descKey: TKey; zones: IndexZone[]; rangeMin: number; rangeMax: number; lang: Lang }
 
-interface IndexCardProps { badge: string; badgeBg: string; badgeColor: string; name: string; value: number; desc: string; zones: IndexZone[]; rangeMin: number; rangeMax: number }
-
-function IndexCard({ badge, badgeBg, badgeColor, name, value, desc, zones, rangeMin, rangeMax }: IndexCardProps) {
-  const zone = currentZoneLabel(value, zones)
+function IndexCard({ badge, badgeBg, badgeColor, nameKey, value, descKey, zones, rangeMin, rangeMax, lang }: IndexCardProps) {
+  const active = zones.find(z => value >= z.min && value < z.max) ?? zones.at(-1)!
   return (
     <div className="card" style={{ padding: '13px 14px', marginBottom: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '11px', fontWeight: 500, padding: '2px 7px', borderRadius: '20px', background: badgeBg, color: badgeColor }}>{badge}</span>
-          <span style={{ fontSize: '12px', color: 'var(--ts)' }}>{name}</span>
+          <span style={{ fontSize: '12px', color: 'var(--ts)' }}>{tr(lang, nameKey)}</span>
         </div>
-        <span style={{ fontSize: '12px', fontWeight: 500, color: zone.color }}>{zone.label}</span>
+        <span style={{ fontSize: '12px', fontWeight: 500, color: active.color }}>{tr(lang, active.key)}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px', marginBottom: '5px' }}>
         <span style={{ fontSize: '28px', fontWeight: 600, color: badgeColor, lineHeight: 1 }}>{value.toFixed(1)}</span>
         <span style={{ fontSize: '12px', color: 'var(--tm)' }}>kg/m²</span>
       </div>
-      <p style={{ fontSize: '12px', color: 'var(--ts)', lineHeight: 1.5, marginBottom: '0' }}>{desc}</p>
-      <RangeBar value={value} zones={zones} min={rangeMin} max={rangeMax} />
+      <p style={{ fontSize: '12px', color: 'var(--ts)', lineHeight: 1.5, marginBottom: '0' }}>{tr(lang, descKey)}</p>
+      <RangeBar value={value} zones={zones} min={rangeMin} max={rangeMax} lang={lang} />
     </div>
   )
 }
@@ -422,27 +418,21 @@ export default function BodyPage({ bodyLogs, lang, profile, onSave, onSaveBatch,
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
               <IndexCard
                 badge="BMI" badgeBg="#E6F1FB" badgeColor="#185FA5"
-                name="체질량지수"
-                value={indices.bmi}
-                desc="체중을 키의 제곱으로 나눈 값이에요. 근육이 많은 사람에겐 과대평가될 수 있어요."
-                zones={BMI_ZONES} rangeMin={15} rangeMax={40}
+                nameKey="idxBmiName" value={indices.bmi} descKey="idxBmiDesc"
+                zones={BMI_ZONES} rangeMin={15} rangeMax={40} lang={lang}
               />
               {indices.ffmi != null && (
                 <IndexCard
                   badge="FFMI" badgeBg="#EAF3DE" badgeColor="#1D9E75"
-                  name="제지방 체질량지수"
-                  value={indices.ffmi}
-                  desc="체지방을 뺀 순수 근육량을 키의 제곱으로 나눈 값이에요. 자연적인 근육 발달의 한계는 약 25 수준이에요."
-                  zones={FFMI_ZONES} rangeMin={15} rangeMax={28}
+                  nameKey="idxFfmiName" value={indices.ffmi} descKey="idxFfmiDesc"
+                  zones={FFMI_ZONES} rangeMin={15} rangeMax={28} lang={lang}
                 />
               )}
               {indices.fmi != null && (
                 <IndexCard
                   badge="FMI" badgeBg="#FAEEDA" badgeColor="#E8892B"
-                  name="체지방 체질량지수"
-                  value={indices.fmi}
-                  desc="체지방량만을 키의 제곱으로 나눈 값이에요. BMI와 달리 근육량의 영향을 받지 않아 실제 비만도를 더 정확하게 반영해요."
-                  zones={FMI_ZONES} rangeMin={0} rangeMax={15}
+                  nameKey="idxFmiName" value={indices.fmi} descKey="idxFmiDesc"
+                  zones={FMI_ZONES} rangeMin={0} rangeMax={15} lang={lang}
                 />
               )}
             </div>
