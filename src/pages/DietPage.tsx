@@ -1102,7 +1102,7 @@ export default function DietPage({ lang, bodyLogs, profile, getLog, logs, favori
                       : `${tr(lang, 'dietTarget')} ${slotTarget} kcal`}
                   </div>
                 </div>
-                <button onClick={() => setOpenSlot(key)} style={{ width: '30px', height: '30px', borderRadius: '50%', border: '.5px solid var(--green)', background: 'var(--green-bg)', color: 'var(--green)', fontSize: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, fontWeight: 300, fontFamily: 'inherit' }}>+</button>
+                <button onClick={() => setOpenSlot(key)} style={{ width: '30px', height: '30px', borderRadius: '50%', border: '.5px solid var(--green)', background: 'var(--green-bg)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, padding: 0 }}><IconPlus size={16} /></button>
               </div>
               {/* Logged entries */}
               {slotEntries.map((entry, idx) => (
