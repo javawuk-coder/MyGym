@@ -5,7 +5,7 @@ const strings = {
     // tabs
     tabRoutine: '루틴', tabLog: '로그', tabExercises: '운동', tabStats: '통계',
     // header
-    logout: '로그아웃', language: '언어', adminPanel: 'Admin 패널',
+    logout: '로그아웃', language: '언어', adminPanel: 'Admin 패널', settings: '설정',
     // timer
     resting: '휴식 중', startWorkout: '운동 시작', working: '● 운동 중',
     timerTotal: '총', timerWork: '운동', timerRest: '휴식', setDone: '완료',
@@ -177,7 +177,7 @@ const strings = {
   },
   en: {
     tabRoutine: 'Routine', tabLog: 'Log', tabExercises: 'Exercises', tabStats: 'Stats',
-    logout: 'Logout', language: 'Language', adminPanel: 'Admin panel',
+    logout: 'Logout', language: 'Language', adminPanel: 'Admin panel', settings: 'Settings',
     resting: 'Resting', startWorkout: 'Start workout', working: '● Working out',
     timerTotal: 'Total', timerWork: 'Workout', timerRest: 'Rest', setDone: 'Done',
     addWorkout: 'Add workout', addFromRoutine: 'Add from routine', addExercise: 'Add exercise',
@@ -336,7 +336,7 @@ const strings = {
   },
   vi: {
     tabRoutine: 'Lịch tập', tabLog: 'Nhật ký', tabExercises: 'Bài tập', tabStats: 'Thống kê',
-    logout: 'Đăng xuất', language: 'Ngôn ngữ', adminPanel: 'Bảng quản trị',
+    logout: 'Đăng xuất', language: 'Ngôn ngữ', adminPanel: 'Bảng quản trị', settings: 'Cài đặt',
     resting: 'Đang nghỉ', startWorkout: 'Bắt đầu tập', working: '● Đang tập',
     timerTotal: 'Tổng', timerWork: 'Tập', timerRest: 'Nghỉ', setDone: 'Xong',
     addWorkout: 'Thêm bài tập', addFromRoutine: 'Thêm từ lịch tập', addExercise: 'Thêm bài tập lẻ',
