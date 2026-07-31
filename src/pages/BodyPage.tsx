@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { IconPlus, IconTrash, IconChevronDown, IconChevronUp, IconUpload, IconDownload, IconTrendingUp, IconTrendingDown, IconMinus } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconChevronDown, IconChevronUp, IconUpload, IconDownload, IconTrendingUp, IconTrendingDown, IconMinus, IconCamera } from '@tabler/icons-react'
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip,
@@ -176,6 +176,42 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
   const fileRef = useRef<HTMLInputElement>(null)
   const [importPreview, setImportPreview] = useState<{ entries: BodyEntry[]; skipped: number } | null>(null)
   const [importing, setImporting] = useState(false)
+
+  // InBody image parsing
+  const inbodyRef = useRef<HTMLInputElement>(null)
+  const [parsing, setParsing] = useState(false)
+
+  const processInbodyImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    setParsing(true)
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve((reader.result as string).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const res = await fetch('/api/parse-inbody', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
+      })
+      if (!res.ok) throw new Error('API error')
+      const parsed = await res.json() as Partial<Record<StdField, number | null>>
+      setStdValues(prev => {
+        const next = { ...prev }
+        for (const f of STD_FIELDS) {
+          const v = parsed[f.key]
+          if (v != null && v > 0) next[f.key] = String(v)
+        }
+        return next
+      })
+    } catch {
+      alert(tr(lang, 'bodyParseError'))
+    } finally {
+      setParsing(false)
+    }
+  }
 
   const latest = bodyLogs.at(-1)
   const allCustomNames = collectCustomNames(bodyLogs)
@@ -361,9 +397,33 @@ export default function BodyPage({ bodyLogs, lang, onSave, onSaveBatch, onDelete
 
       {/* 기록 입력 모달 */}
       {showForm && (
-        <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
+        <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}
+          onPaste={e => {
+            const items = e.clipboardData?.items
+            if (!items) return
+            for (const item of Array.from(items)) {
+              if (item.type.startsWith('image/')) {
+                const file = item.getAsFile()
+                if (file) processInbodyImage(file)
+                break
+              }
+            }
+          }}>
           <div className="mo" style={{ maxWidth: '460px', maxHeight: '85vh', overflowY: 'auto' }}>
-            <div className="mt2">{tr(lang, 'bodyAddRecord')}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <div className="mt2" style={{ margin: 0 }}>{tr(lang, 'bodyAddRecord')}</div>
+              <button
+                className="btn"
+                onClick={() => inbodyRef.current?.click()}
+                disabled={parsing}
+                style={{ fontSize: '12px', gap: '4px', background: parsing ? 'var(--s1)' : 'var(--green-bg)', borderColor: 'var(--green-bd)', color: 'var(--green)' }}
+              >
+                <IconCamera size={13} style={{ marginRight: 3 }} />
+                {parsing ? tr(lang, 'bodyParsing') : tr(lang, 'bodyFromPhoto')}
+              </button>
+              <input ref={inbodyRef} type="file" accept="image/*" style={{ display: 'none' }}
+                onChange={e => { const f = e.target.files?.[0]; if (f) processInbodyImage(f); e.target.value = '' }} />
+            </div>
 
             <div style={{ marginBottom: '12px' }}>
               <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '4px' }}>Date</div>

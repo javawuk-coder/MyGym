@@ -97,6 +97,9 @@ const strings = {
     bodyImportOverwrite: '기존 같은 날짜 기록은 덮어씁니다',
     bodyImportSaving: '저장 중...',
     bodyImportSave: '건 저장',
+    bodyFromPhoto: '인바디 사진으로 입력',
+    bodyParsing: '분석 중...',
+    bodyParseError: '이미지 파싱 실패. 다시 시도해주세요.',
     // diet
     tabDiet: '식단',
     dietOnb1Title: '기본 정보를 알려주세요', dietOnb1Sub: '정확한 칼로리 목표와 영양 권장량을 계산해드려요.',
@@ -252,6 +255,9 @@ const strings = {
     bodyImportOverwrite: 'Existing records on the same date will be overwritten',
     bodyImportSaving: 'Saving...',
     bodyImportSave: 'Save records',
+    bodyFromPhoto: 'InBody photo',
+    bodyParsing: 'Analyzing...',
+    bodyParseError: 'Failed to parse image. Please try again.',
     // diet
     tabDiet: 'Diet',
     dietOnb1Title: 'Tell us about yourself', dietOnb1Sub: 'We\'ll calculate your exact calorie target and macro goals.',
@@ -401,6 +407,9 @@ const strings = {
     bodyImportOverwrite: 'Bản ghi cùng ngày sẽ bị ghi đè',
     bodyImportSaving: 'Đang lưu...',
     bodyImportSave: 'Lưu bản ghi',
+    bodyFromPhoto: 'Ảnh InBody',
+    bodyParsing: 'Đang phân tích...',
+    bodyParseError: 'Không thể phân tích ảnh. Vui lòng thử lại.',
     // diet
     tabDiet: 'Dinh dưỡng',
     dietOnb1Title: 'Cho chúng tôi biết về bạn', dietOnb1Sub: 'Chúng tôi sẽ tính mục tiêu calo và macro chính xác.',
