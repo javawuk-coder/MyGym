@@ -683,48 +683,96 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         {/* Search tab */}
         {!creating && tab === 'search' && (
           <>
-            <div style={{ margin: '10px 16px', display: 'flex', alignItems: 'center', gap: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: '30px', padding: '10px 15px' }}>
-              <IconSearch size={16} style={{ color: 'var(--tm)', flexShrink: 0 }} />
-              <input value={query} onChange={e => setQuery(e.target.value)}
-                placeholder={tr(lang, 'dietSearchPlaceholder')}
-                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
-              {query && <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)' }}><IconX size={14} /></button>}
-            </div>
-            {searching && <div style={{ padding: '12px 18px', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietSearching')}</div>}
-            {query && !searching && results.length === 0 && <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoResults')}</div>}
-            {query && !searching && results.length > 0 && (() => {
-              const localResults = results.filter(f => f.source === 'custom' || f.source === 'kfood')
-              const offResults = results.filter(f => f.source === 'openfoodfacts')
-              return (
-                <>
-                  {localResults.length > 0 && (
-                    <>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
-                        {tr(lang, 'dietSearchResults')} ({localResults.length}) · {lang === 'ko' ? '식약처 / 로컬 DB' : 'MFDS / Local DB'}
-                      </div>
-                      {localResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
-                    </>
-                  )}
-                  {offResults.length > 0 && (
-                    <>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
-                        {tr(lang, 'dietOffNote')} ({offResults.length})
-                      </div>
-                      {offResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount(100) }} />)}
-                    </>
-                  )}
-                </>
-              )
-            })()}
-            {!query && recentFoods.length > 0 && (
+            {!selected ? (
               <>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietRecentFoods')}</div>
-                {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
+                <div style={{ margin: '10px 16px', display: 'flex', alignItems: 'center', gap: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: '30px', padding: '10px 15px' }}>
+                  <IconSearch size={16} style={{ color: 'var(--tm)', flexShrink: 0 }} />
+                  <input value={query} onChange={e => setQuery(e.target.value)}
+                    placeholder={tr(lang, 'dietSearchPlaceholder')}
+                    style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '14px', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none' }} />
+                  {query && <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)' }}><IconX size={14} /></button>}
+                </div>
+                {searching && <div style={{ padding: '12px 18px', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietSearching')}</div>}
+                {query && !searching && results.length === 0 && <div style={{ padding: '20px', textAlign: 'center', fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'dietNoResults')}</div>}
+                {query && !searching && results.length > 0 && (() => {
+                  const localResults = results.filter(f => f.source === 'custom' || f.source === 'kfood')
+                  const offResults = results.filter(f => f.source === 'openfoodfacts')
+                  return (
+                    <>
+                      {localResults.length > 0 && (
+                        <>
+                          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
+                            {tr(lang, 'dietSearchResults')} ({localResults.length}) · {lang === 'ko' ? '식약처 / 로컬 DB' : 'MFDS / Local DB'}
+                          </div>
+                          {localResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
+                        </>
+                      )}
+                      {offResults.length > 0 && (
+                        <>
+                          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>
+                            {tr(lang, 'dietOffNote')} ({offResults.length})
+                          </div>
+                          {offResults.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount(100) }} />)}
+                        </>
+                      )}
+                    </>
+                  )
+                })()}
+                {!query && recentFoods.length > 0 && (
+                  <>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietRecentFoods')}</div>
+                    {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
+                  </>
+                )}
+                <div onClick={() => setCreating('food')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderTop: '.5px solid var(--bd)' }}>
+                  <IconPlus size={16} />{tr(lang, 'dietAddCustom')}
+                </div>
               </>
+            ) : calcSelected && (
+              <div style={{ padding: '16px 18px' }}>
+                <button onClick={() => setSelected(null)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tm)', fontSize: '13px', fontFamily: 'inherit', marginBottom: '14px', padding: 0 }}>
+                  <IconArrowLeft size={16} />{tr(lang, 'dietBackToSearch')}
+                </button>
+                <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div>
+                    <div style={{ fontSize: '15px', fontWeight: 800 }}>{selected.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>{selected.brand ?? (selected.source === 'openfoodfacts' ? tr(lang, 'dietOffNote') : tr(lang, 'dietFoodMine'))}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+                  {[
+                    { label: tr(lang, 'dietCarbs'), val: calcSelected.carbs, color: 'var(--red)' },
+                    { label: tr(lang, 'dietProtein'), val: calcSelected.protein, color: 'var(--blue)' },
+                    { label: tr(lang, 'dietFat'), val: calcSelected.fat, color: 'var(--purple)' },
+                    { label: 'kcal', val: calcSelected.calories, color: 'var(--green)' },
+                  ].map(({ label, val, color }) => (
+                    <div key={label} style={{ flex: 1, textAlign: 'center', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '7px 4px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color }}>{val}</div>
+                      <div style={{ fontSize: '9px', color: 'var(--tm)', marginTop: '1px' }}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{tr(lang, 'dietAmount')}</div>
+                  <input type="number" value={amount} min={1} onChange={e => setAmount(Number(e.target.value))}
+                    style={{ flex: 1, padding: '9px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '16px', fontWeight: 800, textAlign: 'center', fontFamily: 'inherit', color: 'var(--tp)', outline: 'none', fontVariantNumeric: 'tabular-nums' }} />
+                  <span style={{ fontSize: '13px', color: 'var(--tm)', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '9px 12px' }}>g</span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                  {(selected as LocalFood).servingSize && (
+                    <button onClick={() => setAmount((selected as LocalFood).servingSize!)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', background: amount === (selected as LocalFood).servingSize ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--bd)'}`, color: amount === (selected as LocalFood).servingSize ? 'var(--green)' : 'var(--tm)', fontWeight: 600 }}>
+                      {(selected as LocalFood).servingLabel}
+                    </button>
+                  )}
+                  {[50, 100, 150, 200].map(v => (
+                    <button key={v} onClick={() => setAmount(v)} style={{ padding: '6px 10px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', background: amount === v ? 'var(--green-bg)' : 'var(--bg2)', border: `.5px solid ${amount === v ? 'var(--green)' : 'var(--bd)'}`, color: amount === v ? 'var(--green)' : 'var(--tm)' }}>{v}g</button>
+                  ))}
+                </div>
+                <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {tr(lang, 'dietAddBtn')}
+                </button>
+              </div>
             )}
-            <div onClick={() => setCreating('food')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderTop: '.5px solid var(--bd)' }}>
-              <IconPlus size={16} />{tr(lang, 'dietAddCustom')}
-            </div>
           </>
         )}
 
@@ -800,8 +848,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
         )}
       </div>
 
-      {/* Amount panel (when food selected) */}
-      {!creating && selected && calcSelected && (
+      {/* Amount panel (when food selected, non-search tabs) */}
+      {!creating && selected && calcSelected && tab !== 'search' && (
         <div style={{ background: 'var(--bg1)', borderTop: '1.5px solid var(--bd)', padding: '16px 18px', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div>
