@@ -67,7 +67,7 @@ interface MiniChartProps {
 
 function MiniChart({ data, color, unit, label, fieldKey, lang }: MiniChartProps) {
   const pts = data.filter(d => d.value != null) as { date: string; value: number }[]
-  if (pts.length < 2) return null
+  if (pts.length < 1) return null
 
   const first = pts[0].value
   const last = pts[pts.length - 1].value
@@ -78,6 +78,7 @@ function MiniChart({ data, color, unit, label, fieldKey, lang }: MiniChartProps)
   const isFlat = Math.abs(change) < 0.05
   const changeColor = isFlat ? 'var(--tm)' : isGood ? '#1D9E75' : '#E24B4A'
   const domain = metricDomain(pts.map(p => p.value))
+  const hasMultiple = pts.length >= 2
 
   return (
     <div className="card" style={{ padding: '12px 14px' }}>
@@ -89,13 +90,19 @@ function MiniChart({ data, color, unit, label, fieldKey, lang }: MiniChartProps)
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', justifyContent: 'flex-end', color: changeColor, fontSize: '12px', fontWeight: 600 }}>
-            {isFlat ? <IconMinus size={13} /> : isGood ? <IconTrendingDown size={13} /> : <IconTrendingUp size={13} />}
-            {change > 0 ? '+' : ''}{change.toFixed(1)}{unit}
-          </div>
-          <div style={{ fontSize: '10px', color: 'var(--tm)', marginTop: '1px' }}>
-            {pct.toFixed(1)}% ({pts.length} {tr(lang, 'bodyMeasurements')})
-          </div>
+          {hasMultiple ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', justifyContent: 'flex-end', color: changeColor, fontSize: '12px', fontWeight: 600 }}>
+                {isFlat ? <IconMinus size={13} /> : isGood ? <IconTrendingDown size={13} /> : <IconTrendingUp size={13} />}
+                {change > 0 ? '+' : ''}{change.toFixed(1)}{unit}
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--tm)', marginTop: '1px' }}>
+                {pct.toFixed(1)}% ({pts.length} {tr(lang, 'bodyMeasurements')})
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: '10px', color: 'var(--tm)' }}>1 {tr(lang, 'bodyMeasurements')}</div>
+          )}
         </div>
       </div>
       <ResponsiveContainer width="100%" height={90}>
