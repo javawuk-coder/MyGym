@@ -125,7 +125,7 @@ function MainApp() {
         <StatsPage logs={logs} allExercises={allExercises} unit={unit} lang={lang} />
       )}
       {tab === 'body' && (
-        <BodyPage bodyLogs={bodyLogs} lang={lang} onSave={saveBodyEntry} onSaveBatch={saveBodyEntryBatch} onDelete={deleteBodyEntry} />
+        <BodyPage bodyLogs={bodyLogs} lang={lang} profile={dietProfile} onSave={saveBodyEntry} onSaveBatch={saveBodyEntryBatch} onDelete={deleteBodyEntry} />
       )}
       {tab === 'diet' && (
         <DietPage
