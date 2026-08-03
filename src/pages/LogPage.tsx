@@ -694,7 +694,7 @@ export default function LogPage({
       )}
 
       {/* ── 모달 (pick / routine-select / ex-select) ── */}
-      {modal && modal !== 'fill' && (
+      {modal && (
         <div className="mbg" onClick={e => { if (e.target === e.currentTarget) setModal(null) }}>
           <div className="mo" style={{ maxWidth: '480px' }}>
 
