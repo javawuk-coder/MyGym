@@ -475,26 +475,31 @@ export default function LogPage({
           background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', zIndex: 20,
         }}>
-          <div style={{ fontSize: '14px', color: '#888', marginBottom: '12px', letterSpacing: '0.06em' }}>{tr(lang, 'resting')}</div>
+          <div style={{ fontSize: '18px', color: '#888', marginBottom: '14px', letterSpacing: '0.06em' }}>{tr(lang, 'resting')}</div>
           {lastCompletedLabel && (
-            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontWeight: 500, textAlign: 'center' }}>{lastCompletedLabel}</div>
+            <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.8)', marginBottom: '20px', fontWeight: 500, textAlign: 'center' }}>{lastCompletedLabel}</div>
           )}
-          <div style={{ fontSize: '88px', fontWeight: 700, color: '#EF9F27', fontVariantNumeric: 'tabular-nums', letterSpacing: '-3px', lineHeight: 1 }}>
-            {fmtTime(currentRestMs)}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {fmtTime(currentRestMs).split(':').map((part, i) => (
+              <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
+                {i > 0 && <span style={{ fontSize: '96px', fontWeight: 700, color: '#EF9F27', margin: '0 2px', lineHeight: 1, transform: 'translateY(6px)', display: 'inline-block' }}>:</span>}
+                <span style={{ fontSize: '112px', fontWeight: 700, color: '#EF9F27', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{part}</span>
+              </span>
+            ))}
           </div>
           <button onClick={resumeWorkout} style={{
-            marginTop: '40px', padding: '18px 0', borderRadius: '40px', width: '72%',
+            marginTop: '44px', padding: '20px 0', borderRadius: '40px', width: '78%',
             background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
-            fontSize: '20px', fontWeight: 700, fontFamily: 'inherit',
+            fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
           }}>▶ {tr(lang, 'startWorkout')}</button>
-          <div style={{ display: 'flex', gap: '24px', marginTop: '28px' }}>
+          <div style={{ display: 'flex', gap: '32px', marginTop: '32px' }}>
             {([
               { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
               { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
             ] as const).map(({ label, ms, color }) => (
               <div key={label} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}>{label}</div>
-                <div style={{ fontSize: '16px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
+                <div style={{ fontSize: '15px', color: '#888', marginBottom: '4px' }}>{label}</div>
+                <div style={{ fontSize: '22px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
               </div>
             ))}
           </div>
