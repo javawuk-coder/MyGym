@@ -475,26 +475,26 @@ export default function LogPage({
           background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', zIndex: 20,
         }}>
-          <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
-          <div style={{ fontSize: '64px', fontWeight: 700, color: '#BA7517', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
+          <div style={{ fontSize: '14px', color: '#888', marginBottom: '12px', letterSpacing: '0.06em' }}>{tr(lang, 'resting')}</div>
+          {lastCompletedLabel && (
+            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', fontWeight: 500, textAlign: 'center' }}>{lastCompletedLabel}</div>
+          )}
+          <div style={{ fontSize: '88px', fontWeight: 700, color: '#EF9F27', fontVariantNumeric: 'tabular-nums', letterSpacing: '-3px', lineHeight: 1 }}>
             {fmtTime(currentRestMs)}
           </div>
-          {lastCompletedLabel && (
-            <div style={{ fontSize: '12px', color: '#555', marginTop: '8px' }}>{lastCompletedLabel}</div>
-          )}
           <button onClick={resumeWorkout} style={{
-            marginTop: '32px', padding: '16px 48px', borderRadius: '40px',
+            marginTop: '40px', padding: '18px 0', borderRadius: '40px', width: '72%',
             background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
-            fontSize: '18px', fontWeight: 700, fontFamily: 'inherit',
+            fontSize: '20px', fontWeight: 700, fontFamily: 'inherit',
           }}>▶ {tr(lang, 'startWorkout')}</button>
-          <div style={{ display: 'flex', gap: '20px', marginTop: '24px' }}>
+          <div style={{ display: 'flex', gap: '24px', marginTop: '28px' }}>
             {([
               { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
               { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
             ] as const).map(({ label, ms, color }) => (
               <div key={label} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '10px', color: '#666' }}>{label}</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
+                <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}>{label}</div>
+                <div style={{ fontSize: '16px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
               </div>
             ))}
           </div>
