@@ -375,50 +375,50 @@ export default function LogPage({
   const renderDraftEx = (d: DraftEx, di: number) => {
     const ex = getEx(d.exId)
     const lt: LogType = ex?.log_type || 'weight_reps'
-    const colsWR = '20px 1fr 1fr 28px 28px'
-    const colsOther = '20px 1fr 28px 28px'
+    const colsWR = '28px 1fr 1fr 52px 36px'
+    const colsOther = '28px 1fr 52px 36px'
     const nm = ex ? exName(ex, lang) : { main: d.exId }
     return (
-      <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '10px', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
+      <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '16px', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-              <span style={{ fontWeight: 600, fontSize: '14px' }}>{nm.main}</span>
-              {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</span>}
-              {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(ex.muscle, lang)}</span>}
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+              <span style={{ fontWeight: 600, fontSize: '16px' }}>{nm.main}</span>
+              {nm.sub && <span style={{ fontSize: '12px', color: 'var(--tm)' }}>{nm.sub}</span>}
+              {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '11px' }}>{muscleLabel(ex.muscle, lang)}</span>}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
-            <button className="idb" onClick={() => moveExUp(di)} disabled={di === 0} style={{ opacity: di === 0 ? 0.3 : 1 }}><IconArrowUp size={13} /></button>
-            <button className="idb" onClick={() => moveExDown(di)} disabled={di === draftExes.length - 1} style={{ opacity: di === draftExes.length - 1 ? 0.3 : 1 }}><IconArrowDown size={13} /></button>
-            <button className="idb" onClick={() => removeDraftEx(di)}><IconTrash size={13} /></button>
+          <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+            <button className="idb" onClick={() => moveExUp(di)} disabled={di === 0} style={{ opacity: di === 0 ? 0.3 : 1, padding: '4px' }}><IconArrowUp size={16} /></button>
+            <button className="idb" onClick={() => moveExDown(di)} disabled={di === draftExes.length - 1} style={{ opacity: di === draftExes.length - 1 ? 0.3 : 1, padding: '4px' }}><IconArrowDown size={16} /></button>
+            <button className="idb" onClick={() => removeDraftEx(di)} style={{ padding: '4px' }}><IconTrash size={16} /></button>
           </div>
         </div>
-        <div style={{ padding: '10px 12px' }}>
+        <div style={{ padding: '12px 14px' }}>
           <input
             value={d.exNote}
             onChange={e => updateExNote(di, e.target.value)}
             placeholder="운동 메모 (루틴에 저장됩니다)"
-            style={{ width: '100%', fontSize: '12px', padding: '5px 8px', marginBottom: '8px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            style={{ width: '100%', fontSize: '13px', padding: '8px 10px', marginBottom: '12px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit', boxSizing: 'border-box' }}
           />
           {lt === 'cardio' ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
               {(['dist', 'time', 'cal'] as const).map(f => (
                 <div key={f}>
-                  <div style={{ fontSize: '10px', color: 'var(--tm)', marginBottom: '3px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '4px', textAlign: 'center' }}>
                     {f === 'dist' ? tr(lang, 'distKm') : f === 'time' ? tr(lang, 'timMin') : tr(lang, 'calories')}
                   </div>
-                  <input type="number" value={d.cardio[f]} onChange={e => updateCardio(di, f, e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                  <input type="number" value={d.cardio[f]} onChange={e => updateCardio(di, f, e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '16px', padding: '10px 6px' }} />
                 </div>
               ))}
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '6px', fontSize: '10px', color: 'var(--tm)', marginBottom: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '8px', fontSize: '11px', color: 'var(--tm)', marginBottom: '6px', paddingBottom: '6px', borderBottom: '0.5px solid var(--bd)' }}>
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
-                  ? <><span style={{ textAlign: 'center' }}>Weight ({unit})</span><span style={{ textAlign: 'center' }}>Reps</span></>
-                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? `${tr(lang, 'timerWork')}(${tr(lang, 'sec')})` : 'Reps'}</span>}
+                  ? <><span style={{ textAlign: 'center' }}>무게 ({unit})</span><span style={{ textAlign: 'center' }}>횟수</span></>
+                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? `${tr(lang, 'timerWork')}(${tr(lang, 'sec')})` : '횟수'}</span>}
                 <span /><span />
               </div>
               {d.rows.map((row, ri) => {
@@ -426,28 +426,38 @@ export default function LogPage({
                 const isDone = completedSets.has(setKey)
                 const setLabel = `Set ${ri + 1} — ${nm.main}`
                 return (
-                  <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1, borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', paddingBottom: ri < d.rows.length - 1 ? '4px' : 0, marginBottom: ri < d.rows.length - 1 ? '4px' : 0 }}>
-                    <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
+                  <div key={ri} style={{
+                    display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther,
+                    gap: '8px', alignItems: 'center', padding: '8px 0',
+                    borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none',
+                    opacity: isDone ? 0.45 : 1,
+                  }}>
+                    <span style={{ fontSize: '14px', color: 'var(--tm)', textAlign: 'center', fontWeight: 500 }}>{ri + 1}</span>
                     {lt === 'weight_reps' ? (
                       <>
-                        <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center' }} />
-                        <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                        <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
+                        <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
                       </>
                     ) : (
                       <input type="number" value={lt === 'time' ? row.duration : row.reps}
                         onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
-                        placeholder="0" min="0" style={{ textAlign: 'center' }} />
+                        placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
                     )}
-                    <button className="idb" onClick={() => completeSet(setKey, setLabel)}
-                      style={{ color: isDone ? '#1D9E75' : undefined }}>
-                      <IconCheck size={14} />
+                    <button onClick={() => completeSet(setKey, setLabel)} style={{
+                      width: '44px', height: '44px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+                      background: isDone ? '#1D9E75' : 'var(--bg2)',
+                      color: isDone ? '#fff' : 'var(--tm)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <IconCheck size={22} />
                     </button>
-                    <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
+                    <button className="idb" onClick={() => removeRow(di, ri)} style={{ fontSize: '20px', padding: '4px' }}>&times;</button>
                   </div>
                 )
               })}
-              <button className="btn" onClick={() => addRow(di)} style={{ marginTop: '6px', fontSize: '12px', width: '100%' }}>
-                <IconPlus size={12} style={{ marginRight: 3 }} />{tr(lang, 'addSet')}
+              <button className="btn" onClick={() => addRow(di)} style={{ marginTop: '10px', fontSize: '14px', width: '100%', padding: '12px' }}>
+                <IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'addSet')}
               </button>
             </>
           )}
