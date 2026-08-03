@@ -316,7 +316,7 @@ export default function LogPage({
     startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
-    setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }]); setModal('fill')
+    setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }]); setModal('fill')
     startWorkout(); acquireWakeLock()
   }
   const closeFill = () => {
