@@ -33,10 +33,24 @@ export function useRoutines(uid: string | undefined) {
     await updateDoc(doc(db, 'users', uid, 'routines', routineId), data)
   }
 
+  const saveRoutineNotes = async (routineId: string, notes: { exId: string; note?: string }[]) => {
+    if (!uid) return
+    const routine = routines.find(r => r.id === routineId)
+    if (!routine) return
+    const updatedExercises = routine.exercises.map(re => {
+      const entry = notes.find(n => n.exId === re.exId)
+      if (!entry) return re
+      if (entry.note) return { ...re, note: entry.note }
+      const { note: _n, ...rest } = re
+      return rest
+    })
+    await updateDoc(doc(db, 'users', uid, 'routines', routineId), { exercises: updatedExercises })
+  }
+
   const deleteRoutine = async (routineId: string) => {
     if (!uid) return
     await deleteDoc(doc(db, 'users', uid, 'routines', routineId))
   }
 
-  return { routines, loading, addRoutine, updateRoutine, deleteRoutine }
+  return { routines, loading, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine }
 }

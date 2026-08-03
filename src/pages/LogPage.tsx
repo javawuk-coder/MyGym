@@ -29,7 +29,7 @@ interface DraftEx {
   exId: string
   rows: SetRow[]
   cardio: { dist: string; time: string; cal: string }
-  routineNote?: string
+  exNote: string
 }
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
 
@@ -44,7 +44,7 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg'
   return routine.exercises.map(re => {
     const ex = allExercises.find(e => e.id === re.exId)
     const lt = ex?.log_type || 'weight_reps'
-    if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, routineNote: re.note }
+    if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, exNote: re.note ?? '' }
     const displayWeight = lt === 'weight_reps' && re.defaultWeight != null && re.defaultWeight > 0
       ? fromKg(re.defaultWeight, unit)
       : undefined
@@ -53,7 +53,7 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg'
       exId: re.exId,
       rows: makeRows(re.sets || 3, prefilledReps, displayWeight),
       cardio: { dist: '', time: '', cal: '' },
-      routineNote: re.note,
+      exNote: re.note ?? '',
     }
   })
 }
@@ -80,13 +80,14 @@ interface Props {
   lang: Lang
   onAddEntries: (date: string, entries: LogEntry[]) => Promise<void>
   onDeleteEntry: (date: string, index: number) => Promise<void>
+  onSaveRoutineNotes?: (routineId: string, notes: { exId: string; note?: string }[]) => Promise<void>
   initialRoutine?: (Routine & { id: string }) | null
   onConsumedInitial?: () => void
 }
 
 export default function LogPage({
   logs, routines, allExercises, unit, lang,
-  onAddEntries, onDeleteEntry,
+  onAddEntries, onDeleteEntry, onSaveRoutineNotes,
   initialRoutine, onConsumedInitial,
 }: Props) {
   const todayStr = today()
@@ -99,6 +100,7 @@ export default function LogPage({
   const [routineSearch, setRoutineSearch] = useState('')
   const [showAddExInFill, setShowAddExInFill] = useState(false)
   const [addExSearch, setAddExSearch] = useState('')
+  const [currentRoutineId, setCurrentRoutineId] = useState<string | null>(null)
 
   // ── Screen Wake Lock ─────────────────────────────────────────
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -189,6 +191,7 @@ export default function LogPage({
     if (!initialRoutine) return
     setFillTitle(initialRoutine.name)
     setDraftExes(draftFromRoutine(initialRoutine, allExercises, unit))
+    setCurrentRoutineId(initialRoutine.id)
     setModal('fill')
     startWorkout(); acquireWakeLock()
     onConsumedInitial?.()
@@ -292,8 +295,11 @@ export default function LogPage({
     [next[di], next[di + 1]] = [next[di + 1], next[di]]
     return next
   })
+  const updateExNote = (di: number, val: string) =>
+    setDraftExes(prev => prev.map((d, i) => i !== di ? d : { ...d, exNote: val }))
+
   const addDraftEx = (exId: string) => {
-    setDraftExes(prev => [...prev, { exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' } }])
+    setDraftExes(prev => [...prev, { exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }])
     setAddExSearch(''); setShowAddExInFill(false)
   }
 
@@ -306,6 +312,7 @@ export default function LogPage({
 
   const openRoutineFill = (r: Routine & { id: string }) => {
     setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises, unit)); setModal('fill')
+    setCurrentRoutineId(r.id)
     startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
@@ -315,6 +322,7 @@ export default function LogPage({
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
+    setCurrentRoutineId(null)
     setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel('')
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
@@ -354,7 +362,13 @@ export default function LogPage({
       if (sets.length) entries.push({ exId: d.exId, log_type: lt, sets })
     }
     if (!entries.length) { alert(tr(lang, 'noSets')); return }
-    await onAddEntries(selectedDate, entries)
+    const routineIdSnapshot = currentRoutineId
+    const notesSnapshot = draftExes.map(d => ({ exId: d.exId, note: d.exNote.trim() || undefined }))
+    const promises: Promise<unknown>[] = [onAddEntries(selectedDate, entries)]
+    if (routineIdSnapshot && onSaveRoutineNotes) {
+      promises.push(onSaveRoutineNotes(routineIdSnapshot, notesSnapshot))
+    }
+    await Promise.all(promises)
     closeFill()
   }
 
@@ -373,9 +387,6 @@ export default function LogPage({
               {nm.sub && <span style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</span>}
               {ex && <span className={`badge ${MB[ex.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(ex.muscle, lang)}</span>}
             </div>
-            {d.routineNote && (
-              <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '2px' }}>📌 {d.routineNote}</div>
-            )}
           </div>
           <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
             <button className="idb" onClick={() => moveExUp(di)} disabled={di === 0} style={{ opacity: di === 0 ? 0.3 : 1 }}><IconArrowUp size={13} /></button>
@@ -384,6 +395,12 @@ export default function LogPage({
           </div>
         </div>
         <div style={{ padding: '10px 12px' }}>
+          <input
+            value={d.exNote}
+            onChange={e => updateExNote(di, e.target.value)}
+            placeholder="운동 메모 (루틴에 저장됩니다)"
+            style={{ width: '100%', fontSize: '12px', padding: '5px 8px', marginBottom: '8px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit', boxSizing: 'border-box' }}
+          />
           {lt === 'cardio' ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
               {(['dist', 'time', 'cal'] as const).map(f => (
@@ -663,16 +680,15 @@ export default function LogPage({
         </div>
       )}
 
-      {/* ── Fill 모달 ── */}
+      {/* ── Fill 전체화면 ── */}
       {modal === 'fill' && (
-        <div className="mbg">
-          <div className="mo" style={{ maxWidth: '560px', padding: 0, position: 'relative' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
             {/* 휴식 오버레이 */}
             {timerPhase === 'resting' && (
               <div style={{
-                position: 'absolute', inset: 0, borderRadius: 'inherit',
-                background: 'rgba(0,0,0,0.88)', display: 'flex', flexDirection: 'column',
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center', zIndex: 20,
               }}>
                 <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
@@ -701,7 +717,7 @@ export default function LogPage({
               </div>
             )}
 
-            <div style={{ padding: '12px 18px', borderBottom: '0.5px solid var(--bd)' }}>
+            <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
                 <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
@@ -724,7 +740,7 @@ export default function LogPage({
                 </div>
               )}
             </div>
-            <div style={{ maxHeight: 'calc(75vh - 120px)', overflowY: 'auto', padding: '14px 18px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px' }}>
               {draftExes.map((d, di) => renderDraftEx(d, di))}
               {showAddExInFill ? (
                 <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '10px 12px', marginBottom: '10px' }}>
@@ -756,11 +772,10 @@ export default function LogPage({
                 </button>
               )}
             </div>
-            <div style={{ padding: '12px 18px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '12px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
               <button className="btn" onClick={closeFill}>{tr(lang, 'cancel')}</button>
               <button className="btn btn-p" onClick={save}>{tr(lang, 'save')}</button>
             </div>
-          </div>
         </div>
       )}
     </div>
