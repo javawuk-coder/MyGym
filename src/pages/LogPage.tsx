@@ -474,8 +474,109 @@ export default function LogPage({
     )
   }
 
+  // ── Fill 전체화면 ─────────────────────────────────────────────
+  const renderFill = () => (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {timerPhase === 'resting' && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', zIndex: 20,
+        }}>
+          <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
+          <div style={{ fontSize: '64px', fontWeight: 700, color: '#BA7517', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
+            {fmtTime(currentRestMs)}
+          </div>
+          {lastCompletedLabel && (
+            <div style={{ fontSize: '12px', color: '#555', marginTop: '8px' }}>{lastCompletedLabel}</div>
+          )}
+          <button onClick={resumeWorkout} style={{
+            marginTop: '32px', padding: '16px 48px', borderRadius: '40px',
+            background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
+            fontSize: '18px', fontWeight: 700, fontFamily: 'inherit',
+          }}>▶ {tr(lang, 'startWorkout')}</button>
+          <div style={{ display: 'flex', gap: '20px', marginTop: '24px' }}>
+            {([
+              { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+              { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
+            ] as const).map(({ label, ms, color }) => (
+              <div key={label} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', color: '#666' }}>{label}</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
+          <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
+          <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
+        </div>
+        {timerPhase !== 'idle' && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '14px' }}>
+              {[
+                { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+                { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
+                { label: tr(lang, 'timerRest'), ms: restMs, color: '#BA7517' },
+              ].map(({ label, ms, color }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
+                </div>
+              ))}
+            </div>
+            <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>{tr(lang, 'working')}</span>
+          </div>
+        )}
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px' }}>
+        {draftExes.map((d, di) => renderDraftEx(d, di))}
+        {showAddExInFill ? (
+          <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '10px 12px', marginBottom: '10px' }}>
+            <div className="sw" style={{ marginBottom: '6px' }}>
+              <IconSearch size={14} className="si" />
+              <input value={addExSearch} onChange={e => setAddExSearch(e.target.value)}
+                placeholder={tr(lang, 'searchExercise')} style={{ paddingLeft: '32px', fontSize: '13px' }} autoFocus />
+            </div>
+            <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              {filterEx(addExSearch).slice(0, 50).map(x => {
+                const nm = exName(x, lang)
+                return (
+                  <div key={x.id} onClick={() => addDraftEx(x.id)}
+                    style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                    <span>{nm.main}</span>
+                    <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(x.muscle, lang)}</span>
+                  </div>
+                )
+              })}
+            </div>
+            <button className="btn" onClick={() => { setShowAddExInFill(false); setAddExSearch('') }}
+              style={{ marginTop: '6px', fontSize: '12px' }}>{tr(lang, 'cancel')}</button>
+          </div>
+        ) : (
+          <button className="btn" onClick={() => setShowAddExInFill(true)} style={{ width: '100%', fontSize: '13px', padding: '10px' }}>
+            <IconPlus size={14} style={{ marginRight: 5 }} />{tr(lang, 'addExInFill')}
+          </button>
+        )}
+      </div>
+      <div style={{ padding: '12px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
+        <button className="btn" onClick={closeFill}>{tr(lang, 'cancel')}</button>
+        <button className="btn btn-p" onClick={save}>{tr(lang, 'save')}</button>
+      </div>
+    </div>
+  )
+
   // ── Render ────────────────────────────────────────────────────
   const summary = daySummary(selectedLog)
+
+  // 전체화면 로깅 — 캘린더 등 다른 요소와의 stacking 충돌 방지를 위해 early return
+  if (modal === 'fill') {
+    return renderFill()
+  }
 
   return (
     <div>
@@ -680,104 +781,6 @@ export default function LogPage({
         </div>
       )}
 
-      {/* ── Fill 전체화면 ── */}
-      {modal === 'fill' && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-            {/* 휴식 오버레이 */}
-            {timerPhase === 'resting' && (
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', zIndex: 20,
-              }}>
-                <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>{tr(lang, 'resting')}</div>
-                <div style={{ fontSize: '64px', fontWeight: 700, color: '#BA7517', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
-                  {fmtTime(currentRestMs)}
-                </div>
-                {lastCompletedLabel && (
-                  <div style={{ fontSize: '12px', color: '#555', marginTop: '8px' }}>{lastCompletedLabel}</div>
-                )}
-                <button onClick={resumeWorkout} style={{
-                  marginTop: '32px', padding: '16px 48px', borderRadius: '40px',
-                  background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
-                  fontSize: '18px', fontWeight: 700, fontFamily: 'inherit',
-                }}>▶ {tr(lang, 'startWorkout')}</button>
-                <div style={{ display: 'flex', gap: '20px', marginTop: '24px' }}>
-                  {([
-                    { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
-                    { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
-                  ] as const).map(({ label, ms, color }) => (
-                    <div key={label} style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '10px', color: '#666' }}>{label}</div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
-                <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
-              </div>
-              {timerPhase !== 'idle' && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', gap: '14px' }}>
-                    {[
-                      { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
-                      { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
-                      { label: tr(lang, 'timerRest'), ms: restMs, color: '#BA7517' },
-                    ].map(({ label, ms, color }) => (
-                      <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>{tr(lang, 'working')}</span>
-                </div>
-              )}
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px' }}>
-              {draftExes.map((d, di) => renderDraftEx(d, di))}
-              {showAddExInFill ? (
-                <div style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', padding: '10px 12px', marginBottom: '10px' }}>
-                  <div className="sw" style={{ marginBottom: '6px' }}>
-                    <IconSearch size={14} className="si" />
-                    <input value={addExSearch} onChange={e => setAddExSearch(e.target.value)}
-                      placeholder={tr(lang, 'searchExercise')} style={{ paddingLeft: '32px', fontSize: '13px' }} autoFocus />
-                  </div>
-                  <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                    {filterEx(addExSearch).slice(0, 50).map(x => {
-                      const nm = exName(x, lang)
-                      return (
-                        <div key={x.id} onClick={() => addDraftEx(x.id)}
-                          style={{ padding: '7px 8px', cursor: 'pointer', borderBottom: '0.5px solid var(--bd)', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--s1)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = '')}>
-                          <span>{nm.main}</span>
-                          <span className={`badge ${MB[x.muscle] || 'bx'}`} style={{ fontSize: '10px' }}>{muscleLabel(x.muscle, lang)}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <button className="btn" onClick={() => { setShowAddExInFill(false); setAddExSearch('') }}
-                    style={{ marginTop: '6px', fontSize: '12px' }}>{tr(lang, 'cancel')}</button>
-                </div>
-              ) : (
-                <button className="btn" onClick={() => setShowAddExInFill(true)} style={{ width: '100%', fontSize: '13px', padding: '10px' }}>
-                  <IconPlus size={14} style={{ marginRight: 5 }} />{tr(lang, 'addExInFill')}
-                </button>
-              )}
-            </div>
-            <div style={{ padding: '12px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
-              <button className="btn" onClick={closeFill}>{tr(lang, 'cancel')}</button>
-              <button className="btn btn-p" onClick={save}>{tr(lang, 'save')}</button>
-            </div>
-        </div>
-      )}
     </div>
   )
 }
