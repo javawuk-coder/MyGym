@@ -24,7 +24,7 @@ function fmtTime(ms: number) {
   return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 }
 
-interface SetRow { weight: string; reps: string; duration: string; note: string; pr: boolean; rir: string }
+interface SetRow { weight: string; reps: string; duration: string }
 interface DraftEx {
   exId: string
   rows: SetRow[]
@@ -37,7 +37,7 @@ function makeRows(count: number, reps?: number, weight?: number): SetRow[] {
   return Array.from({ length: count }, () => ({
     weight: weight != null ? String(weight) : '',
     reps: reps != null ? String(reps) : '',
-    duration: '', note: '', pr: false, rir: '',
+    duration: '',
   }))
 }
 function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg' | 'lb'): DraftEx[] {
@@ -270,13 +270,13 @@ export default function LogPage({
   }
 
   // ── Draft mutations ───────────────────────────────────────────
-  const updateRow = (di: number, ri: number, field: keyof SetRow, val: string | boolean) =>
+  const updateRow = (di: number, ri: number, field: keyof SetRow, val: string) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: d.rows.map((r, j) => j !== ri ? r : { ...r, [field]: val }),
     }))
   const addRow = (di: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
-      ...d, rows: [...d.rows, { weight: '', reps: '', duration: '', note: '', pr: false, rir: '' }],
+      ...d, rows: [...d.rows, { weight: '', reps: '', duration: '' }],
     }))
   const removeRow = (di: number, ri: number) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
@@ -348,20 +348,15 @@ export default function LogPage({
       }
       const sets: ExerciseSet[] = []
       for (const r of d.rows) {
-        const extras: Partial<ExerciseSet> = {
-          ...(r.note.trim() ? { note: r.note.trim() } : {}),
-          ...(r.pr ? { pr: true } : {}),
-          ...(r.rir !== '' && !isNaN(parseInt(r.rir)) ? { rir: parseInt(r.rir) } : {}),
-        }
         if (lt === 'weight_reps') {
           const w = parseFloat(r.weight), rep = parseInt(r.reps)
-          if (!isNaN(rep) && rep > 0) sets.push({ weight: isNaN(w) ? 0 : toKg(w, unit), reps: rep, ...extras })
+          if (!isNaN(rep) && rep > 0) sets.push({ weight: isNaN(w) ? 0 : toKg(w, unit), reps: rep })
         } else if (lt === 'reps_only') {
           const rep = parseInt(r.reps)
-          if (!isNaN(rep) && rep > 0) sets.push({ reps: rep, ...extras })
+          if (!isNaN(rep) && rep > 0) sets.push({ reps: rep })
         } else {
           const dur = parseInt(r.duration)
-          if (!isNaN(dur) && dur > 0) sets.push({ duration: dur, ...extras })
+          if (!isNaN(dur) && dur > 0) sets.push({ duration: dur })
         }
       }
       if (sets.length) entries.push({ exId: d.exId, log_type: lt, sets })
@@ -431,8 +426,7 @@ export default function LogPage({
                 const isDone = completedSets.has(setKey)
                 const setLabel = `Set ${ri + 1} — ${nm.main}`
                 return (
-                  <div key={ri}>
-                  <div className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1 }}>
+                  <div key={ri} className="sr" style={{ gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, opacity: isDone ? 0.5 : 1, borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', paddingBottom: ri < d.rows.length - 1 ? '4px' : 0, marginBottom: ri < d.rows.length - 1 ? '4px' : 0 }}>
                     <span style={{ fontSize: '11px', color: 'var(--tm)', textAlign: 'center', alignSelf: 'center' }}>{ri + 1}</span>
                     {lt === 'weight_reps' ? (
                       <>
@@ -449,23 +443,6 @@ export default function LogPage({
                       <IconCheck size={14} />
                     </button>
                     <button className="idb" onClick={() => removeRow(di, ri)}>&times;</button>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '2px 0 6px', borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none', marginBottom: ri < d.rows.length - 1 ? '4px' : 0, marginTop: '2px' }}>
-                    <input value={row.note} onChange={e => updateRow(di, ri, 'note', e.target.value)}
-                      placeholder="Note (e.g. RPE 8, 부상 주의)"
-                      style={{ flex: 1, fontSize: '11px', padding: '3px 6px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: row.pr ? '#E24B4A' : 'var(--tm)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                      <input type="checkbox" checked={row.pr} onChange={e => updateRow(di, ri, 'pr', e.target.checked)}
-                        style={{ accentColor: '#E24B4A', width: '12px', height: '12px' }} />
-                      PR
-                    </label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--tm)', whiteSpace: 'nowrap' }}>RIR</span>
-                      <input type="number" value={row.rir} onChange={e => updateRow(di, ri, 'rir', e.target.value)}
-                        placeholder="—" min="0" max="5"
-                        style={{ width: '36px', fontSize: '11px', textAlign: 'center', padding: '3px 4px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit' }} />
-                    </div>
-                  </div>
                   </div>
                 )
               })}
