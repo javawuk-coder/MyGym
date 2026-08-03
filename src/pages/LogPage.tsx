@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
@@ -573,9 +574,9 @@ export default function LogPage({
   // ── Render ────────────────────────────────────────────────────
   const summary = daySummary(selectedLog)
 
-  // 전체화면 로깅 — 캘린더 등 다른 요소와의 stacking 충돌 방지를 위해 early return
+  // 전체화면 로깅 — portal로 document.body에 직접 마운트해 stacking context 완전 우회
   if (modal === 'fill') {
-    return renderFill()
+    return createPortal(renderFill(), document.body) as React.ReactElement
   }
 
   return (
