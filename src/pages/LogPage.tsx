@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
@@ -82,13 +81,14 @@ interface Props {
   onAddEntries: (date: string, entries: LogEntry[]) => Promise<void>
   onDeleteEntry: (date: string, index: number) => Promise<void>
   onSaveRoutineNotes?: (routineId: string, notes: { exId: string; note?: string }[]) => Promise<void>
+  onLoggingChange?: (active: boolean) => void
   initialRoutine?: (Routine & { id: string }) | null
   onConsumedInitial?: () => void
 }
 
 export default function LogPage({
   logs, routines, allExercises, unit, lang,
-  onAddEntries, onDeleteEntry, onSaveRoutineNotes,
+  onAddEntries, onDeleteEntry, onSaveRoutineNotes, onLoggingChange,
   initialRoutine, onConsumedInitial,
 }: Props) {
   const todayStr = today()
@@ -138,6 +138,10 @@ export default function LogPage({
       return () => { if (timerRef.current) clearInterval(timerRef.current) }
     }
   }, [modal, timerPhase])
+
+  useEffect(() => {
+    onLoggingChange?.(modal === 'fill')
+  }, [modal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const startWorkout = () => {
     const now = Date.now()
@@ -574,9 +578,8 @@ export default function LogPage({
   // ── Render ────────────────────────────────────────────────────
   const summary = daySummary(selectedLog)
 
-  // 전체화면 로깅 — portal로 document.body에 직접 마운트해 stacking context 완전 우회
   if (modal === 'fill') {
-    return createPortal(renderFill(), document.body) as React.ReactElement
+    return renderFill()
   }
 
   return (

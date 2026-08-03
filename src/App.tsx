@@ -34,6 +34,7 @@ function MainApp() {
   const [unit, setUnit] = useState<'kg' | 'lb'>('kg')
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('lang') as Lang) || 'ko')
   const [pendingRoutine, setPendingRoutine] = useState<(Routine & { id: string }) | null>(null)
+  const [isLogging, setIsLogging] = useState(false)
 
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
 
@@ -67,27 +68,29 @@ function MainApp() {
 
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '1.5rem 1rem' }}>
-      <Header unit={unit} onUnitToggle={setUnit} lang={lang} onLangChange={handleLangChange} />
+      {!isLogging && <Header unit={unit} onUnitToggle={setUnit} lang={lang} onLangChange={handleLangChange} />}
 
-      <div style={{ display: 'flex', borderBottom: '0.5px solid var(--bd)', marginBottom: '1.5rem' }}>
-        {TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            style={{
-              flex: 1, padding: '10px 0', textAlign: 'center', cursor: 'pointer',
-              fontSize: '12px', background: 'none', border: 'none', fontFamily: 'inherit',
-              color: tab === id ? 'var(--tp)' : 'var(--ts)',
-              borderBottom: tab === id ? '2px solid var(--tp)' : '2px solid transparent',
-              fontWeight: tab === id ? 500 : 400,
-              transition: 'all .15s',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
-            }}
-          >
-            <Icon size={15} />{label}
-          </button>
-        ))}
-      </div>
+      {!isLogging && (
+        <div style={{ display: 'flex', borderBottom: '0.5px solid var(--bd)', marginBottom: '1.5rem' }}>
+          {TABS.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              style={{
+                flex: 1, padding: '10px 0', textAlign: 'center', cursor: 'pointer',
+                fontSize: '12px', background: 'none', border: 'none', fontFamily: 'inherit',
+                color: tab === id ? 'var(--tp)' : 'var(--ts)',
+                borderBottom: tab === id ? '2px solid var(--tp)' : '2px solid transparent',
+                fontWeight: tab === id ? 500 : 400,
+                transition: 'all .15s',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
+              }}
+            >
+              <Icon size={15} />{label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {tab === 'routine' && (
         <RoutinePage
@@ -110,6 +113,7 @@ function MainApp() {
           onAddEntries={addLogEntries}
           onDeleteEntry={deleteLogEntry}
           onSaveRoutineNotes={saveRoutineNotes}
+          onLoggingChange={setIsLogging}
           initialRoutine={pendingRoutine}
           onConsumedInitial={() => setPendingRoutine(null)}
         />
