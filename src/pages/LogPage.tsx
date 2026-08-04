@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
+import { createPortal } from 'react-dom'
+import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown, IconBarbell } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
 const MB: Record<string, string> = {
@@ -102,6 +103,7 @@ export default function LogPage({
   const [showAddExInFill, setShowAddExInFill] = useState(false)
   const [addExSearch, setAddExSearch] = useState('')
   const [currentRoutineId, setCurrentRoutineId] = useState<string | null>(null)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
 
   // ── Screen Wake Lock ─────────────────────────────────────────
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -398,6 +400,14 @@ export default function LogPage({
     }
     await Promise.all(promises)
     closeFill()
+    // PWA 설치 배너: 1회차, 3회차, 5회차... 저장 시 노출
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    const hasPrompt = !!(window as unknown as Record<string, unknown>).__pwaPrompt
+    if (!isStandalone && hasPrompt) {
+      const count = parseInt(localStorage.getItem('gymSaveCount') || '0') + 1
+      localStorage.setItem('gymSaveCount', String(count))
+      if (count % 2 === 1) setShowInstallBanner(true)
+    }
   }
 
   const renderDraftEx = (d: DraftEx, di: number) => {
@@ -602,8 +612,39 @@ export default function LogPage({
     return renderFill()
   }
 
+  const installBanner = showInstallBanner && createPortal(
+    <div style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: 'var(--s2)', borderTop: '0.5px solid var(--bd)',
+      padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px',
+      animation: 'slideUp 0.28s ease',
+    }}>
+      <div style={{ width: 42, height: 42, borderRadius: 10, background: '#1D9E75', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <IconBarbell size={22} color="#fff" />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--tp)' }}>앱으로 설치하기</div>
+        <div style={{ fontSize: '13px', color: 'var(--tm)' }}>홈 화면에서 바로 열기</div>
+      </div>
+      <button onClick={async () => {
+        const prompt = (window as unknown as Record<string, unknown>).__pwaPrompt as { prompt: () => void; userChoice: Promise<{ outcome: string }> } | undefined
+        if (!prompt) return
+        prompt.prompt()
+        const { outcome } = await prompt.userChoice
+        if (outcome === 'accepted') (window as unknown as Record<string, unknown>).__pwaPrompt = null
+        setShowInstallBanner(false)
+      }} style={{
+        background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8,
+        padding: '10px 18px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+      }}>설치</button>
+      <button onClick={() => setShowInstallBanner(false)} style={{ background: 'none', border: 'none', color: 'var(--tm)', cursor: 'pointer', padding: '4px', fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>&times;</button>
+    </div>,
+    document.body
+  )
+
   return (
     <div>
+      {installBanner}
       {/* ── 달력 ── */}
       <div className="card" style={{ marginBottom: '16px', padding: '14px 16px' }}>
         {/* 월 네비게이션 */}

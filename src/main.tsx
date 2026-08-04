@@ -8,6 +8,11 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault()
+  ;(window as unknown as Record<string, unknown>).__pwaPrompt = e
+})
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
