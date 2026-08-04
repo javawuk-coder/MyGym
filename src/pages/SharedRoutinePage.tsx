@@ -18,17 +18,18 @@ export default function SharedRoutinePage({ shareId, lang, allExercises, onAddRo
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [added, setAdded] = useState(false)
+  const [routineName, setRoutineName] = useState('')
 
   useEffect(() => {
     getSharedRoutine(shareId)
-      .then(setRoutine)
+      .then(r => { setRoutine(r); if (r) setRoutineName(r.name) })
       .finally(() => setLoading(false))
   }, [shareId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = async () => {
     if (!routine) return
     setAdding(true)
-    await onAddRoutine({ name: routine.name, exercises: routine.exercises, format: routine.format })
+    await onAddRoutine({ name: routineName.trim() || routine.name, exercises: routine.exercises, format: routine.format })
     setAdded(true)
     setAdding(false)
   }
@@ -57,9 +58,13 @@ export default function SharedRoutinePage({ shareId, lang, allExercises, onAddRo
         <div style={{ width: 40, height: 40, borderRadius: 10, background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <IconBarbell size={22} color="#fff" />
         </div>
-        <div>
-          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '2px' }}>{tr(lang, 'sharedRoutineTitle')}</div>
-          <div style={{ fontSize: '20px', fontWeight: 700 }}>{routine.name}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '4px' }}>{tr(lang, 'sharedRoutineTitle')}</div>
+          <input
+            value={routineName}
+            onChange={e => setRoutineName(e.target.value)}
+            style={{ fontSize: '18px', fontWeight: 700, padding: '6px 10px', width: '100%', boxSizing: 'border-box' }}
+          />
         </div>
       </div>
 

@@ -42,7 +42,9 @@ function MainApp() {
     return 'en'
   })
   const [pendingRoutine, setPendingRoutine] = useState<(Routine & { id: string }) | null>(null)
-  const shareId = new URLSearchParams(window.location.search).get('r')
+  const urlShareId = new URLSearchParams(window.location.search).get('r')
+  if (urlShareId) sessionStorage.setItem('pendingShareId', urlShareId)
+  const shareId = urlShareId || sessionStorage.getItem('pendingShareId')
   const [isLogging, setIsLogging] = useState(false)
 
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
@@ -82,7 +84,7 @@ function MainApp() {
         lang={lang}
         allExercises={allExercises}
         onAddRoutine={addRoutine}
-        onDone={() => { window.history.replaceState({}, '', '/'); window.location.reload() }}
+        onDone={() => { sessionStorage.removeItem('pendingShareId'); window.history.replaceState({}, '', '/'); window.location.reload() }}
       />
     )
   }
