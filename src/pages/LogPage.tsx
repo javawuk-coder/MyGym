@@ -198,6 +198,7 @@ export default function LogPage({
     setDraftExes(draftFromRoutine(initialRoutine, allExercises, unit))
     setCurrentRoutineId(initialRoutine.id)
     setModal('fill')
+    history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
     onConsumedInitial?.()
   }, [initialRoutine]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -318,10 +319,12 @@ export default function LogPage({
   const openRoutineFill = (r: Routine & { id: string }) => {
     setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises, unit)); setModal('fill')
     setCurrentRoutineId(r.id)
+    history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
     setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }]); setModal('fill')
+    history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
   }
   const closeFill = () => {
@@ -333,6 +336,31 @@ export default function LogPage({
     if (timerRef.current) clearInterval(timerRef.current)
     releaseWakeLock()
   }
+
+  // ── 뒤로가기 / 탭 닫기 가로채기 ─────────────────────────────
+  const modalRef = useRef(modal)
+  useEffect(() => { modalRef.current = modal }, [modal])
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (modalRef.current !== 'fill') return
+      history.pushState({ filling: true }, '') // 다시 복원
+      if (window.confirm('운동 로깅 중입니다. 나가면 기록이 사라집니다.\n계속 하시겠습니까?')) {
+        closeFill()
+      }
+    }
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (modalRef.current !== 'fill') return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('popstate', onPopState)
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => {
+      window.removeEventListener('popstate', onPopState)
+      window.removeEventListener('beforeunload', onBeforeUnload)
+    }
+  }, []) // 마운트 한 번만 — modalRef로 현재 상태 참조
 
   const save = async () => {
     const entries: LogEntry[] = []
