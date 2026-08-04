@@ -505,26 +505,26 @@ export default function LogPage({
           </div>
         </div>
       )}
-      <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '10px' : 0 }}>
-          <div style={{ fontWeight: 700, fontSize: '16px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
-          <div style={{ fontSize: '12px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
+      <div style={{ padding: '14px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: timerPhase !== 'idle' ? '12px' : 0 }}>
+          <div style={{ fontWeight: 700, fontSize: '20px' }}>{fillTitle || tr(lang, 'workoutLog')}</div>
+          <div style={{ fontSize: '14px', color: 'var(--tm)' }}>{formatDateHeader(selectedDate, LOCALE_MAP[lang])}</div>
         </div>
         {timerPhase !== 'idle' && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', gap: '14px' }}>
+            <div style={{ display: 'flex', gap: '16px' }}>
               {[
                 { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
                 { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
                 { label: tr(lang, 'timerRest'), ms: restMs, color: '#BA7517' },
               ].map(({ label, ms, color }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
-                  <span style={{ fontSize: '10px', color: 'var(--tm)' }}>{label}</span>
-                  <span style={{ fontSize: '14px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
+                <div key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--tm)' }}>{label}</span>
+                  <span style={{ fontSize: '17px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</span>
                 </div>
               ))}
             </div>
-            <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: 600 }}>{tr(lang, 'working')}</span>
+            <span style={{ fontSize: '14px', color: '#1D9E75', fontWeight: 600 }}>{tr(lang, 'working')}</span>
           </div>
         )}
       </div>
@@ -560,9 +560,9 @@ export default function LogPage({
           </button>
         )}
       </div>
-      <div style={{ padding: '12px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexShrink: 0 }}>
-        <button className="btn" onClick={closeFill}>{tr(lang, 'cancel')}</button>
-        <button className="btn btn-p" onClick={save}>{tr(lang, 'save')}</button>
+      <div style={{ padding: '14px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '10px', justifyContent: 'flex-end', flexShrink: 0 }}>
+        <button className="btn" onClick={closeFill} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'cancel')}</button>
+        <button className="btn btn-p" onClick={save} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'save')}</button>
       </div>
     </div>
   )
