@@ -414,7 +414,7 @@ export default function LogPage({
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '8px', fontSize: '11px', color: 'var(--tm)', marginBottom: '6px', paddingBottom: '6px', borderBottom: '0.5px solid var(--bd)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '8px', fontSize: '14px', color: 'var(--tm)', marginBottom: '6px', paddingBottom: '6px', borderBottom: '0.5px solid var(--bd)' }}>
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
                   ? <><span style={{ textAlign: 'center' }}>무게 ({unit})</span><span style={{ textAlign: 'center' }}>횟수</span></>
@@ -435,13 +435,13 @@ export default function LogPage({
                     <span style={{ fontSize: '14px', color: 'var(--tm)', textAlign: 'center', fontWeight: 500 }}>{ri + 1}</span>
                     {lt === 'weight_reps' ? (
                       <>
-                        <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
-                        <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
+                        <input type="number" value={row.weight} onChange={e => updateRow(di, ri, 'weight', e.target.value)} placeholder="0" min="0" step="0.5" style={{ textAlign: 'center', fontSize: '26px', padding: '12px 4px', fontWeight: 500 }} />
+                        <input type="number" value={row.reps} onChange={e => updateRow(di, ri, 'reps', e.target.value)} placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '26px', padding: '12px 4px', fontWeight: 500 }} />
                       </>
                     ) : (
                       <input type="number" value={lt === 'time' ? row.duration : row.reps}
                         onChange={e => updateRow(di, ri, lt === 'time' ? 'duration' : 'reps', e.target.value)}
-                        placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '20px', padding: '12px 6px', fontWeight: 500 }} />
+                        placeholder="0" min="0" style={{ textAlign: 'center', fontSize: '26px', padding: '12px 4px', fontWeight: 500 }} />
                     )}
                     <button onClick={() => completeSet(setKey, setLabel)} style={{
                       width: '44px', height: '44px', borderRadius: '50%', border: 'none', cursor: 'pointer',
