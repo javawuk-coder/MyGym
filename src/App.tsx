@@ -32,7 +32,14 @@ function MainApp() {
   const uid = user?.uid
   const [tab, setTab] = useState<Tab>('routine')
   const [unit, setUnit] = useState<'kg' | 'lb'>('kg')
-  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('lang') as Lang) || 'ko')
+  const [lang, setLang] = useState<Lang>(() => {
+    const saved = localStorage.getItem('lang') as Lang | null
+    if (saved) return saved
+    const nav = navigator.language.toLowerCase()
+    if (nav.startsWith('ko')) return 'ko'
+    if (nav.startsWith('vi')) return 'vi'
+    return 'en'
+  })
   const [pendingRoutine, setPendingRoutine] = useState<(Routine & { id: string }) | null>(null)
   const [isLogging, setIsLogging] = useState(false)
 
