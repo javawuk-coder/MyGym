@@ -11,6 +11,7 @@ import StatsPage from './pages/StatsPage'
 import BodyPage from './pages/BodyPage'
 import DietPage from './pages/DietPage'
 import OnboardingModal from './components/OnboardingModal'
+import SharedRoutinePage from './pages/SharedRoutinePage'
 import { useRoutines } from './hooks/useRoutines'
 import { useLogs } from './hooks/useLogs'
 import { useCustomExercises } from './hooks/useCustomExercises'
@@ -41,6 +42,7 @@ function MainApp() {
     return 'en'
   })
   const [pendingRoutine, setPendingRoutine] = useState<(Routine & { id: string }) | null>(null)
+  const shareId = new URLSearchParams(window.location.search).get('r')
   const [isLogging, setIsLogging] = useState(false)
 
   useEffect(() => { if (profile?.unit) setUnit(profile.unit) }, [profile])
@@ -71,6 +73,18 @@ function MainApp() {
   const handleStartRoutine = (r: Routine & { id: string }) => {
     setPendingRoutine(r)
     setTab('log')
+  }
+
+  if (shareId) {
+    return (
+      <SharedRoutinePage
+        shareId={shareId}
+        lang={lang}
+        allExercises={allExercises}
+        onAddRoutine={addRoutine}
+        onDone={() => { window.history.replaceState({}, '', '/'); window.location.reload() }}
+      />
+    )
   }
 
   return (
@@ -108,6 +122,7 @@ function MainApp() {
           onDeleteRoutine={deleteRoutine}
           onStartRoutine={handleStartRoutine}
           lang={lang}
+          uid={uid}
         />
       )}
       {tab === 'log' && (

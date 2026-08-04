@@ -46,5 +46,17 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.uid;
     }
+
+    // ── shared_routines (공유 루틴) ───────────────────────
+    match /shared_routines/{shareId} {
+      // 로그인한 누구나 읽기 가능
+      allow read: if request.auth != null;
+      // 본인만 생성
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.authorId;
+      // 본인만 삭제
+      allow delete: if request.auth != null
+        && request.auth.uid == resource.data.authorId;
+    }
   }
 }

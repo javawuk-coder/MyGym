@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
-  IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto,
+  IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto, IconShare,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise, WorkoutFormat, WorkoutFormatType } from '../types'
 import { tr, exName, muscleLabel, fmtLabel, type Lang } from '../lib/i18n'
+import { useSharedRoutines } from '../hooks/useSharedRoutines'
 
 const MB: Record<string, string> = {
   chest:'bc', back:'bb', legs:'bl', shoulder:'bs', arm:'ba',
@@ -122,9 +123,11 @@ interface Props {
   onDeleteRoutine: (id: string) => Promise<void>
   onStartRoutine: (r: Routine & { id: string }) => void
   lang: Lang
+  uid?: string
 }
 
-export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine, lang }: Props) {
+export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine, lang, uid }: Props) {
+  const { shareRoutine } = useSharedRoutines()
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [routineName, setRoutineName] = useState('')
@@ -487,6 +490,18 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
                   </button>
                   <button className="btn" onClick={() => openEdit(r)}><IconPencil size={14} /></button>
+                  {uid && (
+                    <button className="btn" title={tr(lang, 'shareRoutine')} onClick={async () => {
+                      const shareId = await shareRoutine(r, uid)
+                      const url = `${location.origin}/?r=${shareId}`
+                      if (navigator.share) {
+                        await navigator.share({ title: r.name, text: tr(lang, 'shareRoutineText'), url })
+                      } else {
+                        await navigator.clipboard.writeText(url)
+                        alert(tr(lang, 'shareCopied'))
+                      }
+                    }}><IconShare size={14} /></button>
+                  )}
                   <button className="btn btn-d" onClick={() => { if (confirm('Delete?')) onDeleteRoutine(r.id) }}>
                     <IconTrash size={14} />
                   </button>
