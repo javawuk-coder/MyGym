@@ -60,7 +60,7 @@ function MainApp() {
     { id: 'diet',      label: tr(lang, 'tabDiet'),      Icon: IconSalad },
   ]
 
-  const { routines, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises } = useRoutines(uid)
+  const { routines, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises, toggleRoutineFavorite } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
   const { bodyLogs, saveBodyEntry, saveBodyEntryBatch, deleteBodyEntry } = useBodyLogs(uid)
@@ -122,6 +122,7 @@ function MainApp() {
           onAddRoutine={addRoutine}
           onUpdateRoutine={updateRoutine}
           onDeleteRoutine={deleteRoutine}
+          onToggleFavorite={toggleRoutineFavorite}
           onStartRoutine={handleStartRoutine}
           lang={lang}
           uid={uid}

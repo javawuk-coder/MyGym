@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
-  IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto, IconShare,
+  IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto, IconShare, IconStar, IconStarFilled,
 } from '@tabler/icons-react'
 import type { Exercise, Routine, RoutineExercise, WorkoutFormat, WorkoutFormatType } from '../types'
 import { tr, exName, muscleLabel, fmtLabel, type Lang } from '../lib/i18n'
@@ -121,12 +121,13 @@ interface Props {
   onAddRoutine: (r: Omit<Routine, 'id'>) => Promise<void>
   onUpdateRoutine: (id: string, data: { name: string; exercises: RoutineExercise[]; format: WorkoutFormat }) => Promise<void>
   onDeleteRoutine: (id: string) => Promise<void>
+  onToggleFavorite: (id: string, value: boolean) => Promise<void>
   onStartRoutine: (r: Routine & { id: string }) => void
   lang: Lang
   uid?: string
 }
 
-export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onStartRoutine, lang, uid }: Props) {
+export default function RoutinePage({ routines, allExercises, onAddRoutine, onUpdateRoutine, onDeleteRoutine, onToggleFavorite, onStartRoutine, lang, uid }: Props) {
   const { shareRoutine } = useSharedRoutines()
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -490,6 +491,14 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                     <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
                   </button>
                   <button className="btn" onClick={() => openEdit(r)}><IconPencil size={14} /></button>
+                  <button
+                    className="btn"
+                    title={r.favorite ? '즐겨찾기 해제' : '즐겨찾기'}
+                    onClick={() => onToggleFavorite(r.id, !r.favorite)}
+                    style={{ color: r.favorite ? '#EF9F27' : undefined }}
+                  >
+                    {r.favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
+                  </button>
                   {uid && (
                     <button className="btn" title={tr(lang, 'shareRoutine')} onClick={async () => {
                       const shareId = await shareRoutine(r, uid)

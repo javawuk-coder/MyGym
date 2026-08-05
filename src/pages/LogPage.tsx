@@ -99,7 +99,7 @@ interface Props {
   allExercises: Exercise[]
   unit: 'kg' | 'lb'
   lang: Lang
-  onAddEntries: (date: string, entries: LogEntry[]) => Promise<void>
+  onAddEntries: (date: string, entries: LogEntry[], meta?: { routineId?: string; routineName?: string }) => Promise<void>
   onDeleteEntry: (date: string, index: number) => Promise<void>
   onSaveRoutineNotes?: (routineId: string, notes: { exId: string; note?: string }[]) => Promise<void>
   onPatchRoutineExercises?: (routineId: string, exercises: RoutineExercise[]) => Promise<void>
@@ -443,7 +443,10 @@ export default function LogPage({
     if (!entries.length) { alert(tr(lang, 'noSets')); return }
     const routineIdSnapshot = currentRoutineId
     const notesSnapshot = draftExes.map(d => ({ exId: d.exId, note: d.exNote.trim() || undefined }))
-    const promises: Promise<unknown>[] = [onAddEntries(selectedDate, entries)]
+    const routineMeta = routineIdSnapshot && fillTitle
+      ? { routineId: routineIdSnapshot, routineName: fillTitle }
+      : undefined
+    const promises: Promise<unknown>[] = [onAddEntries(selectedDate, entries, routineMeta)]
     if (routineIdSnapshot && onSaveRoutineNotes) {
       promises.push(onSaveRoutineNotes(routineIdSnapshot, notesSnapshot))
     }
@@ -841,6 +844,13 @@ export default function LogPage({
       {!selectedLog || !selectedLog.exercises.length ? (
         <div className="emp">{tr(lang, 'noLog')}</div>
       ) : (
+        <>
+        {selectedLog.routineName && (
+          <div style={{ fontSize: '12px', color: 'var(--tm)', fontWeight: 600, marginBottom: '6px', paddingLeft: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <IconBarbell size={13} style={{ flexShrink: 0 }} />
+            {selectedLog.routineName}
+          </div>
+        )}
         <div className="card" style={{ padding: '4px 0' }}>
           {selectedLog.exercises.map((entry, ei) => {
             const x = getEx(entry.exId)
@@ -862,6 +872,7 @@ export default function LogPage({
             )
           })}
         </div>
+        </>
       )}
 
       {/* ── 모달 (pick / routine-select / ex-select) ── */}

@@ -52,6 +52,8 @@ export interface LogEntry {
 export interface DayLog {
   date: string // YYYY-MM-DD
   exercises: LogEntry[]
+  routineId?: string
+  routineName?: string
 }
 
 export interface RoutineExercise {
@@ -107,6 +109,7 @@ export interface Routine {
   name: string
   exercises: RoutineExercise[]
   format?: WorkoutFormat
+  favorite?: boolean
   createdAt?: unknown
 }
 

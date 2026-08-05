@@ -12,9 +12,13 @@ export function useRoutines(uid: string | undefined) {
 
   useEffect(() => {
     if (!uid) { setRoutines([]); setLoading(false); return }
-    const q = query(collection(db, 'users', uid, 'routines'), orderBy('createdAt', 'asc'))
+    const q = query(collection(db, 'users', uid, 'routines'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, snap => {
-      setRoutines(snap.docs.map(d => ({ id: d.id, ...d.data() } as Routine & { id: string })))
+      const raw = snap.docs.map(d => ({ id: d.id, ...d.data() } as Routine & { id: string })
+      )
+      // 즐겨찾기 상단 고정, 나머지는 최신순 유지
+      raw.sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0))
+      setRoutines(raw)
       setLoading(false)
     }, () => setLoading(false))
     return unsub
@@ -52,10 +56,15 @@ export function useRoutines(uid: string | undefined) {
     await deleteDoc(doc(db, 'users', uid, 'routines', routineId))
   }
 
+  const toggleRoutineFavorite = async (routineId: string, value: boolean) => {
+    if (!uid) return
+    await updateDoc(doc(db, 'users', uid, 'routines', routineId), { favorite: value })
+  }
+
   const patchRoutineExercises = async (routineId: string, exercises: RoutineExercise[]) => {
     if (!uid) return
     await updateDoc(doc(db, 'users', uid, 'routines', routineId), { exercises })
   }
 
-  return { routines, loading, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises }
+  return { routines, loading, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises, toggleRoutineFavorite }
 }
