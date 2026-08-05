@@ -41,18 +41,38 @@ function makeRows(count: number, reps?: number, weight?: number): SetRow[] {
     duration: '',
   }))
 }
-function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg' | 'lb'): DraftEx[] {
+function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg' | 'lb', logs: DayLog[]): DraftEx[] {
+  const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date))
   return routine.exercises.map(re => {
     const ex = allExercises.find(e => e.id === re.exId)
     const lt = ex?.log_type || 'weight_reps'
     if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, exNote: re.note ?? '' }
-    const displayWeight = lt === 'weight_reps' && re.defaultWeight != null && re.defaultWeight > 0
-      ? fromKg(re.defaultWeight, unit)
-      : undefined
-    const prefilledReps = re.reps && re.reps > 0 ? re.reps : undefined
+    // 가장 최근 로그에서 해당 운동의 마지막 세트 값 추출
+    let histWeight: number | undefined
+    let histReps: number | undefined
+    let histDuration: number | undefined
+    for (const dayLog of sortedLogs) {
+      const entry = dayLog.exercises.find(e => e.exId === re.exId)
+      if (entry?.sets?.length) {
+        const lastSet = entry.sets[entry.sets.length - 1]
+        if (lt === 'weight_reps') {
+          if (lastSet.weight != null && lastSet.weight >= 0) histWeight = fromKg(lastSet.weight, unit)
+          if (lastSet.reps != null && lastSet.reps > 0) histReps = lastSet.reps
+        } else if (lt === 'reps_only') {
+          if (lastSet.reps != null && lastSet.reps > 0) histReps = lastSet.reps
+        } else {
+          if (lastSet.duration != null && lastSet.duration > 0) histDuration = lastSet.duration
+        }
+        break
+      }
+    }
+    const displayWeight = histWeight ?? (lt === 'weight_reps' && re.defaultWeight != null && re.defaultWeight > 0 ? fromKg(re.defaultWeight, unit) : undefined)
+    const prefilledReps = histReps ?? (re.reps && re.reps > 0 ? re.reps : undefined)
+    const rows = makeRows(re.sets || 3, prefilledReps, displayWeight)
+    if (histDuration != null) rows.forEach(r => { r.duration = String(histDuration) })
     return {
       exId: re.exId,
-      rows: makeRows(re.sets || 3, prefilledReps, displayWeight),
+      rows,
       cardio: { dist: '', time: '', cal: '' },
       exNote: re.note ?? '',
     }
@@ -226,7 +246,7 @@ export default function LogPage({
   useEffect(() => {
     if (!initialRoutine) return
     setFillTitle(initialRoutine.name)
-    setDraftExes(draftFromRoutine(initialRoutine, allExercises, unit))
+    setDraftExes(draftFromRoutine(initialRoutine, allExercises, unit, logs))
     setCurrentRoutineId(initialRoutine.id)
     setModal('fill')
     history.pushState({ filling: true }, '')
@@ -348,7 +368,7 @@ export default function LogPage({
   }
 
   const openRoutineFill = (r: Routine & { id: string }) => {
-    setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises, unit)); setModal('fill')
+    setFillTitle(r.name); setDraftExes(draftFromRoutine(r, allExercises, unit, logs)); setModal('fill')
     setCurrentRoutineId(r.id)
     history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
