@@ -60,7 +60,7 @@ function MainApp() {
     { id: 'diet',      label: tr(lang, 'tabDiet'),      Icon: IconSalad },
   ]
 
-  const { routines, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine } = useRoutines(uid)
+  const { routines, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises } = useRoutines(uid)
   const { logs, addLogEntries, deleteLogEntry } = useLogs(uid)
   const { customExercises, addCustomExercise, deleteCustomExercise } = useCustomExercises(uid)
   const { bodyLogs, saveBodyEntry, saveBodyEntryBatch, deleteBodyEntry } = useBodyLogs(uid)
@@ -137,6 +137,7 @@ function MainApp() {
           onAddEntries={addLogEntries}
           onDeleteEntry={deleteLogEntry}
           onSaveRoutineNotes={saveRoutineNotes}
+          onPatchRoutineExercises={patchRoutineExercises}
           onLoggingChange={setIsLogging}
           initialRoutine={pendingRoutine}
           onConsumedInitial={() => setPendingRoutine(null)}

@@ -52,5 +52,10 @@ export function useRoutines(uid: string | undefined) {
     await deleteDoc(doc(db, 'users', uid, 'routines', routineId))
   }
 
-  return { routines, loading, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine }
+  const patchRoutineExercises = async (routineId: string, exercises: RoutineExercise[]) => {
+    if (!uid) return
+    await updateDoc(doc(db, 'users', uid, 'routines', routineId), { exercises })
+  }
+
+  return { routines, loading, addRoutine, updateRoutine, saveRoutineNotes, deleteRoutine, patchRoutineExercises }
 }

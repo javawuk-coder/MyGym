@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown, IconBarbell } from '@tabler/icons-react'
-import type { Exercise, DayLog, LogEntry, LogType, Routine, ExerciseSet } from '../types'
+import type { Exercise, DayLog, LogEntry, LogType, Routine, RoutineExercise, ExerciseSet } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
 const MB: Record<string, string> = {
   chest: 'bc', back: 'bb', legs: 'bl', shoulder: 'bs', arm: 'ba',
@@ -82,6 +82,7 @@ interface Props {
   onAddEntries: (date: string, entries: LogEntry[]) => Promise<void>
   onDeleteEntry: (date: string, index: number) => Promise<void>
   onSaveRoutineNotes?: (routineId: string, notes: { exId: string; note?: string }[]) => Promise<void>
+  onPatchRoutineExercises?: (routineId: string, exercises: RoutineExercise[]) => Promise<void>
   onLoggingChange?: (active: boolean) => void
   initialRoutine?: (Routine & { id: string }) | null
   onConsumedInitial?: () => void
@@ -89,7 +90,7 @@ interface Props {
 
 export default function LogPage({
   logs, routines, allExercises, unit, lang,
-  onAddEntries, onDeleteEntry, onSaveRoutineNotes, onLoggingChange,
+  onAddEntries, onDeleteEntry, onSaveRoutineNotes, onPatchRoutineExercises, onLoggingChange,
   initialRoutine, onConsumedInitial,
 }: Props) {
   const todayStr = today()
@@ -139,6 +140,7 @@ export default function LogPage({
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
   const [lastCompletedLabel, setLastCompletedLabel] = useState('')
   const [lastCompletedDi, setLastCompletedDi] = useState(-1)
+  const [lastCompletedRi, setLastCompletedRi] = useState(-1)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
   const segStartRef = useRef<number | null>(null)
@@ -170,6 +172,7 @@ export default function LogPage({
     setCompletedSets(new Set())
     setLastCompletedLabel('')
     setLastCompletedDi(-1)
+    setLastCompletedRi(-1)
   }
 
   // ✓ 완료 → 운동 시간 누적, 휴식 시작
@@ -179,8 +182,10 @@ export default function LogPage({
       accWorkRef.current += now - segStartRef.current
       setAccWorkMs(accWorkRef.current)
     }
+    const [diStr, riStr] = key.split('-')
     setLastCompletedLabel(label)
-    setLastCompletedDi(parseInt(key.split('-')[0], 10))
+    setLastCompletedDi(parseInt(diStr, 10))
+    setLastCompletedRi(parseInt(riStr, 10))
     phaseRef.current = 'resting'
     segStartRef.current = now
     setTimerPhase('resting')
@@ -206,9 +211,16 @@ export default function LogPage({
   const restMs = accRestMs + (timerPhase === 'resting' ? segElapsed : 0)
   const currentRestMs = timerPhase === 'resting' ? segElapsed : 0  // 현재 휴식 세션만 (오버레이용)
   const totalMs = workMs + restMs
+  // 다음 세트 (같은 운동, 다음 row)
+  const sameExDraft = lastCompletedDi >= 0 ? (draftExes[lastCompletedDi] ?? null) : null
+  const hasNextSetInEx = sameExDraft !== null && lastCompletedRi >= 0 && lastCompletedRi + 1 < sameExDraft.rows.length
+  const sameExEntry = sameExDraft ? (allExercises.find(e => e.id === sameExDraft.exId) ?? null) : null
+  const sameExNm = sameExEntry ? exName(sameExEntry, lang) : sameExDraft ? { main: sameExDraft.exId } : null
+  const nextSetLabel = hasNextSetInEx && sameExNm ? `Set ${lastCompletedRi + 2} — ${sameExNm.main}` : null
+  // 다음 운동 (다음 DraftEx)
   const nextExDraft = lastCompletedDi >= 0 && lastCompletedDi + 1 < draftExes.length
     ? draftExes[lastCompletedDi + 1] : null
-  const nextExEntry = nextExDraft ? allExercises.find(e => e.id === nextExDraft.exId) ?? null : null
+  const nextExEntry = nextExDraft ? (allExercises.find(e => e.id === nextExDraft.exId) ?? null) : null
   const nextExNm = nextExEntry ? exName(nextExEntry, lang) : nextExDraft ? { main: nextExDraft.exId } : null
 
   useEffect(() => {
@@ -350,7 +362,7 @@ export default function LogPage({
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
     setCurrentRoutineId(null)
-    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDi(-1)
+    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDi(-1); setLastCompletedRi(-1)
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
     releaseWakeLock()
@@ -414,6 +426,37 @@ export default function LogPage({
     const promises: Promise<unknown>[] = [onAddEntries(selectedDate, entries)]
     if (routineIdSnapshot && onSaveRoutineNotes) {
       promises.push(onSaveRoutineNotes(routineIdSnapshot, notesSnapshot))
+    }
+    if (routineIdSnapshot && onPatchRoutineExercises) {
+      const currentRoutine = routines.find(r => r.id === routineIdSnapshot)
+      if (currentRoutine) {
+        const updatedExes: RoutineExercise[] = currentRoutine.exercises.map((re, i) => {
+          const d = draftExes[i]
+          if (!d || d.exId !== re.exId) return re
+          const ex = getEx(d.exId)
+          const lt: LogType = ex?.log_type || 'weight_reps'
+          let lastRow: SetRow | undefined
+          for (let j = d.rows.length - 1; j >= 0; j--) {
+            const r = d.rows[j]
+            if (lt === 'weight_reps' && (r.weight || r.reps)) { lastRow = r; break }
+            if (lt === 'reps_only' && r.reps) { lastRow = r; break }
+            if (lt === 'time' && r.duration) { lastRow = r; break }
+          }
+          const updated: RoutineExercise = { ...re, sets: d.rows.length }
+          if (lastRow) {
+            if (lt === 'weight_reps') {
+              const w = parseFloat(lastRow.weight), rep = parseInt(lastRow.reps)
+              if (!isNaN(w) && w > 0) updated.defaultWeight = toKg(w, unit)
+              if (!isNaN(rep) && rep > 0) updated.reps = rep
+            } else if (lt === 'reps_only') {
+              const rep = parseInt(lastRow.reps)
+              if (!isNaN(rep) && rep > 0) updated.reps = rep
+            }
+          }
+          return updated
+        })
+        promises.push(onPatchRoutineExercises(routineIdSnapshot, updatedExes))
+      }
     }
     await Promise.all(promises)
     closeFill()
@@ -565,13 +608,23 @@ export default function LogPage({
               ))}
             </div>
           </div>
-          {/* 하단: 다음 운동 */}
-          {nextExNm && nextExDraft && (
-            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '16px 20px', flexShrink: 0 }}>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '4px' }}>다음</div>
-              <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextExNm.main}</div>
-              {nextExNm.sub && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{nextExNm.sub}</div>}
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{nextExDraft.rows.length}세트</div>
+          {/* 하단: 다음 세트 + 다음 운동 */}
+          {(nextSetLabel || nextExNm) && (
+            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 20px 20px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {nextSetLabel && (
+                <div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>다음 세트</div>
+                  <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextSetLabel}</div>
+                </div>
+              )}
+              {nextExNm && nextExDraft && (
+                <div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>다음 운동</div>
+                  <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextExNm.main}</div>
+                  {nextExNm.sub && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExNm.sub}</div>}
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExDraft.rows.length}세트</div>
+                </div>
+              )}
             </div>
           )}
         </div>
