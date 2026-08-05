@@ -32,6 +32,7 @@ export default function SharedRoutinePage({ shareId, lang, allExercises, onAddRo
     await onAddRoutine({ name: routineName.trim() || routine.name, exercises: routine.exercises, format: routine.format })
     setAdded(true)
     setAdding(false)
+    setTimeout(onDone, 1500)
   }
 
   if (loading) {
