@@ -119,6 +119,16 @@ export default function LogPage({
     wakeLockRef.current = null
   }
 
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && phaseRef.current !== 'idle' && !wakeLockRef.current) {
+        acquireWakeLock()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Timer state ───────────────────────────────────────────────
   // timerPhase: 'idle' | 'working' | 'resting'
   const [timerPhase, setTimerPhase] = useState<'idle' | 'working' | 'resting'>('idle')
@@ -128,6 +138,7 @@ export default function LogPage({
   const [, setTick] = useState(0)                 // 1초마다 re-render용
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
   const [lastCompletedLabel, setLastCompletedLabel] = useState('')
+  const [lastCompletedDi, setLastCompletedDi] = useState(-1)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
   const segStartRef = useRef<number | null>(null)
@@ -158,6 +169,7 @@ export default function LogPage({
     setTick(0)
     setCompletedSets(new Set())
     setLastCompletedLabel('')
+    setLastCompletedDi(-1)
   }
 
   // ✓ 완료 → 운동 시간 누적, 휴식 시작
@@ -168,6 +180,7 @@ export default function LogPage({
       setAccWorkMs(accWorkRef.current)
     }
     setLastCompletedLabel(label)
+    setLastCompletedDi(parseInt(key.split('-')[0], 10))
     phaseRef.current = 'resting'
     segStartRef.current = now
     setTimerPhase('resting')
@@ -193,6 +206,10 @@ export default function LogPage({
   const restMs = accRestMs + (timerPhase === 'resting' ? segElapsed : 0)
   const currentRestMs = timerPhase === 'resting' ? segElapsed : 0  // 현재 휴식 세션만 (오버레이용)
   const totalMs = workMs + restMs
+  const nextExDraft = lastCompletedDi >= 0 && lastCompletedDi + 1 < draftExes.length
+    ? draftExes[lastCompletedDi + 1] : null
+  const nextExEntry = nextExDraft ? allExercises.find(e => e.id === nextExDraft.exId) ?? null : null
+  const nextExNm = nextExEntry ? exName(nextExEntry, lang) : nextExDraft ? { main: nextExDraft.exId } : null
 
   useEffect(() => {
     if (!initialRoutine) return
@@ -333,7 +350,7 @@ export default function LogPage({
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
     setCurrentRoutineId(null)
-    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel('')
+    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDi(-1)
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
     releaseWakeLock()
@@ -511,36 +528,52 @@ export default function LogPage({
         <div style={{
           position: 'absolute', inset: 0,
           background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', zIndex: 20,
+          zIndex: 20,
         }}>
-          <div style={{ fontSize: '18px', color: '#888', marginBottom: '14px', letterSpacing: '0.06em' }}>{tr(lang, 'resting')}</div>
+          {/* 상단: 방금 완료한 세트 */}
           {lastCompletedLabel && (
-            <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.8)', marginBottom: '20px', fontWeight: 500, textAlign: 'center' }}>{lastCompletedLabel}</div>
+            <div style={{ padding: '28px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase' }}>방금 완료</div>
+              <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.85)', fontWeight: 500, textAlign: 'center', lineHeight: 1.4 }}>{lastCompletedLabel}</div>
+            </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {fmtTime(currentRestMs).split(':').map((part, i) => (
-              <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
-                {i > 0 && <span style={{ fontSize: '96px', fontWeight: 700, color: '#EF9F27', margin: '0 2px', lineHeight: 1, transform: 'translateY(6px)', display: 'inline-block' }}>:</span>}
-                <span style={{ fontSize: '112px', fontWeight: 700, color: '#EF9F27', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{part}</span>
-              </span>
-            ))}
+          {/* 중앙: 타이머 + 버튼 + 통계 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontSize: '14px', color: '#888', letterSpacing: '0.06em', marginBottom: '14px' }}>{tr(lang, 'resting')}</div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {fmtTime(currentRestMs).split(':').map((part, i) => (
+                <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
+                  {i > 0 && <span style={{ fontSize: '96px', fontWeight: 700, color: '#EF9F27', margin: '0 2px', lineHeight: 1, transform: 'translateY(6px)', display: 'inline-block' }}>:</span>}
+                  <span style={{ fontSize: '112px', fontWeight: 700, color: '#EF9F27', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{part}</span>
+                </span>
+              ))}
+            </div>
+            <button onClick={resumeWorkout} style={{
+              marginTop: '32px', padding: '20px 0', borderRadius: '40px', width: '78%',
+              background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
+              fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
+            }}>▶ {tr(lang, 'startWorkout')}</button>
+            <div style={{ display: 'flex', gap: '32px', marginTop: '24px' }}>
+              {([
+                { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+                { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
+              ] as const).map(({ label, ms, color }) => (
+                <div key={label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '15px', color: '#888', marginBottom: '4px' }}>{label}</div>
+                  <div style={{ fontSize: '22px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <button onClick={resumeWorkout} style={{
-            marginTop: '44px', padding: '20px 0', borderRadius: '40px', width: '78%',
-            background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
-            fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
-          }}>▶ {tr(lang, 'startWorkout')}</button>
-          <div style={{ display: 'flex', gap: '32px', marginTop: '32px' }}>
-            {([
-              { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
-              { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
-            ] as const).map(({ label, ms, color }) => (
-              <div key={label} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '15px', color: '#888', marginBottom: '4px' }}>{label}</div>
-                <div style={{ fontSize: '22px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
-              </div>
-            ))}
-          </div>
+          {/* 하단: 다음 운동 */}
+          {nextExNm && nextExDraft && (
+            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '16px 20px', flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '4px' }}>다음</div>
+              <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextExNm.main}</div>
+              {nextExNm.sub && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{nextExNm.sub}</div>}
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>{nextExDraft.rows.length}세트</div>
+            </div>
+          )}
         </div>
       )}
       <div style={{ padding: '14px 16px', borderBottom: '0.5px solid var(--bd)', flexShrink: 0 }}>
