@@ -478,43 +478,45 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
           const color = FORMAT_COLORS[fmt.type]
           return (
             <div className="card" key={r.id}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>{r.name}</div>
+              <div style={{ marginBottom: '10px' }}>
+                {/* 1줄: 루틴명 + 포맷 뱃지 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700, fontSize: '16px' }}>{r.name}</span>
                   <span style={{
                     display: 'inline-block', fontSize: '11px', padding: '2px 10px', borderRadius: '20px',
-                    fontWeight: 600, background: `${color}22`, color, border: `0.5px solid ${color}44`,
+                    fontWeight: 600, background: `${color}22`, color, border: `0.5px solid ${color}44`, flexShrink: 0,
                   }}>{formatSummary(fmt)}</span>
                 </div>
-                  <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                    <button className="btn btn-p" onClick={() => onStartRoutine(r)}>
-                      <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
-                    </button>
-                    <button className="btn" onClick={() => openEdit(r)}><IconPencil size={14} /></button>
-                    <button
-                      className="btn"
-                      title={r.favorite ? '즐겨찾기 해제' : '즐겨찾기'}
-                      onClick={() => onToggleFavorite(r.id, !r.favorite)}
-                      style={{ color: r.favorite ? '#EF9F27' : undefined }}
-                    >
-                      {r.favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
-                    </button>
-                    {uid && (
-                      <button className="btn" title={tr(lang, 'shareRoutine')} onClick={async () => {
-                        const shareId = await shareRoutine(r, uid)
-                        const url = `${location.origin}/?r=${shareId}`
-                        if (navigator.share) {
-                          await navigator.share({ title: r.name, text: tr(lang, 'shareRoutineText'), url })
-                        } else {
-                          await navigator.clipboard.writeText(url)
-                          alert(tr(lang, 'shareCopied'))
-                        }
-                      }}><IconShare size={14} /></button>
-                    )}
-                    <button className="btn btn-d" onClick={() => { if (confirm('Delete?')) onDeleteRoutine(r.id) }}>
-                      <IconTrash size={14} />
-                    </button>
-                  </div>
+                {/* 2줄: 버튼들 */}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button className="btn btn-p" onClick={() => onStartRoutine(r)}>
+                    <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
+                  </button>
+                  <button className="btn" onClick={() => openEdit(r)}><IconPencil size={14} /></button>
+                  <button
+                    className="btn"
+                    title={r.favorite ? '즐겨찾기 해제' : '즐겨찾기'}
+                    onClick={() => onToggleFavorite(r.id, !r.favorite)}
+                    style={{ color: r.favorite ? '#EF9F27' : undefined }}
+                  >
+                    {r.favorite ? <IconStarFilled size={14} /> : <IconStar size={14} />}
+                  </button>
+                  {uid && (
+                    <button className="btn" title={tr(lang, 'shareRoutine')} onClick={async () => {
+                      const shareId = await shareRoutine(r, uid)
+                      const url = `${location.origin}/?r=${shareId}`
+                      if (navigator.share) {
+                        await navigator.share({ title: r.name, text: tr(lang, 'shareRoutineText'), url })
+                      } else {
+                        await navigator.clipboard.writeText(url)
+                        alert(tr(lang, 'shareCopied'))
+                      }
+                    }}><IconShare size={14} /></button>
+                  )}
+                  <button className="btn btn-d" onClick={() => { if (confirm('Delete?')) onDeleteRoutine(r.id) }}>
+                    <IconTrash size={14} />
+                  </button>
+                </div>
               </div>
               <div>
                 {r.exercises.map((re, i) => {
