@@ -203,14 +203,33 @@ export default function LogPage({
       setAccWorkMs(accWorkRef.current)
     }
     const [diStr, riStr] = key.split('-')
+    const di = parseInt(diStr, 10)
+    const ri = parseInt(riStr, 10)
     setLastCompletedLabel(label)
-    setLastCompletedDi(parseInt(diStr, 10))
-    setLastCompletedRi(parseInt(riStr, 10))
+    setLastCompletedDi(di)
+    setLastCompletedRi(ri)
     phaseRef.current = 'resting'
     segStartRef.current = now
     setTimerPhase('resting')
     setSegStartedAt(now)
-    setCompletedSets(prev => new Set([...prev, key]))
+    setCompletedSets(prev => {
+      const next = new Set([...prev, key])
+      // 다음 미완료 set으로 스크롤
+      let nextKey: string | null = null
+      for (let d = di; d < draftExes.length; d++) {
+        const startRi = d === di ? ri + 1 : 0
+        for (let r = startRi; r < draftExes[d].rows.length; r++) {
+          if (!next.has(`${d}-${r}`)) { nextKey = `${d}-${r}`; break }
+        }
+        if (nextKey) break
+      }
+      if (nextKey) {
+        setTimeout(() => {
+          document.getElementById(`set-${nextKey}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 150)
+      }
+      return next
+    })
   }
 
   // 시작 버튼 → 휴식 시간 누적, 운동 시작
@@ -547,11 +566,15 @@ export default function LogPage({
                 const isDone = completedSets.has(setKey)
                 const setLabel = `Set ${ri + 1} — ${nm.main}`
                 return (
-                  <div key={ri} style={{
+                  <div key={ri} id={`set-${setKey}`} style={{
                     display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther,
                     gap: '8px', alignItems: 'center', padding: '8px 0',
                     borderBottom: ri < d.rows.length - 1 ? '0.5px solid var(--bd)' : 'none',
-                    opacity: isDone ? 0.45 : 1,
+                    opacity: isDone ? 0.35 : 1,
+                    background: isDone ? 'rgba(29,158,117,0.07)' : 'transparent',
+                    borderLeft: isDone ? '3px solid #1D9E75' : '3px solid transparent',
+                    paddingLeft: isDone ? '8px' : '0',
+                    transition: 'opacity 0.2s, background 0.2s',
                   }}>
                     <span style={{ fontSize: '14px', color: 'var(--tm)', textAlign: 'center', fontWeight: 500 }}>{ri + 1}</span>
                     {lt === 'weight_reps' ? (
