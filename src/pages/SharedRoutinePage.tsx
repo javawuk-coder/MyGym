@@ -80,7 +80,7 @@ export default function SharedRoutinePage({ shareId, lang, allExercises, onAddRo
                 {nm.sub && <div style={{ fontSize: '11px', color: 'var(--tm)' }}>{nm.sub}</div>}
               </div>
               <div style={{ fontSize: '13px', color: 'var(--tm)', flexShrink: 0, marginLeft: '12px' }}>
-                {re.sets}세트 × {re.reps}회
+                {re.sets}{tr(lang, 'sets')} × {re.reps}{tr(lang, 'reps')}
               </div>
             </div>
           )

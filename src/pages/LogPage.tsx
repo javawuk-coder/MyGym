@@ -415,7 +415,7 @@ export default function LogPage({
     const onPopState = () => {
       if (modalRef.current !== 'fill') return
       history.pushState({ filling: true }, '') // 다시 복원
-      if (window.confirm('운동 로깅 중입니다. 나가면 기록이 사라집니다.\n계속 하시겠습니까?')) {
+      if (window.confirm(tr(lang, 'confirmLeaveWorkout'))) {
         closeFill()
       }
     }
@@ -538,7 +538,7 @@ export default function LogPage({
           <input
             value={d.exNote}
             onChange={e => updateExNote(di, e.target.value)}
-            placeholder="운동 메모 (루틴에 저장됩니다)"
+            placeholder={tr(lang, 'exNoteLabel')}
             style={{ width: '100%', fontSize: '13px', padding: '8px 10px', marginBottom: '12px', border: '0.5px solid var(--bd)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--ts)', fontFamily: 'inherit', boxSizing: 'border-box' }}
           />
           {lt === 'cardio' ? (
@@ -557,8 +557,8 @@ export default function LogPage({
               <div style={{ display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther, gap: '8px', fontSize: '14px', color: 'var(--tm)', marginBottom: '6px', paddingBottom: '6px', borderBottom: '0.5px solid var(--bd)' }}>
                 <span style={{ textAlign: 'center' }}>#</span>
                 {lt === 'weight_reps'
-                  ? <><span style={{ textAlign: 'center' }}>무게 ({unit})</span><span style={{ textAlign: 'center' }}>횟수</span></>
-                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? `${tr(lang, 'timerWork')}(${tr(lang, 'sec')})` : '횟수'}</span>}
+                  ? <><span style={{ textAlign: 'center' }}>{tr(lang, 'weightCol')} ({unit})</span><span style={{ textAlign: 'center' }}>{tr(lang, 'repsCol')}</span></>
+                  : <span style={{ textAlign: 'center' }}>{lt === 'time' ? `${tr(lang, 'timerWork')}(${tr(lang, 'sec')})` : tr(lang, 'repsCol')}</span>}
                 <span /><span />
               </div>
               {d.rows.map((row, ri) => {
@@ -755,8 +755,8 @@ export default function LogPage({
         <IconBarbell size={22} color="#fff" />
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--tp)' }}>앱으로 설치하기</div>
-        <div style={{ fontSize: '13px', color: 'var(--tm)' }}>홈 화면에서 바로 열기</div>
+        <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--tp)' }}>{tr(lang, 'installApp')}</div>
+        <div style={{ fontSize: '13px', color: 'var(--tm)' }}>{tr(lang, 'installAppSub')}</div>
       </div>
       <button onClick={async () => {
         const prompt = (window as unknown as Record<string, unknown>).__pwaPrompt as { prompt: () => void; userChoice: Promise<{ outcome: string }> } | undefined
@@ -768,7 +768,7 @@ export default function LogPage({
       }} style={{
         background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8,
         padding: '10px 18px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
-      }}>설치</button>
+      }}>{tr(lang, 'install')}</button>
       <button onClick={() => setShowInstallBanner(false)} style={{ background: 'none', border: 'none', color: 'var(--tm)', cursor: 'pointer', padding: '4px', fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>&times;</button>
     </div>,
     document.body

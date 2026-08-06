@@ -203,12 +203,13 @@ function AppRouter() {
 
   if (path === '/admin') {
     if (profile?.role !== 'admin') {
+      const lang = (localStorage.getItem('lang') as Lang) || 'ko'
       return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center', color: 'var(--ts)' }}>
             <div style={{ fontSize: '32px', marginBottom: '12px' }}>🔒</div>
-            <p>Admin 권한이 필요합니다</p>
-            <a href="/" style={{ fontSize: '13px', color: '#185FA5', marginTop: '8px', display: 'block' }}>← 앱으로 돌아가기</a>
+            <p>{tr(lang, 'adminRequired')}</p>
+            <a href="/" style={{ fontSize: '13px', color: '#185FA5', marginTop: '8px', display: 'block' }}>{tr(lang, 'backToApp')}</a>
           </div>
         </div>
       )

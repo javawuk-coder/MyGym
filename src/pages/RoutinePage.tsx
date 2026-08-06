@@ -495,7 +495,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   <button className="btn" onClick={() => openEdit(r)}><IconPencil size={14} /></button>
                   <button
                     className="btn"
-                    title={r.favorite ? '즐겨찾기 해제' : '즐겨찾기'}
+                    title={r.favorite ? tr(lang, 'favRemove') : tr(lang, 'favAdd')}
                     onClick={() => onToggleFavorite(r.id, !r.favorite)}
                     style={{ color: r.favorite ? '#EF9F27' : undefined }}
                   >
