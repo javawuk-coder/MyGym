@@ -137,7 +137,7 @@
     {
         "id":  "chest_16",
         "name":  "Single-Arm Cable Fly",
-        "ko":  "단팔 케이블 플라이",
+        "ko":  "원암 케이블 플라이",
         "muscle":  "chest",
         "equipment":  "cable",
         "type":  "isolation",
@@ -398,7 +398,7 @@
     {
         "id":  "back_15",
         "name":  "Single-Arm Lat Pulldown",
-        "ko":  "단팔 랫 풀다운",
+        "ko":  "원암 랫 풀다운",
         "muscle":  "back",
         "equipment":  "cable",
         "type":  "compound",
@@ -452,7 +452,7 @@
     {
         "id":  "back_21",
         "name":  "Single-Arm Dumbbell Row",
-        "ko":  "단팔 덤벨 로우",
+        "ko":  "원암 덤벨 로우",
         "muscle":  "back",
         "equipment":  "dumbbell",
         "type":  "compound",
@@ -497,7 +497,7 @@
     {
         "id":  "back_26",
         "name":  "Single-Arm Cable Row",
-        "ko":  "단팔 케이블 로우",
+        "ko":  "원암 케이블 로우",
         "muscle":  "back",
         "equipment":  "cable",
         "type":  "compound",
@@ -713,7 +713,7 @@
     {
         "id":  "legs_12",
         "name":  "Single-Leg Press",
-        "ko":  "단다리 레그 프레스",
+        "ko":  "원레그 레그 프레스",
         "muscle":  "legs",
         "equipment":  "machine",
         "type":  "compound",
@@ -740,7 +740,7 @@
     {
         "id":  "legs_15",
         "name":  "Single-Leg Romanian Deadlift",
-        "ko":  "단다리 루마니안 데드리프트",
+        "ko":  "원레그 루마니안 데드리프트",
         "muscle":  "legs",
         "equipment":  "dumbbell",
         "type":  "compound",
@@ -848,7 +848,7 @@
     {
         "id":  "legs_27",
         "name":  "Single-Leg Curl",
-        "ko":  "단다리 레그 컬",
+        "ko":  "원레그 레그 컬",
         "muscle":  "legs",
         "equipment":  "machine",
         "type":  "isolation",
@@ -866,7 +866,7 @@
     {
         "id":  "legs_29",
         "name":  "Single-Leg Extension",
-        "ko":  "단다리 레그 익스텐션",
+        "ko":  "원레그 레그 익스텐션",
         "muscle":  "legs",
         "equipment":  "machine",
         "type":  "isolation",
@@ -902,7 +902,7 @@
     {
         "id":  "legs_33",
         "name":  "Single-Leg Calf Raise",
-        "ko":  "단다리 카프 레이즈",
+        "ko":  "원레그 카프 레이즈",
         "muscle":  "legs",
         "equipment":  "bodyweight",
         "type":  "isolation",
@@ -1388,7 +1388,7 @@
     {
         "id":  "arm_16",
         "name":  "Single-Arm Cable Curl",
-        "ko":  "단팔 케이블 컬",
+        "ko":  "원암 케이블 컬",
         "muscle":  "arm",
         "equipment":  "cable",
         "type":  "isolation",
@@ -1442,7 +1442,7 @@
     {
         "id":  "arm_22",
         "name":  "Single-Arm Tricep Pushdown",
-        "ko":  "단팔 트라이셉 푸시다운",
+        "ko":  "원암 트라이셉 푸시다운",
         "muscle":  "arm",
         "equipment":  "cable",
         "type":  "isolation",
@@ -1928,7 +1928,7 @@
     {
         "id":  "glute_04",
         "name":  "Single-Leg Hip Thrust",
-        "ko":  "단다리 힙 쓰러스트",
+        "ko":  "원레그 힙 쓰러스트",
         "muscle":  "glute",
         "equipment":  "barbell",
         "type":  "isolation",
@@ -1955,7 +1955,7 @@
     {
         "id":  "glute_07",
         "name":  "Single-Leg Glute Bridge",
-        "ko":  "단다리 글루트 브릿지",
+        "ko":  "원레그 글루트 브릿지",
         "muscle":  "glute",
         "equipment":  "bodyweight",
         "type":  "isolation",
