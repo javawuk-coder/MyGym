@@ -478,13 +478,14 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
           const color = FORMAT_COLORS[fmt.type]
           return (
             <div className="card" key={r.id}>
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '8px' }}>{r.name}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>{r.name}</div>
                   <span style={{
                     display: 'inline-block', fontSize: '11px', padding: '2px 10px', borderRadius: '20px',
-                    fontWeight: 600, background: `${color}22`, color, border: `0.5px solid ${color}44`, flexShrink: 0,
+                    fontWeight: 600, background: `${color}22`, color, border: `0.5px solid ${color}44`,
                   }}>{formatSummary(fmt)}</span>
+                </div>
                   <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                     <button className="btn btn-p" onClick={() => onStartRoutine(r)}>
                       <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
@@ -514,7 +515,6 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       <IconTrash size={14} />
                     </button>
                   </div>
-                </div>
               </div>
               <div>
                 {r.exercises.map((re, i) => {
