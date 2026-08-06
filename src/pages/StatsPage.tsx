@@ -167,13 +167,12 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
         <div style={{ position: 'relative', height: '16px', marginTop: '5px' }}>
           {chartData.map((d, i) => {
             if (!d.showLabel) return null
-            const pct = chartData.length === 1 ? 50 : (i / (chartData.length - 1)) * 100
-            const anchor = i === 0 ? 'left' : i === chartData.length - 1 ? 'right' : 'center'
+            const pct = (i + 0.5) / chartData.length * 100
             return (
               <div key={i} style={{
                 position: 'absolute',
-                [anchor === 'right' ? 'right' : 'left']: anchor === 'right' ? '0%' : `${pct}%`,
-                transform: anchor === 'center' ? 'translateX(-50%)' : 'none',
+                left: `${pct}%`,
+                transform: 'translateX(-50%)',
                 fontSize: '10px', color: 'var(--tm)', whiteSpace: 'nowrap',
               }}>{d.label}</div>
             )
