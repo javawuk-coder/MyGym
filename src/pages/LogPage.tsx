@@ -616,7 +616,7 @@ export default function LogPage({
       {timerPhase === 'resting' && (
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
+          background: '#111', display: 'flex', flexDirection: 'column',
           zIndex: 20,
         }}>
           {/* 상단: 방금 완료한 세트 */}
@@ -628,7 +628,7 @@ export default function LogPage({
           )}
           {/* 중앙: 타이머 + 버튼 + 통계 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: '14px', color: '#888', letterSpacing: '0.06em', marginBottom: '14px' }}>{tr(lang, 'resting')}</div>
+            <div style={{ fontSize: '14px', color: '#fff', letterSpacing: '0.06em', marginBottom: '14px' }}>{tr(lang, 'resting')}</div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {fmtTime(currentRestMs).split(':').map((part, i) => (
                 <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
@@ -648,7 +648,7 @@ export default function LogPage({
                 { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
               ] as const).map(({ label, ms, color }) => (
                 <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '15px', color: '#888', marginBottom: '4px' }}>{label}</div>
+                  <div style={{ fontSize: '15px', color: '#fff', marginBottom: '4px' }}>{label}</div>
                   <div style={{ fontSize: '22px', fontWeight: 500, color, fontVariantNumeric: 'tabular-nums' }}>{fmtTime(ms)}</div>
                 </div>
               ))}
@@ -656,19 +656,19 @@ export default function LogPage({
           </div>
           {/* 하단: 다음 세트 + 다음 운동 */}
           {(nextSetLabel || nextExNm) && (
-            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 20px 20px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 20px 20px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {nextSetLabel && (
-                <div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>{tr(lang, 'nextSet')}</div>
-                  <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextSetLabel}</div>
+                <div style={{ background: '#1c2a24', borderLeft: '2px solid #1D9E75', borderRadius: '6px', padding: '8px 12px' }}>
+                  <div style={{ fontSize: '9px', color: '#1D9E75', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '3px' }}>{tr(lang, 'nextSet')}</div>
+                  <div style={{ fontSize: '15px', color: '#e8e8e8', fontWeight: 600 }}>{nextSetLabel}</div>
                 </div>
               )}
               {nextExNm && nextExDraft && (
-                <div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>{tr(lang, 'nextExercise')}</div>
-                  <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextExNm.main}</div>
-                  {nextExNm.sub && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExNm.sub}</div>}
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExDraft.rows.length}{tr(lang, 'sets')}</div>
+                <div style={{ background: '#1c2a24', borderLeft: '2px solid #1D9E75', borderRadius: '6px', padding: '8px 12px' }}>
+                  <div style={{ fontSize: '9px', color: '#1D9E75', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '3px' }}>{tr(lang, 'nextExercise')}</div>
+                  <div style={{ fontSize: '15px', color: '#e8e8e8', fontWeight: 600 }}>{nextExNm.main}</div>
+                  {nextExNm.sub && <div style={{ fontSize: '12px', color: '#8fcca8', marginTop: '2px' }}>{nextExNm.sub}</div>}
+                  <div style={{ fontSize: '12px', color: '#8fcca8', marginTop: '2px' }}>{nextExDraft.rows.length} {tr(lang, 'sets')}</div>
                 </div>
               )}
             </div>
