@@ -25,8 +25,19 @@ function fromKg(kg: number, unit: 'kg' | 'lb') {
   return unit === 'lb' ? Math.round(kg * 2.205 * 10) / 10 : kg
 }
 
+const DAY_NAMES: Record<Lang, string[]> = {
+  ko: ['일', '월', '화', '수', '목', '금', '토'],
+  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  vi: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+}
+const MONTH_LBL: Record<Lang, (m: number) => string> = {
+  ko: m => `${m}월`,
+  en: m => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1],
+  vi: m => `Th${m}`,
+}
+
 export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
-  const [periodDays, setPeriodDays] = useState(30)
+  const [periodDays, setPeriodDays] = useState(7)
 
   const getEx = (id: string) => allExercises.find(e => e.id === id)
 
@@ -43,6 +54,55 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
       .reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
   )
   const workoutDays = filtered.filter(l => l.exercises.length).length
+
+  // Volume chart data
+  const exVol = (exercises: typeof filtered[0]['exercises']) =>
+    exercises.reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
+
+  type ChartPoint = { label: string; vol: number; showLabel: boolean }
+  const chartData: ChartPoint[] = (() => {
+    if (periodDays === 7) {
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(Date.now() - (6 - i) * 86400000)
+        const log = filtered.find(l => l.date === d.toISOString().slice(0, 10))
+        return { label: DAY_NAMES[lang][d.getDay()], vol: log ? exVol(log.exercises) : 0, showLabel: true }
+      })
+    }
+    if (periodDays === 30) {
+      return Array.from({ length: 30 }, (_, i) => {
+        const d = new Date(Date.now() - (29 - i) * 86400000)
+        const log = filtered.find(l => l.date === d.toISOString().slice(0, 10))
+        return {
+          label: `${d.getMonth() + 1}/${d.getDate()}`,
+          vol: log ? exVol(log.exercises) : 0,
+          showLabel: i % 7 === 0 || i === 29,
+        }
+      })
+    }
+    if (periodDays === 90) {
+      return Array.from({ length: 13 }, (_, i) => {
+        const ago = 12 - i
+        const end = new Date(Date.now() - ago * 7 * 86400000)
+        const start = new Date(Date.now() - (ago + 1) * 7 * 86400000)
+        const vol = filtered
+          .filter(l => l.date > start.toISOString().slice(0, 10) && l.date <= end.toISOString().slice(0, 10))
+          .reduce((a, l) => a + exVol(l.exercises), 0)
+        return { label: `${start.getMonth() + 1}/${start.getDate()}`, vol, showLabel: i % 3 === 0 || i === 12 }
+      })
+    }
+    // 전체: monthly
+    const mm: Record<string, number> = {}
+    filtered.forEach(l => { mm[l.date.slice(0, 7)] = (mm[l.date.slice(0, 7)] || 0) + exVol(l.exercises) })
+    const sorted = Object.entries(mm).sort(([a], [b]) => a.localeCompare(b))
+    const step = Math.max(1, Math.ceil(sorted.length / 6))
+    return sorted.map(([m, vol], i) => ({
+      label: MONTH_LBL[lang](parseInt(m.slice(5))),
+      vol,
+      showLabel: i % step === 0 || i === sorted.length - 1,
+    }))
+  })()
+  const chartMax = Math.max(...chartData.map(d => d.vol), 1)
+  const barGap = periodDays === 30 ? '2px' : '4px'
 
   // Volume by muscle
   const mv: Record<string, number> = {}
@@ -85,6 +145,31 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
         <div className="sc"><div className="sn">{workoutDays}</div><div className="sl">{tr(lang, 'workoutDays')}</div></div>
         <div className="sc"><div className="sn">{totalSets}</div><div className="sl">{tr(lang, 'totalSets')}</div></div>
         <div className="sc"><div className="sn">{(fromKg(totalVol, unit) / 1000).toFixed(1)}{unit === 'kg' ? 't' : 'k lb'}</div><div className="sl">{tr(lang, 'totalVolume')}</div></div>
+      </div>
+
+      {/* 날짜별 볼륨 차트 */}
+      <div className="card" style={{ marginBottom: '1rem' }}>
+        <div className="stitle" style={{ marginBottom: '12px' }}>{tr(lang, 'statsVolumeChart')}</div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: barGap, height: '72px' }}>
+          {chartData.map((d, i) => (
+            <div key={i} style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
+              <div style={{
+                width: '100%',
+                height: `${d.vol === 0 ? 3 : Math.max(4, Math.round((d.vol / chartMax) * 68))}px`,
+                background: '#1D9E75',
+                borderRadius: '2px 2px 0 0',
+                opacity: d.vol === 0 ? 0.15 : 1,
+              }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', marginTop: '5px' }}>
+          {chartData.map((d, i) => (
+            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: '10px', color: 'var(--tm)', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              {d.showLabel ? d.label : ''}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Volume by muscle */}

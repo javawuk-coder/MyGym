@@ -27,6 +27,7 @@ const strings = {
     installApp: '앱으로 설치하기', installAppSub: '홈 화면에서 바로 열기', install: '설치',
     // stats
     workoutDays: '운동한 날', totalSets: '총 세트', totalVolume: '총 볼륨',
+    statsVolumeChart: '날짜별 볼륨',
     volumeByMuscle: '근육별 볼륨', noData: '데이터 없음',
     logToSee: '운동을 기록하면 나타나요',
     period7: '7일', period30: '30일', period90: '90일', periodAll: '전체',
@@ -207,6 +208,7 @@ const strings = {
     exNoteLabel: 'Exercise note (saved to routine)', weightCol: 'Weight', repsCol: 'Reps',
     installApp: 'Install app', installAppSub: 'Open from home screen', install: 'Install',
     workoutDays: 'Workout days', totalSets: 'Total sets', totalVolume: 'Total volume',
+    statsVolumeChart: 'Volume by day',
     volumeByMuscle: 'Volume by muscle', noData: 'No data',
     logToSee: 'Log workouts to see data',
     period7: '7 days', period30: '30 days', period90: '90 days', periodAll: 'All',
@@ -377,6 +379,7 @@ const strings = {
     exNoteLabel: 'Ghi chú bài tập (lưu vào lịch tập)', weightCol: 'Tạ', repsCol: 'Số lần',
     installApp: 'Cài ứng dụng', installAppSub: 'Mở từ màn hình chính', install: 'Cài đặt',
     workoutDays: 'Ngày tập', totalSets: 'Tổng set', totalVolume: 'Tổng khối lượng',
+    statsVolumeChart: 'Khối lượng theo ngày',
     volumeByMuscle: 'Khối lượng theo cơ', noData: 'Không có dữ liệu',
     logToSee: 'Hãy ghi lại để xem dữ liệu',
     period7: '7 ngày', period30: '30 ngày', period90: '90 ngày', periodAll: 'Tất cả',
