@@ -255,7 +255,7 @@ export default function LogPage({
   const hasNextSetInEx = sameExDraft !== null && lastCompletedRi >= 0 && lastCompletedRi + 1 < sameExDraft.rows.length
   const sameExEntry = sameExDraft ? (allExercises.find(e => e.id === sameExDraft.exId) ?? null) : null
   const sameExNm = sameExEntry ? exName(sameExEntry, lang) : sameExDraft ? { main: sameExDraft.exId } : null
-  const nextSetLabel = hasNextSetInEx && sameExNm ? `Set ${lastCompletedRi + 2} — ${sameExNm.main}` : null
+  const nextSetLabel = hasNextSetInEx && sameExNm ? `${tr(lang, 'setLabel')} ${lastCompletedRi + 2} — ${sameExNm.main}` : null
   // 다음 운동 (다음 DraftEx)
   const nextExDraft = lastCompletedDi >= 0 && lastCompletedDi + 1 < draftExes.length
     ? draftExes[lastCompletedDi + 1] : null
@@ -564,7 +564,7 @@ export default function LogPage({
               {d.rows.map((row, ri) => {
                 const setKey = `${di}-${ri}`
                 const isDone = completedSets.has(setKey)
-                const setLabel = `Set ${ri + 1} — ${nm.main}`
+                const setLabel = `${tr(lang, 'setLabel')} ${ri + 1} — ${nm.main}`
                 return (
                   <div key={ri} id={`set-${setKey}`} style={{
                     display: 'grid', gridTemplateColumns: lt === 'weight_reps' ? colsWR : colsOther,
@@ -622,7 +622,7 @@ export default function LogPage({
           {/* 상단: 방금 완료한 세트 */}
           {lastCompletedLabel && (
             <div style={{ padding: '28px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase' }}>방금 완료</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase' }}>{tr(lang, 'justCompleted')}</div>
               <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.85)', fontWeight: 500, textAlign: 'center', lineHeight: 1.4 }}>{lastCompletedLabel}</div>
             </div>
           )}
@@ -659,16 +659,16 @@ export default function LogPage({
             <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 20px 20px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {nextSetLabel && (
                 <div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>다음 세트</div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>{tr(lang, 'nextSet')}</div>
                   <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextSetLabel}</div>
                 </div>
               )}
               {nextExNm && nextExDraft && (
                 <div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>다음 운동</div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '3px' }}>{tr(lang, 'nextExercise')}</div>
                   <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{nextExNm.main}</div>
                   {nextExNm.sub && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExNm.sub}</div>}
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExDraft.rows.length}세트</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>{nextExDraft.rows.length}{tr(lang, 'sets')}</div>
                 </div>
               )}
             </div>

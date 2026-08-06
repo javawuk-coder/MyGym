@@ -9,6 +9,7 @@ const strings = {
     // timer
     resting: '휴식 중', startWorkout: '운동 시작', working: '● 운동 중',
     timerTotal: '총', timerWork: '운동', timerRest: '휴식', setDone: '완료',
+    justCompleted: '방금 완료', nextSet: '다음 세트', nextExercise: '다음 운동', sets: '세트', setLabel: 'Set',
     // log page
     addWorkout: '운동 추가', addFromRoutine: '루틴으로 추가', addExercise: '개별 운동 추가',
     addFromRoutineDesc: '저장된 루틴을 불러와 세트/무게를 입력합니다',
@@ -185,6 +186,7 @@ const strings = {
     logout: 'Logout', language: 'Language', adminPanel: 'Admin panel', settings: 'Settings',
     resting: 'Resting', startWorkout: 'Start workout', working: '● Working out',
     timerTotal: 'Total', timerWork: 'Workout', timerRest: 'Rest', setDone: 'Done',
+    justCompleted: 'Just done', nextSet: 'Next set', nextExercise: 'Next exercise', sets: 'sets', setLabel: 'Set',
     addWorkout: 'Add workout', addFromRoutine: 'Add from routine', addExercise: 'Add exercise',
     addFromRoutineDesc: 'Load a saved routine and enter sets & weight',
     addExerciseDesc: 'Select an exercise to log',
@@ -349,6 +351,7 @@ const strings = {
     logout: 'Đăng xuất', language: 'Ngôn ngữ', adminPanel: 'Bảng quản trị', settings: 'Cài đặt',
     resting: 'Đang nghỉ', startWorkout: 'Bắt đầu tập', working: '● Đang tập',
     timerTotal: 'Tổng', timerWork: 'Tập', timerRest: 'Nghỉ', setDone: 'Xong',
+    justCompleted: 'Vừa xong', nextSet: 'Set tiếp theo', nextExercise: 'Bài tiếp theo', sets: 'sets', setLabel: 'Set',
     addWorkout: 'Thêm bài tập', addFromRoutine: 'Thêm từ lịch tập', addExercise: 'Thêm bài tập lẻ',
     addFromRoutineDesc: 'Tải lịch tập đã lưu và nhập set/tạ',
     addExerciseDesc: 'Chọn bài tập để ghi lại',
