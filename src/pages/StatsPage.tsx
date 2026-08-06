@@ -69,13 +69,14 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
       })
     }
     if (periodDays === 30) {
+      const startDow = new Date(Date.now() - 29 * 86400000).getDay()
       return Array.from({ length: 30 }, (_, i) => {
         const d = new Date(Date.now() - (29 - i) * 86400000)
         const log = filtered.find(l => l.date === d.toISOString().slice(0, 10))
         return {
           label: `${d.getMonth() + 1}/${d.getDate()}`,
           vol: log ? exVol(log.exercises) : 0,
-          showLabel: i % 7 === 0 || i === 29,
+          showLabel: d.getDay() === startDow,
         }
       })
     }
@@ -163,12 +164,20 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', marginTop: '5px' }}>
-          {chartData.map((d, i) => (
-            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: '10px', color: 'var(--tm)', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-              {d.showLabel ? d.label : ''}
-            </div>
-          ))}
+        <div style={{ position: 'relative', height: '16px', marginTop: '5px' }}>
+          {chartData.map((d, i) => {
+            if (!d.showLabel) return null
+            const pct = chartData.length === 1 ? 50 : (i / (chartData.length - 1)) * 100
+            const anchor = i === 0 ? 'left' : i === chartData.length - 1 ? 'right' : 'center'
+            return (
+              <div key={i} style={{
+                position: 'absolute',
+                [anchor === 'right' ? 'right' : 'left']: anchor === 'right' ? '0%' : `${pct}%`,
+                transform: anchor === 'center' ? 'translateX(-50%)' : 'none',
+                fontSize: '10px', color: 'var(--tm)', whiteSpace: 'nowrap',
+              }}>{d.label}</div>
+            )
+          })}
         </div>
       </div>
 
