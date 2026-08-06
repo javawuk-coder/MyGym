@@ -488,7 +488,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   }}>{formatSummary(fmt)}</span>
                 </div>
                 {/* 2줄: 버튼들 */}
-                <div style={{ display: 'flex', gap: '6px' }}>
+                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                   <button className="btn btn-p" onClick={() => onStartRoutine(r)}>
                     <IconPlayerPlay size={14} style={{ marginRight: 4 }} />Start
                   </button>
