@@ -622,7 +622,7 @@ export default function LogPage({
           {/* 상단: 방금 완료한 세트 */}
           {lastCompletedLabel && (
             <div style={{ padding: '28px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '.08em', textTransform: 'uppercase' }}>{tr(lang, 'justCompleted')}</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', letterSpacing: '.08em', textTransform: 'uppercase' }}>{tr(lang, 'justCompleted')}</div>
               <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.85)', fontWeight: 500, textAlign: 'center', lineHeight: 1.4 }}>{lastCompletedLabel}</div>
             </div>
           )}
@@ -644,7 +644,7 @@ export default function LogPage({
             }}>▶ {tr(lang, 'startWorkout')}</button>
             <div style={{ display: 'flex', gap: '32px', marginTop: '24px' }}>
               {([
-                { label: tr(lang, 'timerTotal'), ms: totalMs, color: 'var(--tp)' },
+                { label: tr(lang, 'timerTotal'), ms: totalMs, color: '#fff' },
                 { label: tr(lang, 'timerWork'), ms: workMs, color: '#1D9E75' },
               ] as const).map(({ label, ms, color }) => (
                 <div key={label} style={{ textAlign: 'center' }}>
