@@ -56,8 +56,6 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
   const workoutDays = filtered.filter(l => l.exercises.length).length
 
   // Volume chart data (유산소: 60분 = 5000kg 환산)
-  const exVol = (exercises: typeof filtered[0]['exercises']) =>
-    exercises.reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
   const exChartVol = (exercises: typeof filtered[0]['exercises']) =>
     exercises.reduce((a, e) => {
       if (e.log_type === 'cardio') return a + ((e.time || 0) / 60) * 5000
