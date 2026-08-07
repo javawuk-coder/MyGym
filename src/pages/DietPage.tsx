@@ -422,13 +422,21 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const [servingCount, setServingCount] = useState(1)
   const [addError, setAddError] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
+  const [savingToCustom, setSavingToCustom] = useState(false)
+  const [saveLabel, setSaveLabel] = useState('1인분')
+  const [savedToCustom, setSavedToCustom] = useState(false)
 
   useEffect(() => {
     setServingCount(1)
+    setSavingToCustom(false)
+    setSavedToCustom(false)
+    setSaveLabel('1인분')
   }, [selected])
   const [creating, setCreating] = useState<'food' | 'meal' | null>(null)
   const [editingFood, setEditingFood] = useState<CustomFood | null>(null)
-  const [recentFoods] = useState<FoodItem[]>([])
+  const [recentFoods, setRecentFoods] = useState<(FoodItem & { _amt?: number })[]>(() => {
+    try { return JSON.parse(localStorage.getItem('diet_recent_foods') || '[]') } catch { return [] }
+  })
 
   // Meal creation state
   const [mealName, setMealName] = useState('')
@@ -489,12 +497,35 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
     }
   }
 
+  async function handleSaveToCustom() {
+    if (!selected) return
+    await onSaveCustomFood({
+      name: selected.name,
+      ...(selected.brand !== undefined && { brand: selected.brand }),
+      calories100g: selected.calories100g,
+      carbs100g: selected.carbs100g,
+      protein100g: selected.protein100g,
+      fat100g: selected.fat100g,
+      servingSize: amount,
+      servingLabel: `${saveLabel} (${amount}g)`,
+    })
+    setSavedToCustom(true)
+    setSavingToCustom(false)
+  }
+
   async function handleAdd() {
     if (!selected || adding) return
     setAddError(null)
     setAdding(true)
     try {
       await onAdd(makeEntry(selected, amount))
+      // 최근 음식 업데이트
+      const entry = { ...selected, _amt: amount }
+      setRecentFoods(prev => {
+        const next = [entry, ...prev.filter(f => f.id !== selected.id)].slice(0, 10)
+        localStorage.setItem('diet_recent_foods', JSON.stringify(next))
+        return next
+      })
       setSelected(null)
       setAmount(100)
       onClose()
@@ -745,7 +776,7 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
                 {!query && recentFoods.length > 0 && (
                   <>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--tm)', textTransform: 'uppercase', letterSpacing: '.06em', padding: '10px 18px 4px' }}>{tr(lang, 'dietRecentFoods')}</div>
-                    {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as LocalFood).servingSize ?? 100) }} />)}
+                    {recentFoods.map(f => <FoodRow key={f.id} food={f} onSelect={() => { setSelected(f); setAmount((f as any)._amt ?? (f as LocalFood).servingSize ?? 100) }} />)}
                   </>
                 )}
                 <div onClick={() => setCreating('food')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '13px 18px', color: 'var(--green)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderTop: '.5px solid var(--bd)' }}>
@@ -826,6 +857,30 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
                 <button onClick={handleAdd} disabled={adding} style={{ width: '100%', padding: '13px', background: adding ? 'var(--tm)' : 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: adding ? 'default' : 'pointer', fontFamily: 'inherit', opacity: adding ? 0.7 : 1 }}>
                   {adding ? '...' : tr(lang, 'dietAddBtn')}
                 </button>
+                {selected.source !== 'custom' && (
+                  savedToCustom ? (
+                    <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--green)', marginTop: '10px' }}>
+                      ✓ {lang === 'ko' ? '내 음식에 저장됨' : lang === 'vi' ? 'Đã lưu' : 'Saved to My Foods'}
+                    </div>
+                  ) : savingToCustom ? (
+                    <div style={{ marginTop: '10px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <input
+                        value={saveLabel}
+                        onChange={e => setSaveLabel(e.target.value)}
+                        placeholder={lang === 'ko' ? '단위 (1인분, 1개...)' : 'Unit (1 serving...)'}
+                        style={{ flex: 1, padding: '8px 10px', background: 'var(--bg2)', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '13px', color: 'var(--tp)', fontFamily: 'inherit', outline: 'none' }}
+                      />
+                      <button onClick={handleSaveToCustom} style={{ padding: '8px 12px', background: 'var(--tp)', color: 'var(--s2)', border: 'none', borderRadius: 'var(--r)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                        {lang === 'ko' ? '저장' : 'Save'}
+                      </button>
+                      <button onClick={() => setSavingToCustom(false)} style={{ padding: '8px 10px', background: 'none', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', color: 'var(--tm)' }}>✕</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setSavingToCustom(true)} style={{ width: '100%', marginTop: '8px', padding: '10px', background: 'none', border: '.5px solid var(--bd)', borderRadius: 'var(--r)', fontSize: '13px', color: 'var(--ts)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {lang === 'ko' ? '내 음식으로 저장' : lang === 'vi' ? 'Lưu vào thực phẩm' : 'Save to My Foods'} (+{amount}g)
+                    </button>
+                  )
+                )}
               </div>
             )}
           </>
