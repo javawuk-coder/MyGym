@@ -248,7 +248,7 @@ export default function LogPage({
     setSegStartedAt(now)
   }
 
-  // ── 음성 인식: 쉬는 중 자동 ON ──────────────────────────────
+  // ── 음성 인식: 쉬는 중 자동 ON (ko-KR ↔ en-US 교대) ────────
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SR: (new () => any) | undefined = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
@@ -258,33 +258,33 @@ export default function LogPage({
       setVoiceActive(false)
       return
     }
-    const sr = new SR()
-    sr.continuous = true
-    sr.interimResults = false
-    sr.lang = LOCALE_MAP[lang] || 'ko-KR'
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sr.onresult = (e: any) => {
-      const text = e.results[e.results.length - 1][0].transcript.toLowerCase().trim()
-      if (['시작', 'start', 'go'].some(w => text.includes(w))) resumeWorkout()
-    }
-    sr.onerror = () => setVoiceActive(false)
-    sr.onend = () => {
-      if (phaseRef.current === 'resting') {
-        try { sr.start() } catch { /* ignore */ }
-      } else {
-        setVoiceActive(false)
+    const LANGS = ['ko-KR', 'en-US']
+    let langIdx = 0
+    let stopped = false
+    const TRIGGERS = ['시작', 'start', 'go', '스타트']
+    const startSR = () => {
+      if (stopped) return
+      const sr = new SR()
+      sr.continuous = false
+      sr.interimResults = false
+      sr.lang = LANGS[langIdx++ % 2]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sr.onresult = (e: any) => {
+        const text = e.results[e.results.length - 1][0].transcript.toLowerCase().trim()
+        if (TRIGGERS.some(w => text.includes(w))) resumeWorkout()
       }
+      sr.onerror = () => { /* ignore: 다음 세션에서 재시도 */ }
+      sr.onend = () => {
+        if (!stopped && phaseRef.current === 'resting') startSR()
+        else if (!stopped) setVoiceActive(false)
+      }
+      try { sr.start(); srRef.current = sr; setVoiceActive(true) } catch { setVoiceActive(false) }
     }
-    try {
-      sr.start()
-      srRef.current = sr
-      setVoiceActive(true)
-    } catch {
-      setVoiceActive(false)
-    }
+    startSR()
     return () => {
-      sr.onend = null
-      try { sr.stop() } catch { /* ignore */ }
+      stopped = true
+      if (srRef.current) srRef.current.onend = null
+      try { srRef.current?.stop() } catch { /* ignore */ }
       srRef.current = null
       setVoiceActive(false)
     }
