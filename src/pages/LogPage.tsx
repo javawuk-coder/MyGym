@@ -166,7 +166,8 @@ export default function LogPage({
   const segStartRef = useRef<number | null>(null)
   const accWorkRef = useRef(0)
   const accRestRef = useRef(0)
-  const srRef = useRef<SpeechRecognition | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const srRef = useRef<any>(null)
   const [voiceActive, setVoiceActive] = useState(false)
 
   useEffect(() => {
@@ -250,7 +251,7 @@ export default function LogPage({
   // ── 음성 인식: 쉬는 중 자동 ON ──────────────────────────────
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SR: (new () => SpeechRecognition) | undefined = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
+    const SR: (new () => any) | undefined = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
     if (!SR || timerPhase !== 'resting') {
       try { srRef.current?.stop() } catch { /* ignore */ }
       srRef.current = null
@@ -261,7 +262,8 @@ export default function LogPage({
     sr.continuous = true
     sr.interimResults = false
     sr.lang = LOCALE_MAP[lang] || 'ko-KR'
-    sr.onresult = (e: SpeechRecognitionEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sr.onresult = (e: any) => {
       const text = e.results[e.results.length - 1][0].transcript.toLowerCase().trim()
       if (['시작', 'start', 'go'].some(w => text.includes(w))) resumeWorkout()
     }
