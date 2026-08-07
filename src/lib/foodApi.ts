@@ -117,6 +117,8 @@ const KO_DB: LocalFood[] = [
   // ── 분식 ────────────────────────────────────────────────────────────────────
   { id: 'local-tteokbokki', name: '떡볶이', aliases: ['tteokbokki', 'spicy rice cake', 'tteok'], source: 'custom', calories100g: 135, carbs100g: 27.5, protein100g: 3.0, fat100g: 1.5, servingSize: 300, servingLabel: '1인분 (300g)' },
   { id: 'local-sundae', name: '순대', aliases: ['sundae', 'blood sausage', '순대'], source: 'custom', calories100g: 195, carbs100g: 18.0, protein100g: 10.0, fat100g: 8.5, servingSize: 200, servingLabel: '1인분 (200g)' },
+  { id: 'local-sundaeguk', name: '순대국 (순대국밥)', aliases: ['sundaeguk', 'sundae soup', '순대국밥'], source: 'custom', calories100g: 85, carbs100g: 6.0, protein100g: 6.5, fat100g: 3.5, servingSize: 600, servingLabel: '1인분 (600g)' },
+  { id: 'local-haejangguk', name: '해장국 (뼈다귀)', aliases: ['haejangguk', 'hangover soup', '해장국', '뼈해장국'], source: 'custom', calories100g: 55, carbs100g: 2.0, protein100g: 5.5, fat100g: 2.5, servingSize: 600, servingLabel: '1인분 (600g)' },
   { id: 'local-eomuk', name: '어묵 (오뎅)', aliases: ['eomuk', 'odeng', 'fishcake', 'fish cake'], source: 'custom', calories100g: 80, carbs100g: 10.0, protein100g: 7.0, fat100g: 1.5, servingSize: 100, servingLabel: '1회분 (100g)' },
   { id: 'local-twigim', name: '튀김', aliases: ['twigim', 'korean fritter', 'deep fried'], source: 'custom', calories100g: 255, carbs100g: 25.0, protein100g: 6.0, fat100g: 14.0, servingSize: 100, servingLabel: '1회분 (100g)' },
   { id: 'local-hotdog', name: '핫도그 (분식)', aliases: ['hotdog', 'corn dog', 'korean hot dog'], source: 'custom', calories100g: 258, carbs100g: 28.0, protein100g: 7.5, fat100g: 12.5, servingSize: 100, servingLabel: '1개 (100g)' },
@@ -425,10 +427,16 @@ export async function searchFood(query: string, _lang = 'ko'): Promise<FoodItem[
       searchStaticKFoodDB(query),
       fetchKFood(query),
     ])
-    const seen = new Set(localResults.map(f => f.id))
+    const seenId = new Set(localResults.map(f => f.id))
+    const seenKey = new Set(localResults.map(f => `${f.name}|${f.calories100g}`))
     const merged: FoodItem[] = []
     for (const f of [...staticResults, ...apiResults]) {
-      if (!seen.has(f.id)) { seen.add(f.id); merged.push(f) }
+      const key = `${f.name}|${f.calories100g}`
+      if (!seenId.has(f.id) && !seenKey.has(key)) {
+        seenId.add(f.id)
+        seenKey.add(key)
+        merged.push(f)
+      }
     }
     return [...localResults, ...merged]
   }
