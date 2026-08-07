@@ -166,6 +166,8 @@ export default function LogPage({
   const segStartRef = useRef<number | null>(null)
   const accWorkRef = useRef(0)
   const accRestRef = useRef(0)
+  const srRef = useRef<SpeechRecognition | null>(null)
+  const [voiceActive, setVoiceActive] = useState(false)
 
   useEffect(() => {
     if (modal === 'fill' && timerPhase !== 'idle') {
@@ -244,6 +246,47 @@ export default function LogPage({
     setTimerPhase('working')
     setSegStartedAt(now)
   }
+
+  // ── 음성 인식: 쉬는 중 자동 ON ──────────────────────────────
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR: (new () => SpeechRecognition) | undefined = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
+    if (!SR || timerPhase !== 'resting') {
+      try { srRef.current?.stop() } catch { /* ignore */ }
+      srRef.current = null
+      setVoiceActive(false)
+      return
+    }
+    const sr = new SR()
+    sr.continuous = true
+    sr.interimResults = false
+    sr.lang = LOCALE_MAP[lang] || 'ko-KR'
+    sr.onresult = (e: SpeechRecognitionEvent) => {
+      const text = e.results[e.results.length - 1][0].transcript.toLowerCase().trim()
+      if (['시작', 'start', 'go'].some(w => text.includes(w))) resumeWorkout()
+    }
+    sr.onerror = () => setVoiceActive(false)
+    sr.onend = () => {
+      if (phaseRef.current === 'resting') {
+        try { sr.start() } catch { /* ignore */ }
+      } else {
+        setVoiceActive(false)
+      }
+    }
+    try {
+      sr.start()
+      srRef.current = sr
+      setVoiceActive(true)
+    } catch {
+      setVoiceActive(false)
+    }
+    return () => {
+      sr.onend = null
+      try { sr.stop() } catch { /* ignore */ }
+      srRef.current = null
+      setVoiceActive(false)
+    }
+  }, [timerPhase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const segElapsed = segStartedAt !== null ? Date.now() - segStartedAt : 0
   const workMs = accWorkMs + (timerPhase === 'working' ? segElapsed : 0)
@@ -646,6 +689,12 @@ export default function LogPage({
               background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
               fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
             }}>▶ {tr(lang, 'startWorkout')}</button>
+            {voiceActive && (
+              <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+                <span className="mic-pulse">🎤</span>
+                <span>"시작" · "start" · "go"</span>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: '32px', marginTop: '24px' }}>
               {([
                 { label: tr(lang, 'timerTotal'), ms: totalMs, color: '#fff' },
