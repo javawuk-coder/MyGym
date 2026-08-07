@@ -687,9 +687,19 @@ export default function LogPage({
               fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
             }}>▶ {tr(lang, 'startWorkout')}</button>
             {voiceActive && (
-              <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                <span className="mic-pulse">🎤</span>
-                <span>{lang === 'ko' ? '"시작"' : '"start" · "go"'}</span>
+              <div style={{
+                marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px',
+                background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.1)',
+                borderRadius: '20px', padding: '7px 16px',
+              }}>
+                <span className="mic-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#1D9E75', display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                  {lang === 'ko' ? '듣는 중' : 'Listening'}
+                </span>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>·</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>
+                  {lang === 'ko' ? '"시작" 이라고 말해보세요' : 'Say "start" or "go"'}
+                </span>
               </div>
             )}
             <div style={{ display: 'flex', gap: '32px', marginTop: '24px' }}>
