@@ -478,7 +478,15 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
 
   function makeEntry(food: FoodItem, amt: number): DietEntry {
     const n = calcEntryNutrition(food, amt)
-    return { foodId: food.id, name: food.name, brand: food.brand, amount: amt, unit: 'g', source: food.source, ...n }
+    return {
+      foodId: food.id,
+      name: food.name,
+      ...(food.brand !== undefined && { brand: food.brand }),
+      amount: amt,
+      unit: 'g',
+      source: food.source,
+      ...n,
+    }
   }
 
   async function handleAdd() {
