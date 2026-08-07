@@ -27,7 +27,7 @@ export function useDietLogs(uid: string | undefined) {
     const log = getLog(date)
     const updated: DietLog = {
       ...log,
-      meals: { ...log.meals, [slot]: [...log.meals[slot], entry] },
+      meals: { ...log.meals, [slot]: [...(log.meals[slot] ?? []), entry] },
     }
     await setDoc(doc(db, 'users', uid, 'dietLogs', date), updated)
   }
@@ -37,7 +37,7 @@ export function useDietLogs(uid: string | undefined) {
     const log = getLog(date)
     const updated: DietLog = {
       ...log,
-      meals: { ...log.meals, [slot]: [...log.meals[slot], ...entries] },
+      meals: { ...log.meals, [slot]: [...(log.meals[slot] ?? []), ...entries] },
     }
     await setDoc(doc(db, 'users', uid, 'dietLogs', date), updated)
   }
@@ -45,7 +45,7 @@ export function useDietLogs(uid: string | undefined) {
   async function removeEntry(date: string, slot: MealSlotKey, index: number) {
     if (!uid) return
     const log = getLog(date)
-    const newSlot = log.meals[slot].filter((_, i) => i !== index)
+    const newSlot = (log.meals[slot] ?? []).filter((_, i) => i !== index)
     await setDoc(doc(db, 'users', uid, 'dietLogs', date), {
       ...log, meals: { ...log.meals, [slot]: newSlot },
     })

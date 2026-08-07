@@ -420,6 +420,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   const [selected, setSelected] = useState<FoodItem | null>(null)
   const [amount, setAmount] = useState(100)
   const [servingCount, setServingCount] = useState(1)
+  const [addError, setAddError] = useState<string | null>(null)
+  const [adding, setAdding] = useState(false)
 
   useEffect(() => {
     setServingCount(1)
@@ -480,11 +482,20 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   }
 
   async function handleAdd() {
-    if (!selected) return
-    await onAdd(makeEntry(selected, amount))
-    setSelected(null)
-    setAmount(100)
-    onClose()
+    if (!selected || adding) return
+    setAddError(null)
+    setAdding(true)
+    try {
+      await onAdd(makeEntry(selected, amount))
+      setSelected(null)
+      setAmount(100)
+      onClose()
+    } catch (e) {
+      console.error('Diet add failed:', e)
+      setAddError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setAdding(false)
+    }
   }
 
   async function handleAddTemplate(tpl: MealTemplate) {
@@ -799,8 +810,13 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
                     </>
                   )
                 })()}
-                <button onClick={handleAdd} style={{ width: '100%', padding: '13px', background: 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: 'pointer', fontFamily: 'inherit' }}>
-                  {tr(lang, 'dietAddBtn')}
+                {addError && (
+                  <div style={{ fontSize: '12px', color: '#c0392b', background: '#fff0f0', border: '.5px solid #f5c6c6', borderRadius: 'var(--r)', padding: '8px 12px', marginBottom: '8px' }}>
+                    {addError}
+                  </div>
+                )}
+                <button onClick={handleAdd} disabled={adding} style={{ width: '100%', padding: '13px', background: adding ? 'var(--tm)' : 'var(--green)', color: '#fff', fontSize: '15px', fontWeight: 800, border: 'none', borderRadius: 'var(--r)', cursor: adding ? 'default' : 'pointer', fontFamily: 'inherit', opacity: adding ? 0.7 : 1 }}>
+                  {adding ? '...' : tr(lang, 'dietAddBtn')}
                 </button>
               </div>
             )}
