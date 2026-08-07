@@ -185,6 +185,7 @@ export interface CustomFood {
   protein100g: number
   fat100g: number
   servingSize?: number
+  servingLabel?: string
   createdAt?: unknown
 }
 

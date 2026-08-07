@@ -480,8 +480,8 @@ function FoodSearchModal({ lang, slotLabel, favorites, customFoods, templates, i
   function foodItemToFoodType(fav: FavoriteFood): FoodItem {
     return { id: fav.id, name: fav.name, brand: fav.brand, calories100g: fav.calories100g, carbs100g: fav.carbs100g, protein100g: fav.protein100g, fat100g: fav.fat100g, source: fav.source }
   }
-  function customToFoodType(c: CustomFood): FoodItem {
-    return { id: c.id, name: c.name, brand: c.brand, calories100g: c.calories100g, carbs100g: c.carbs100g, protein100g: c.protein100g, fat100g: c.fat100g, source: 'custom' }
+  function customToFoodType(c: CustomFood): LocalFood {
+    return { id: c.id, name: c.name, brand: c.brand, calories100g: c.calories100g, carbs100g: c.carbs100g, protein100g: c.protein100g, fat100g: c.fat100g, source: 'custom', servingSize: c.servingSize, servingLabel: c.servingLabel }
   }
 
   function makeEntry(food: FoodItem, amt: number): DietEntry {
