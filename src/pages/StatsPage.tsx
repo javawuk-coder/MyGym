@@ -55,9 +55,14 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
   )
   const workoutDays = filtered.filter(l => l.exercises.length).length
 
-  // Volume chart data
+  // Volume chart data (유산소: 60분 = 5000kg 환산)
   const exVol = (exercises: typeof filtered[0]['exercises']) =>
     exercises.reduce((a, e) => a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0), 0)
+  const exChartVol = (exercises: typeof filtered[0]['exercises']) =>
+    exercises.reduce((a, e) => {
+      if (e.log_type === 'cardio') return a + ((e.time || 0) / 60) * 5000
+      return a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0)
+    }, 0)
 
   type ChartPoint = { label: string; vol: number; showLabel: boolean }
   const chartData: ChartPoint[] = (() => {
@@ -65,7 +70,7 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
       return Array.from({ length: 7 }, (_, i) => {
         const d = new Date(Date.now() - (6 - i) * 86400000)
         const log = filtered.find(l => l.date === d.toISOString().slice(0, 10))
-        return { label: DAY_NAMES[lang][d.getDay()], vol: log ? exVol(log.exercises) : 0, showLabel: true }
+        return { label: DAY_NAMES[lang][d.getDay()], vol: log ? exChartVol(log.exercises) : 0, showLabel: true }
       })
     }
     if (periodDays === 30) {
@@ -75,7 +80,7 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
         const log = filtered.find(l => l.date === d.toISOString().slice(0, 10))
         return {
           label: `${d.getMonth() + 1}/${d.getDate()}`,
-          vol: log ? exVol(log.exercises) : 0,
+          vol: log ? exChartVol(log.exercises) : 0,
           showLabel: d.getDay() === startDow,
         }
       })
@@ -87,13 +92,13 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
         const start = new Date(Date.now() - (ago + 1) * 7 * 86400000)
         const vol = filtered
           .filter(l => l.date > start.toISOString().slice(0, 10) && l.date <= end.toISOString().slice(0, 10))
-          .reduce((a, l) => a + exVol(l.exercises), 0)
+          .reduce((a, l) => a + exChartVol(l.exercises), 0)
         return { label: `${start.getMonth() + 1}/${start.getDate()}`, vol, showLabel: i % 3 === 0 || i === 12 }
       })
     }
     // 전체: monthly
     const mm: Record<string, number> = {}
-    filtered.forEach(l => { mm[l.date.slice(0, 7)] = (mm[l.date.slice(0, 7)] || 0) + exVol(l.exercises) })
+    filtered.forEach(l => { mm[l.date.slice(0, 7)] = (mm[l.date.slice(0, 7)] || 0) + exChartVol(l.exercises) })
     const sorted = Object.entries(mm).sort(([a], [b]) => a.localeCompare(b))
     const step = Math.max(1, Math.ceil(sorted.length / 6))
     return sorted.map(([m, vol], i) => ({

@@ -282,12 +282,16 @@ export default function LogPage({
   const firstDow = new Date(calYear, calMonthNum - 1, 1).getDay()
   const daysInMonth = new Date(calYear, calMonthNum, 0).getDate()
 
-  // 이달 최대 볼륨 (색 정규화용)
-  const monthVolumes = Array.from({ length: daysInMonth }, (_, i) => {
+  // 이달 날짜별 운동 타입 (calendar circle color)
+  const monthDayColors = Array.from({ length: daysInMonth }, (_, i) => {
     const d = `${calMonth}-${String(i + 1).padStart(2, '0')}`
-    return daySummary(logMap[d])?.vol ?? 0
+    const dayLog = logMap[d]
+    if (!dayLog?.exercises?.length) return null
+    const types = dayLog.exercises.map(e => e.log_type || 'weight_reps')
+    if (types.some(t => t === 'weight_reps' || t === 'reps_only')) return 'weight'
+    if (types.some(t => t === 'cardio')) return 'cardio'
+    return 'hiit'
   })
-  const maxMonthVol = Math.max(...monthVolumes, 1)
 
   const prevMonth = () => {
     const d = new Date(calYear, calMonthNum - 2, 1)
@@ -779,6 +783,19 @@ export default function LogPage({
       {installBanner}
       {/* ── 달력 ── */}
       <div className="card" style={{ marginBottom: '16px', padding: '14px 16px' }}>
+        {/* 범례 */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '10px', flexWrap: 'wrap' }}>
+          {([
+            { color: '#378ADD', key: 'calLegendWeight' },
+            { color: '#1D9E75', key: 'calLegendCardio' },
+            { color: '#E24B4A', key: 'calLegendHiit' },
+          ] as const).map(({ color, key }) => (
+            <span key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--tm)' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, display: 'inline-block', flexShrink: 0 }} />
+              {tr(lang, key)}
+            </span>
+          ))}
+        </div>
         {/* 월 네비게이션 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <button className="idb" onClick={prevMonth}><IconChevronLeft size={16} /></button>
@@ -805,9 +822,10 @@ export default function LogPage({
           {Array.from({ length: daysInMonth }, (_, i) => {
             const day = i + 1
             const dateStr = `${calMonth}-${String(day).padStart(2, '0')}`
-            const vol = monthVolumes[i]
-            const hasLog = vol > 0
-            const circleSize = hasLog ? Math.round(8 + (vol / maxMonthVol) * 22) : 0
+            const dayColor = monthDayColors[i]
+            const hasLog = dayColor !== null
+            const circleSize = 28
+            const circleColor = dayColor === 'weight' ? 'rgba(55, 138, 221, 0.22)' : dayColor === 'cardio' ? 'rgba(29, 158, 117, 0.22)' : 'rgba(226, 75, 74, 0.22)'
             const isSelected = dateStr === selectedDate
             const isToday = dateStr === todayStr
             const isFuture = dateStr > todayStr
@@ -827,7 +845,7 @@ export default function LogPage({
                     position: 'absolute', top: '50%', left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: `${circleSize}px`, height: `${circleSize}px`,
-                    borderRadius: '50%', background: 'rgba(24, 95, 165, 0.22)',
+                    borderRadius: '50%', background: circleColor,
                     pointerEvents: 'none',
                   }} />
                 )}
