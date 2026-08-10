@@ -270,6 +270,15 @@
         "log_type":  "weight_reps"
     },
     {
+        "id":  "chest_31",
+        "name":  "Seated Cable Fly",
+        "ko":  "시티드 케이블 플라이",
+        "muscle":  "chest",
+        "equipment":  "cable",
+        "type":  "isolation",
+        "log_type":  "weight_reps"
+    },
+    {
         "id":  "back_01",
         "name":  "Conventional Deadlift",
         "ko":  "컨벤셔널 데드리프트",
