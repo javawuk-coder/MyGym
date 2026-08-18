@@ -130,9 +130,13 @@ export default function LogPage({
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
   const acquireWakeLock = async () => {
     try {
-      if ('wakeLock' in navigator) {
-        wakeLockRef.current = await navigator.wakeLock.request('screen')
-      }
+      if (!('wakeLock' in navigator)) return
+      const sentinel = await navigator.wakeLock.request('screen')
+      wakeLockRef.current = sentinel
+      sentinel.addEventListener('release', () => {
+        if (wakeLockRef.current === sentinel) wakeLockRef.current = null
+        if (phaseRef.current !== 'idle') acquireWakeLock()
+      })
     } catch { /* 권한 거부 시 무시 */ }
   }
   const releaseWakeLock = () => {
@@ -166,9 +170,6 @@ export default function LogPage({
   const segStartRef = useRef<number | null>(null)
   const accWorkRef = useRef(0)
   const accRestRef = useRef(0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const srRef = useRef<any>(null)
-  const [voiceActive, setVoiceActive] = useState(false)
 
   useEffect(() => {
     if (modal === 'fill' && timerPhase !== 'idle') {
@@ -247,43 +248,6 @@ export default function LogPage({
     setTimerPhase('working')
     setSegStartedAt(now)
   }
-
-  // ── 음성 인식: 쉬는 중 자동 ON ──────────────────────────────
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SR: (new () => any) | undefined = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition
-    if (!SR || timerPhase !== 'resting') {
-      try { srRef.current?.stop() } catch { /* ignore */ }
-      srRef.current = null
-      setVoiceActive(false)
-      return
-    }
-    const TRIGGERS = lang === 'ko' ? ['시작'] : ['start', 'go']
-    const sr = new SR()
-    sr.continuous = true
-    sr.interimResults = false
-    sr.lang = LOCALE_MAP[lang] || 'ko-KR'
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sr.onresult = (e: any) => {
-      const text = e.results[e.results.length - 1][0].transcript.toLowerCase().trim()
-      if (TRIGGERS.some(w => text.includes(w))) resumeWorkout()
-    }
-    sr.onerror = () => { /* ignore */ }
-    sr.onend = () => {
-      if (phaseRef.current === 'resting') {
-        try { sr.start() } catch { /* ignore */ }
-      } else {
-        setVoiceActive(false)
-      }
-    }
-    try { sr.start(); srRef.current = sr; setVoiceActive(true) } catch { setVoiceActive(false) }
-    return () => {
-      sr.onend = null
-      try { sr.stop() } catch { /* ignore */ }
-      srRef.current = null
-      setVoiceActive(false)
-    }
-  }, [timerPhase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const segElapsed = segStartedAt !== null ? Date.now() - segStartedAt : 0
   const workMs = accWorkMs + (timerPhase === 'working' ? segElapsed : 0)
@@ -686,22 +650,6 @@ export default function LogPage({
               background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer',
               fontSize: '22px', fontWeight: 700, fontFamily: 'inherit',
             }}>▶ {tr(lang, 'startWorkout')}</button>
-            {voiceActive && (
-              <div style={{
-                marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.1)',
-                borderRadius: '20px', padding: '7px 16px',
-              }}>
-                <span className="mic-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#1D9E75', display: 'inline-block', flexShrink: 0 }} />
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
-                  {lang === 'ko' ? '듣는 중' : 'Listening'}
-                </span>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>·</span>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>
-                  {lang === 'ko' ? '"시작" 이라고 말해보세요' : 'Say "start" or "go"'}
-                </span>
-              </div>
-            )}
             <div style={{ display: 'flex', gap: '32px', marginTop: '24px' }}>
               {([
                 { label: tr(lang, 'timerTotal'), ms: totalMs, color: '#fff' },
