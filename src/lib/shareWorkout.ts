@@ -51,7 +51,7 @@ export async function shareWorkout({ log, exNames, unit, dateLabel }: ShareWorko
   const exes = log.exercises
 
   // measure height
-  const ROW_H = 38
+  const ROW_H = 46
   const headerH = 24 + 20 + 8 + 20 + 32 + 56 + 16 + 1 + 16
   const footerH = 20 + PAD
   const H = headerH + exes.length * ROW_H + footerH
@@ -122,7 +122,7 @@ export async function shareWorkout({ log, exNames, unit, dateLabel }: ShareWorko
   ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke()
   y += 16
 
-  // exercise rows
+  // exercise rows — 2-line layout (name above, detail below) to avoid overlap
   for (let i = 0; i < exes.length; i++) {
     const entry = exes[i]
     const name = exNames[entry.exId] || entry.exId
@@ -134,18 +134,13 @@ export async function shareWorkout({ log, exNames, unit, dateLabel }: ShareWorko
       ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke()
     }
 
-    const rowMid = y + ROW_H / 2
-
-    // exercise name
     ctx.fillStyle = 'rgba(255,255,255,0.82)'
     ctx.font = `400 13px ${font}`
-    ctx.fillText(name, PAD, rowMid + 5)
+    ctx.fillText(name, PAD, y + 16)
 
-    // detail (right-aligned)
     ctx.fillStyle = 'rgba(255,255,255,0.38)'
-    ctx.font = `400 12px ${font}`
-    const detailW = ctx.measureText(detail).width
-    ctx.fillText(detail, W - PAD - detailW, rowMid + 5)
+    ctx.font = `400 11px ${font}`
+    ctx.fillText(detail, PAD, y + 30)
 
     y += ROW_H
   }
