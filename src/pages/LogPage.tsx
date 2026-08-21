@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown, IconBarbell } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown, IconBarbell, IconShare } from '@tabler/icons-react'
 import type { Exercise, DayLog, LogEntry, LogType, Routine, RoutineExercise, ExerciseSet } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
+import { shareWorkout } from '../lib/shareWorkout'
 const MB: Record<string, string> = {
   chest: 'bc', back: 'bb', legs: 'bl', shoulder: 'bs', arm: 'ba',
   core: 'bco', glute: 'bg', hiit: 'bhiit', cardio: 'bcard', custom: 'bx',
@@ -881,9 +882,28 @@ export default function LogPage({
             </div>
           )}
         </div>
-        <button className="btn btn-p" onClick={() => setModal('pick')}>
-          <IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'add')}
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {selectedLog && selectedLog.exercises.length > 0 && (
+            <button className="idb" title="공유" onClick={() => {
+              const exNamesMap: Record<string, string> = {}
+              for (const e of selectedLog.exercises) {
+                const x = allExercises.find(ex => ex.id === e.exId)
+                exNamesMap[e.exId] = x ? exName(x, lang).main : e.exId
+              }
+              shareWorkout({
+                log: selectedLog,
+                exNames: exNamesMap,
+                unit,
+                dateLabel: formatDateHeader(selectedDate, LOCALE_MAP[lang]),
+              })
+            }}>
+              <IconShare size={16} />
+            </button>
+          )}
+          <button className="btn btn-p" onClick={() => setModal('pick')}>
+            <IconPlus size={14} style={{ marginRight: 4 }} />{tr(lang, 'add')}
+          </button>
+        </div>
       </div>
 
       {!selectedLog || !selectedLog.exercises.length ? (
