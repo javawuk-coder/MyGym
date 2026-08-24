@@ -28,12 +28,15 @@ function fmtTime(ms: number) {
 
 interface SetRow { weight: string; reps: string; duration: string }
 interface DraftEx {
+  draftId: string  // stable across reorder/delete — used as setKey prefix
   exId: string
   rows: SetRow[]
   cardio: { dist: string; time: string; cal: string }
   exNote: string
 }
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
+let _draftSeq = 0
+function newDraftId() { return String(++_draftSeq) }
 
 function makeRows(count: number, reps?: number, weight?: number): SetRow[] {
   return Array.from({ length: count }, () => ({
@@ -47,7 +50,7 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg'
   return routine.exercises.map(re => {
     const ex = allExercises.find(e => e.id === re.exId)
     const lt = ex?.log_type || 'weight_reps'
-    if (lt === 'cardio') return { exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, exNote: re.note ?? '' }
+    if (lt === 'cardio') return { draftId: newDraftId(), exId: re.exId, rows: [], cardio: { dist: '', time: '', cal: '' }, exNote: re.note ?? '' }
     // 가장 최근 로그에서 해당 운동의 마지막 세트 값 추출
     let histWeight: number | undefined
     let histReps: number | undefined
@@ -72,6 +75,7 @@ function draftFromRoutine(routine: Routine, allExercises: Exercise[], unit: 'kg'
     const rows = makeRows(re.sets || 3, prefilledReps, displayWeight)
     if (histDuration != null) rows.forEach(r => { r.duration = String(histDuration) })
     return {
+      draftId: newDraftId(),
       exId: re.exId,
       rows,
       cardio: { dist: '', time: '', cal: '' },
@@ -164,7 +168,7 @@ export default function LogPage({
   const [, setTick] = useState(0)                 // 1초마다 re-render용
   const [completedSets, setCompletedSets] = useState<Set<string>>(new Set())
   const [lastCompletedLabel, setLastCompletedLabel] = useState('')
-  const [lastCompletedDi, setLastCompletedDi] = useState(-1)
+  const [lastCompletedDraftId, setLastCompletedDraftId] = useState<string | null>(null)
   const [lastCompletedRi, setLastCompletedRi] = useState(-1)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseRef = useRef<'idle' | 'working' | 'resting'>('idle')
@@ -196,7 +200,7 @@ export default function LogPage({
     setTick(0)
     setCompletedSets(new Set())
     setLastCompletedLabel('')
-    setLastCompletedDi(-1)
+    setLastCompletedDraftId(null)
     setLastCompletedRi(-1)
   }
 
@@ -207,11 +211,13 @@ export default function LogPage({
       accWorkRef.current += now - segStartRef.current
       setAccWorkMs(accWorkRef.current)
     }
-    const [diStr, riStr] = key.split('-')
-    const di = parseInt(diStr, 10)
-    const ri = parseInt(riStr, 10)
+    // key = "${draftId}-${ri}" — draftId is stable across reorder/delete
+    const lastDash = key.lastIndexOf('-')
+    const draftId = key.slice(0, lastDash)
+    const ri = parseInt(key.slice(lastDash + 1), 10)
+    const di = draftExes.findIndex(d => d.draftId === draftId)
     setLastCompletedLabel(label)
-    setLastCompletedDi(di)
+    setLastCompletedDraftId(draftId)
     setLastCompletedRi(ri)
     phaseRef.current = 'resting'
     segStartRef.current = now
@@ -224,7 +230,8 @@ export default function LogPage({
       for (let d = di; d < draftExes.length; d++) {
         const startRi = d === di ? ri + 1 : 0
         for (let r = startRi; r < draftExes[d].rows.length; r++) {
-          if (!next.has(`${d}-${r}`)) { nextKey = `${d}-${r}`; break }
+          const k = `${draftExes[d].draftId}-${r}`
+          if (!next.has(k)) { nextKey = k; break }
         }
         if (nextKey) break
       }
@@ -255,7 +262,8 @@ export default function LogPage({
   const restMs = accRestMs + (timerPhase === 'resting' ? segElapsed : 0)
   const currentRestMs = timerPhase === 'resting' ? segElapsed : 0  // 현재 휴식 세션만 (오버레이용)
   const totalMs = workMs + restMs
-  // 다음 세트 (같은 운동, 다음 row)
+  // 다음 세트 (같은 운동, 다음 row) — di를 draftId로 동적 조회해 reorder/delete 후에도 정확
+  const lastCompletedDi = lastCompletedDraftId != null ? draftExes.findIndex(d => d.draftId === lastCompletedDraftId) : -1
   const sameExDraft = lastCompletedDi >= 0 ? (draftExes[lastCompletedDi] ?? null) : null
   const hasNextSetInEx = sameExDraft !== null && lastCompletedRi >= 0 && lastCompletedRi + 1 < sameExDraft.rows.length
   const sameExEntry = sameExDraft ? (allExercises.find(e => e.id === sameExDraft.exId) ?? null) : null
@@ -358,10 +366,25 @@ export default function LogPage({
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: [...d.rows, { weight: '', reps: '', duration: '' }],
     }))
-  const removeRow = (di: number, ri: number) =>
+  const removeRow = (di: number, ri: number) => {
+    const draftId = draftExes[di]?.draftId
+    if (draftId) {
+      setCompletedSets(prev => {
+        const next = new Set<string>()
+        for (const k of prev) {
+          if (!k.startsWith(`${draftId}-`)) { next.add(k); continue }
+          const kr = parseInt(k.slice(k.lastIndexOf('-') + 1), 10)
+          if (kr < ri) next.add(k)
+          else if (kr > ri) next.add(`${draftId}-${kr - 1}`)
+          // kr === ri: deleted row, drop it
+        }
+        return next
+      })
+    }
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, rows: d.rows.filter((_, j) => j !== ri),
     }))
+  }
   const updateCardio = (di: number, field: 'dist' | 'time' | 'cal', val: string) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : {
       ...d, cardio: { ...d.cardio, [field]: val },
@@ -384,7 +407,7 @@ export default function LogPage({
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : { ...d, exNote: val }))
 
   const addDraftEx = (exId: string) => {
-    setDraftExes(prev => [...prev, { exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }])
+    setDraftExes(prev => [...prev, { draftId: newDraftId(), exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }])
     setAddExSearch(''); setShowAddExInFill(false)
   }
 
@@ -402,7 +425,7 @@ export default function LogPage({
     startWorkout(); acquireWakeLock()
   }
   const openExFill = (exId: string) => {
-    setFillTitle(''); setDraftExes([{ exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }]); setModal('fill')
+    setFillTitle(''); setDraftExes([{ draftId: newDraftId(), exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }]); setModal('fill')
     history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
   }
@@ -410,7 +433,7 @@ export default function LogPage({
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
     setCurrentRoutineId(null)
-    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDi(-1); setLastCompletedRi(-1)
+    setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDraftId(null); setLastCompletedRi(-1)
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
     releaseWakeLock()
@@ -571,7 +594,7 @@ export default function LogPage({
                 <span /><span />
               </div>
               {d.rows.map((row, ri) => {
-                const setKey = `${di}-${ri}`
+                const setKey = `${d.draftId}-${ri}`
                 const isDone = completedSets.has(setKey)
                 const setLabel = `${tr(lang, 'setLabel')} ${ri + 1} — ${nm.main}`
                 return (
