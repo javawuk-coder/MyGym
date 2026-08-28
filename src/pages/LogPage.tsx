@@ -10,13 +10,21 @@ const MB: Record<string, string> = {
 }
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-function playBeep(freq: number, duration: number, vol: number) {
+function playBeep(freq: number, duration: number, vol: number, type: OscillatorType = 'sine') {
   try {
     const ctx = new AudioContext()
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
+    const comp = ctx.createDynamicsCompressor()
+    comp.threshold.value = -6
+    comp.knee.value = 3
+    comp.ratio.value = 4
+    comp.attack.value = 0.001
+    comp.release.value = 0.1
+    osc.type = type
     osc.connect(gain)
-    gain.connect(ctx.destination)
+    gain.connect(comp)
+    comp.connect(ctx.destination)
     osc.frequency.value = freq
     gain.gain.setValueAtTime(vol, ctx.currentTime)
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
@@ -263,9 +271,9 @@ export default function LogPage({
   useEffect(() => {
     if (tabataState?.phase === 'done') setShowFinishConfirm(true)
     // Phase-start beep: signals work/rest/setRest transition
-    if (tabataState?.phase === 'work') playBeep(1047, 0.12, 0.4)       // C6 — energetic
-    else if (tabataState?.phase === 'rest') playBeep(659, 0.12, 0.3)    // E5 — softer
-    else if (tabataState?.phase === 'setRest') playBeep(440, 0.2, 0.3)  // A4 — low, long rest
+    if (tabataState?.phase === 'work') playBeep(880, 0.18, 1.0, 'square')
+    else if (tabataState?.phase === 'rest') playBeep(659, 0.18, 0.9, 'sine')
+    else if (tabataState?.phase === 'setRest') playBeep(440, 0.3, 0.9, 'sine')
   }, [tabataState?.phase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Countdown beep: last 5 seconds of each phase
@@ -274,8 +282,8 @@ export default function LogPage({
     const { phase, seconds } = tabataState
     if (phase === 'ready' || phase === 'done' || seconds <= 0 || seconds > 5) return
     // seconds 5→4→3→2: short beep. seconds 1: final beep (higher, longer)
-    if (seconds === 1) playBeep(1319, 0.22, 0.45)  // E6 — final
-    else playBeep(880, 0.07, 0.25)                  // A5 — tick
+    if (seconds === 1) playBeep(1319, 0.25, 1.0, 'square')
+    else playBeep(880, 0.1, 0.8, 'sine')
   }, [tabataState?.seconds]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const startWorkout = () => {
@@ -833,7 +841,7 @@ export default function LogPage({
                 })()}
 
                 {/* Countdown */}
-                <div style={{ fontSize: tabata.seconds >= 100 ? '110px' : '140px', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: tabataPhaseColor }}>
+                <div style={{ fontSize: tabata.seconds >= 100 ? '130px' : '160px', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: tabataPhaseColor }}>
                   {tabata.seconds}
                 </div>
 
@@ -848,14 +856,18 @@ export default function LogPage({
                 })()}
 
                 {/* Progress */}
-                <div style={{ display: 'flex', gap: '28px', marginTop: '28px' }}>
+                <div style={{ display: 'flex', gap: '0', marginTop: '28px' }}>
                   {[
                     { label: tr(lang, 'tabataExLabel'), val: `${tabata.ex + 1}/${tabata.exCount}` },
                     { label: tr(lang, 'tabataRoundLabel'), val: `${tabata.round}/${tabata.totalRounds}` },
-                  ].map(({ label, val }) => (
-                    <div key={label} style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>{label}</div>
-                      <div style={{ fontSize: '18px', fontWeight: 600, color: 'rgba(255,255,255,0.75)', fontVariantNumeric: 'tabular-nums' }}>{val}</div>
+                    { label: tr(lang, 'tabataSetLabel'), val: `${tabata.set}/${tabata.totalSets}` },
+                  ].map(({ label, val }, i) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'stretch' }}>
+                      {i > 0 && <div style={{ width: '0.5px', background: 'rgba(255,255,255,0.12)', margin: '4px 20px' }} />}
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>{label}</div>
+                        <div style={{ fontSize: '22px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', fontVariantNumeric: 'tabular-nums' }}>{val}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
