@@ -224,25 +224,35 @@ export default function LogPage({
     segStartRef.current = now
     setTimerPhase('resting')
     setSegStartedAt(now)
+
+    // 이 세트까지 완료했을 때 남은 세트가 있는지 미리 확인
+    const nextCompleted = new Set([...completedSets, key])
+    const allDone = draftExes.every(d => d.rows.every((_, r) => nextCompleted.has(`${d.draftId}-${r}`)))
+
     setCompletedSets(prev => {
       const next = new Set([...prev, key])
-      // 다음 미완료 set으로 스크롤
-      let nextKey: string | null = null
-      for (let d = di; d < draftExes.length; d++) {
-        const startRi = d === di ? ri + 1 : 0
-        for (let r = startRi; r < draftExes[d].rows.length; r++) {
-          const k = `${draftExes[d].draftId}-${r}`
-          if (!next.has(k)) { nextKey = k; break }
+      if (!allDone) {
+        // 다음 미완료 set으로 스크롤
+        let nextKey: string | null = null
+        for (let d = di; d < draftExes.length; d++) {
+          const startRi = d === di ? ri + 1 : 0
+          for (let r = startRi; r < draftExes[d].rows.length; r++) {
+            const k = `${draftExes[d].draftId}-${r}`
+            if (!next.has(k)) { nextKey = k; break }
+          }
+          if (nextKey) break
         }
-        if (nextKey) break
-      }
-      if (nextKey) {
-        setTimeout(() => {
-          document.getElementById(`set-${nextKey}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }, 150)
+        if (nextKey) {
+          setTimeout(() => {
+            document.getElementById(`set-${nextKey}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }, 150)
+        }
       }
       return next
     })
+
+    // 모든 세트 완료 시 휴식 오버레이 대신 운동 완료 확인 다이얼로그 표시
+    if (allDone) setShowFinishConfirm(true)
   }
 
   // 시작 버튼 → 휴식 시간 누적, 운동 시작
@@ -773,7 +783,7 @@ export default function LogPage({
             <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '8px' }}>{tr(lang, 'confirmFinishWorkout')}</div>
             <div style={{ fontSize: '14px', color: 'var(--tm)', marginBottom: '24px' }}>{tr(lang, 'confirmFinishWorkoutBody')}</div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button className="btn" onClick={() => setShowFinishConfirm(false)}
+              <button className="btn" onClick={() => { setShowFinishConfirm(false); resumeWorkout() }}
                 style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutCancel')}</button>
               <button className="btn btn-p" onClick={() => { setShowFinishConfirm(false); save() }}
                 style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutOk')}</button>
