@@ -14,7 +14,7 @@ const strings = {
     // tabata timer
     tabataStart: '시작', tabataPause: '일시정지', tabataResume: '▶ 재개',
     tabataSkip: '⏭ 스킵', tabataEnd: '종료',
-    tabataWork: '운동', tabataRest: '휴식', tabataSetRest: '세트 휴식',
+    tabataPrepare: '준비', tabataWork: '운동', tabataRest: '휴식', tabataSetRest: '세트 휴식',
     tabataSetLabel: '세트', tabataRoundLabel: '라운드', tabataExLabel: '운동',
     tabataNext: '다음',
     // log page
@@ -207,7 +207,7 @@ const strings = {
     justCompleted: 'Just done', nextSet: 'Next set', nextExercise: 'Next exercise', setLabel: 'Set',
     tabataStart: 'Start', tabataPause: 'Pause', tabataResume: '▶ Resume',
     tabataSkip: '⏭ Skip', tabataEnd: 'End',
-    tabataWork: 'Work', tabataRest: 'Rest', tabataSetRest: 'Set Rest',
+    tabataPrepare: 'Get Ready', tabataWork: 'Work', tabataRest: 'Rest', tabataSetRest: 'Set Rest',
     tabataSetLabel: 'Set', tabataRoundLabel: 'Round', tabataExLabel: 'Exercise',
     tabataNext: 'Next',
     addWorkout: 'Add workout', addFromRoutine: 'Add from routine', addExercise: 'Add exercise',
@@ -388,7 +388,7 @@ const strings = {
     justCompleted: 'Vừa xong', nextSet: 'Set tiếp theo', nextExercise: 'Bài tiếp theo', setLabel: 'Set',
     tabataStart: 'Bắt đầu', tabataPause: 'Tạm dừng', tabataResume: '▶ Tiếp tục',
     tabataSkip: '⏭ Bỏ qua', tabataEnd: 'Kết thúc',
-    tabataWork: 'Tập', tabataRest: 'Nghỉ', tabataSetRest: 'Nghỉ set',
+    tabataPrepare: 'Chuẩn bị', tabataWork: 'Tập', tabataRest: 'Nghỉ', tabataSetRest: 'Nghỉ set',
     tabataSetLabel: 'Set', tabataRoundLabel: 'Hiệp', tabataExLabel: 'Bài',
     tabataNext: 'Tiếp theo',
     addWorkout: 'Thêm bài tập', addFromRoutine: 'Thêm từ lịch tập', addExercise: 'Thêm bài tập lẻ',

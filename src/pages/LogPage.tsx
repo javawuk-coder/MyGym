@@ -53,7 +53,7 @@ interface DraftEx {
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
 
 interface TabataState {
-  phase: 'ready' | 'work' | 'rest' | 'setRest' | 'done'
+  phase: 'ready' | 'prepare' | 'work' | 'rest' | 'setRest' | 'done'
   seconds: number
   set: number; ex: number; round: number; paused: boolean
   workSec: number; restSec: number; setRestSec: number
@@ -68,16 +68,24 @@ function initTabata(fmt: WorkoutFormat, exCount: number): TabataState {
   }
 }
 function nextTabataState(s: TabataState): TabataState {
+  if (s.phase === 'prepare') return { ...s, phase: 'work', seconds: s.workSec }
   if (s.phase === 'work') {
-    if (s.round >= s.totalRounds && s.ex >= s.exCount - 1 && s.set >= s.totalSets)
-      return { ...s, phase: 'done', seconds: 0 }
+    const lastRound = s.round >= s.totalRounds
+    const lastEx = s.ex >= s.exCount - 1
+    // 블록 끝 (마지막 라운드 × 마지막 운동)
+    if (lastRound && lastEx) {
+      if (s.set >= s.totalSets) return { ...s, phase: 'done', seconds: 0 }
+      // 세트 간 휴식으로 직접 이동 — restSec 중복 없이
+      return { ...s, set: s.set + 1, ex: 0, round: 1, phase: 'setRest', seconds: s.setRestSec }
+    }
+    // 그 외: 일반 rest
     return { ...s, phase: 'rest', seconds: s.restSec }
   }
   if (s.phase === 'rest') {
+    // 같은 운동 다음 라운드
     if (s.round < s.totalRounds) return { ...s, round: s.round + 1, phase: 'work', seconds: s.workSec }
-    if (s.ex < s.exCount - 1) return { ...s, ex: s.ex + 1, round: 1, phase: 'work', seconds: s.workSec }
-    if (s.set < s.totalSets) return { ...s, set: s.set + 1, ex: 0, round: 1, phase: 'setRest', seconds: s.setRestSec }
-    return { ...s, phase: 'done', seconds: 0 }
+    // 마지막 라운드 → 다음 운동 (블록 끝은 work 단계에서 이미 처리)
+    return { ...s, ex: s.ex + 1, round: 1, phase: 'work', seconds: s.workSec }
   }
   if (s.phase === 'setRest') return { ...s, round: 1, phase: 'work', seconds: s.workSec }
   return s
@@ -763,8 +771,8 @@ export default function LogPage({
   const renderFill = () => {
     // Tabata timer overlay
     const tabata = tabataState
-    const tabataPhaseColor = tabata?.phase === 'work' ? '#1D9E75' : tabata?.phase === 'rest' ? '#EF9F27' : '#3b82f6'
-    const tabataPhaseName = tabata?.phase === 'work' ? tr(lang, 'tabataWork') : tabata?.phase === 'rest' ? tr(lang, 'tabataRest') : tr(lang, 'tabataSetRest')
+    const tabataPhaseColor = tabata?.phase === 'work' ? '#1D9E75' : tabata?.phase === 'rest' ? '#EF9F27' : tabata?.phase === 'prepare' ? '#ffffff' : '#3b82f6'
+    const tabataPhaseName = tabata?.phase === 'work' ? tr(lang, 'tabataWork') : tabata?.phase === 'rest' ? tr(lang, 'tabataRest') : tabata?.phase === 'prepare' ? tr(lang, 'tabataPrepare') : tr(lang, 'tabataSetRest')
     const tabataCurEx = tabata ? draftExes[tabata.ex] : null
     const tabataNextEx = tabata && tabata.phase === 'rest' && tabata.round >= tabata.totalRounds && tabata.ex < tabata.exCount - 1
       ? draftExes[tabata.ex + 1] : null
@@ -807,7 +815,7 @@ export default function LogPage({
                   })}
                 </div>
                 <button
-                  onClick={() => setTabataState(s => s ? { ...s, phase: 'work', seconds: s.workSec } : s)}
+                  onClick={() => setTabataState(s => s ? { ...s, phase: 'prepare', seconds: 10 } : s)}
                   style={{ padding: '18px 72px', borderRadius: '40px', background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '22px', fontWeight: 700, fontFamily: 'inherit' }}>
                   {tr(lang, 'tabataStart')}
                 </button>
@@ -819,7 +827,7 @@ export default function LogPage({
                 <div style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: tabataPhaseColor, marginBottom: '6px' }}>
                   {tabataPhaseName}
                 </div>
-                {tabata.phase === 'work' && tabataCurEx && (() => {
+                {(tabata.phase === 'work' || tabata.phase === 'prepare') && tabataCurEx && (() => {
                   const ex = getEx(tabataCurEx.exId)
                   return ex ? <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '17px', marginBottom: '10px', textAlign: 'center', padding: '0 24px' }}>{exName(ex, lang).main}</div> : null
                 })()}
@@ -991,7 +999,7 @@ export default function LogPage({
         <button className="btn" onClick={closeFill} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'cancel')}</button>
         {tabata ? (
           <button className="btn btn-p"
-            onClick={() => setTabataState(s => s && s.phase === 'ready' ? { ...s, phase: 'work', seconds: s.workSec } : s)}
+            onClick={() => setTabataState(s => s && s.phase === 'ready' ? { ...s, phase: 'prepare', seconds: 10 } : s)}
             style={{ fontSize: '16px', padding: '12px 22px' }}>
             ▶ {tr(lang, 'tabataStart')}
           </button>
