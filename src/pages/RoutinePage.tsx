@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   IconLayoutList, IconPlus, IconPlayerPlay, IconTrash,
   IconPencil, IconSearch, IconX, IconGripVertical, IconPhoto, IconShare, IconStar, IconStarFilled,
@@ -134,6 +134,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
   const [routineName, setRoutineName] = useState('')
   const [selected, setSelected] = useState<RoutineExercise[]>([])
   const [format, setFormat] = useState<WorkoutFormat>(defaultFormat())
+  const [rawInputs, setRawInputs] = useState<Record<string, string>>({})
   const [search, setSearch] = useState('')
   const [filterMuscle, setFilterMuscle] = useState('all')
   const dragIndex = useRef<number | null>(null)
@@ -187,6 +188,24 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
 
   const updateFormat = (patch: Partial<WorkoutFormat>) => setFormat(prev => ({ ...prev, ...patch }))
 
+  const numField = (key: string, def: number) => ({
+    type: 'number' as const, min: 1,
+    value: rawInputs[key] !== undefined ? rawInputs[key] : String((format as unknown as Record<string, number>)[key] ?? def),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value
+      setRawInputs(prev => ({ ...prev, [key]: raw }))
+      const n = parseInt(raw)
+      if (raw !== '' && !isNaN(n) && n >= 1) updateFormat({ [key]: n })
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      const n = parseInt(e.target.value)
+      const val = (!isNaN(n) && n >= 1) ? n : def
+      updateFormat({ [key]: val })
+      setRawInputs(prev => { const r = { ...prev }; delete r[key]; return r })
+    },
+    style: { textAlign: 'center' as const, padding: '5px' },
+  })
+
   const setFormatType = (t: WorkoutFormatType) => {
     const defaults: Record<WorkoutFormatType, Partial<WorkoutFormat>> = {
       sets_reps: {},
@@ -197,6 +216,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
       interval:  { intervalUnit: 'min', workMin: 2, restMin: 1, workSec2: 45, restSec2: 15, intervalRounds: 6 },
     }
     setFormat({ type: t, ...defaults[t] })
+    setRawInputs({})
   }
 
   const openAdd = () => {
@@ -665,10 +685,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
-                      <input type="number" min="1"
-                        value={(format as unknown as Record<string, number>)[key] ?? def}
-                        onChange={e => updateFormat({ [key]: parseInt(e.target.value) || def })}
-                        style={{ textAlign: 'center', padding: '5px' }} />
+                      <input {...numField(key, def)} />
                     </div>
                   ))}
                 </div>
@@ -679,10 +696,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   ].map(({ label, key, def }) => (
                     <div key={key}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{label}</div>
-                      <input type="number" min="1"
-                        value={(format as unknown as Record<string, number>)[key] ?? def}
-                        onChange={e => updateFormat({ [key]: parseInt(e.target.value) || def })}
-                        style={{ textAlign: 'center', padding: '5px' }} />
+                      <input {...numField(key, def)} />
                     </div>
                   ))}
                 </div>
@@ -700,9 +714,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <div>
                     <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineForTimeRounds')}</div>
-                    <input type="number" min="1" value={format.formatRounds ?? 1}
-                      onChange={e => updateFormat({ formatRounds: parseInt(e.target.value) || 1 })}
-                      style={{ textAlign: 'center', padding: '5px' }} />
+                    <input {...numField('formatRounds', 1)} />
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineForTimeTimeCap')}</div>
@@ -724,9 +736,7 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                 </div>
                 <div style={{ maxWidth: '180px' }}>
                   <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineAmrapDuration')}</div>
-                  <input type="number" min="1" value={format.duration ?? 20}
-                    onChange={e => updateFormat({ duration: parseInt(e.target.value) || 20 })}
-                    style={{ textAlign: 'center', padding: '5px' }} />
+                  <input {...numField('duration', 20)} />
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>
                   {tr(lang, 'routineAmrapHint')}
@@ -746,15 +756,11 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', alignItems: 'end' }}>
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineEmomEvery')} (E<strong>X</strong>MOM)</div>
-                      <input type="number" min="1" max="10" value={ev}
-                        onChange={e => updateFormat({ every: parseInt(e.target.value) || 1 })}
-                        style={{ textAlign: 'center', padding: '5px' }} />
+                      <input {...numField('every', 1)} max={10} />
                     </div>
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Sets</div>
-                      <input type="number" min="1" value={sets}
-                        onChange={e => updateFormat({ emomSets: parseInt(e.target.value) || 1 })}
-                        style={{ textAlign: 'center', padding: '5px' }} />
+                      <input {...numField('emomSets', 1)} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Total Duration</div>
@@ -792,38 +798,28 @@ export default function RoutinePage({ routines, allExercises, onAddRoutine, onUp
                       <>
                         <div>
                           <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalWorkSec')}</div>
-                          <input type="number" min="1" value={format.workSec2 ?? 45}
-                            onChange={e => updateFormat({ workSec2: parseInt(e.target.value) || 45 })}
-                            style={{ textAlign: 'center', padding: '5px' }} />
+                          <input {...numField('workSec2', 45)} />
                         </div>
                         <div>
                           <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalRestSec')}</div>
-                          <input type="number" min="1" value={format.restSec2 ?? 15}
-                            onChange={e => updateFormat({ restSec2: parseInt(e.target.value) || 15 })}
-                            style={{ textAlign: 'center', padding: '5px' }} />
+                          <input {...numField('restSec2', 15)} />
                         </div>
                       </>
                     ) : (
                       <>
                         <div>
                           <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalWorkMin')}</div>
-                          <input type="number" min="1" value={format.workMin ?? 2}
-                            onChange={e => updateFormat({ workMin: parseInt(e.target.value) || 2 })}
-                            style={{ textAlign: 'center', padding: '5px' }} />
+                          <input {...numField('workMin', 2)} />
                         </div>
                         <div>
                           <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>{tr(lang, 'routineIntervalRestMin')}</div>
-                          <input type="number" min="1" value={format.restMin ?? 1}
-                            onChange={e => updateFormat({ restMin: parseInt(e.target.value) || 1 })}
-                            style={{ textAlign: 'center', padding: '5px' }} />
+                          <input {...numField('restMin', 1)} />
                         </div>
                       </>
                     )}
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--tm)', marginBottom: '3px' }}>Rounds</div>
-                      <input type="number" min="1" value={format.intervalRounds ?? 6}
-                        onChange={e => updateFormat({ intervalRounds: parseInt(e.target.value) || 6 })}
-                        style={{ textAlign: 'center', padding: '5px' }} />
+                      <input {...numField('intervalRounds', 6)} />
                     </div>
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--tm)', marginTop: '8px' }}>

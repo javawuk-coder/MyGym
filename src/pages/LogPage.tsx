@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { IconPlus, IconTrash, IconSearch, IconChevronLeft, IconChevronRight, IconCheck, IconArrowUp, IconArrowDown, IconBarbell, IconShare } from '@tabler/icons-react'
-import type { Exercise, DayLog, LogEntry, LogType, Routine, RoutineExercise, ExerciseSet } from '../types'
+import type { Exercise, DayLog, LogEntry, LogType, Routine, RoutineExercise, ExerciseSet, WorkoutFormat } from '../types'
 import { tr, exName, muscleLabel, type Lang } from '../lib/i18n'
 import { shareWorkout } from '../lib/shareWorkout'
 const MB: Record<string, string> = {
@@ -9,6 +9,22 @@ const MB: Record<string, string> = {
   core: 'bco', glute: 'bg', hiit: 'bhiit', cardio: 'bcard', custom: 'bx',
 }
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+function playBeep(freq: number, duration: number, vol: number) {
+  try {
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.value = freq
+    gain.gain.setValueAtTime(vol, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
+    osc.start()
+    osc.stop(ctx.currentTime + duration)
+    osc.onended = () => ctx.close()
+  } catch { /* unsupported */ }
+}
 
 function toKg(v: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(v / 2.205 * 10) / 10 : parseFloat(String(v)) || 0 }
 function fromKg(kg: number, unit: 'kg' | 'lb') { return unit === 'lb' ? Math.round(kg * 2.205 * 10) / 10 : kg }
@@ -35,6 +51,38 @@ interface DraftEx {
   exNote: string
 }
 type ModalState = null | 'pick' | 'routine-select' | 'ex-select' | 'fill'
+
+interface TabataState {
+  phase: 'ready' | 'work' | 'rest' | 'setRest' | 'done'
+  seconds: number
+  set: number; ex: number; round: number; paused: boolean
+  workSec: number; restSec: number; setRestSec: number
+  totalRounds: number; totalSets: number; exCount: number
+}
+function initTabata(fmt: WorkoutFormat, exCount: number): TabataState {
+  return {
+    phase: 'ready', seconds: fmt.workSec ?? 20,
+    set: 1, ex: 0, round: 1, paused: false,
+    workSec: fmt.workSec ?? 20, restSec: fmt.restSec ?? 10, setRestSec: fmt.setRestSec ?? 120,
+    totalRounds: fmt.tabataRounds ?? 8, totalSets: fmt.tabataSets ?? 1, exCount,
+  }
+}
+function nextTabataState(s: TabataState): TabataState {
+  if (s.phase === 'work') {
+    if (s.round >= s.totalRounds && s.ex >= s.exCount - 1 && s.set >= s.totalSets)
+      return { ...s, phase: 'done', seconds: 0 }
+    return { ...s, phase: 'rest', seconds: s.restSec }
+  }
+  if (s.phase === 'rest') {
+    if (s.round < s.totalRounds) return { ...s, round: s.round + 1, phase: 'work', seconds: s.workSec }
+    if (s.ex < s.exCount - 1) return { ...s, ex: s.ex + 1, round: 1, phase: 'work', seconds: s.workSec }
+    if (s.set < s.totalSets) return { ...s, set: s.set + 1, ex: 0, round: 1, phase: 'setRest', seconds: s.setRestSec }
+    return { ...s, phase: 'done', seconds: 0 }
+  }
+  if (s.phase === 'setRest') return { ...s, round: 1, phase: 'work', seconds: s.workSec }
+  return s
+}
+
 let _draftSeq = 0
 function newDraftId() { return String(++_draftSeq) }
 
@@ -131,6 +179,8 @@ export default function LogPage({
   const [currentRoutineId, setCurrentRoutineId] = useState<string | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
+  const [tabataState, setTabataState] = useState<TabataState | null>(null)
+  const tabataTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // ── Screen Wake Lock ─────────────────────────────────────────
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -187,6 +237,38 @@ export default function LogPage({
   useEffect(() => {
     onLoggingChange?.(modal === 'fill')
   }, [modal]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Tabata countdown ──────────────────────────────────────────
+  useEffect(() => {
+    if (tabataTimerRef.current) clearInterval(tabataTimerRef.current)
+    if (!tabataState || tabataState.phase === 'ready' || tabataState.phase === 'done' || tabataState.paused) return
+    tabataTimerRef.current = setInterval(() => {
+      setTabataState(prev => {
+        if (!prev || prev.paused) return prev
+        if (prev.seconds > 1) return { ...prev, seconds: prev.seconds - 1 }
+        return nextTabataState(prev)
+      })
+    }, 1000)
+    return () => { if (tabataTimerRef.current) clearInterval(tabataTimerRef.current) }
+  }, [tabataState?.phase, tabataState?.paused]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (tabataState?.phase === 'done') setShowFinishConfirm(true)
+    // Phase-start beep: signals work/rest/setRest transition
+    if (tabataState?.phase === 'work') playBeep(1047, 0.12, 0.4)       // C6 — energetic
+    else if (tabataState?.phase === 'rest') playBeep(659, 0.12, 0.3)    // E5 — softer
+    else if (tabataState?.phase === 'setRest') playBeep(440, 0.2, 0.3)  // A4 — low, long rest
+  }, [tabataState?.phase]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Countdown beep: last 5 seconds of each phase
+  useEffect(() => {
+    if (!tabataState || tabataState.paused) return
+    const { phase, seconds } = tabataState
+    if (phase === 'ready' || phase === 'done' || seconds <= 0 || seconds > 5) return
+    // seconds 5→4→3→2: short beep. seconds 1: final beep (higher, longer)
+    if (seconds === 1) playBeep(1319, 0.22, 0.45)  // E6 — final
+    else playBeep(880, 0.07, 0.25)                  // A5 — tick
+  }, [tabataState?.seconds]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const startWorkout = () => {
     const now = Date.now()
@@ -294,6 +376,8 @@ export default function LogPage({
     setModal('fill')
     history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
+    if (initialRoutine.format?.type === 'tabata') setTabataState(initTabata(initialRoutine.format, initialRoutine.exercises.length))
+    else setTabataState(null)
     onConsumedInitial?.()
   }, [initialRoutine]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -307,14 +391,20 @@ export default function LogPage({
   const daysInMonth = new Date(calYear, calMonthNum, 0).getDate()
 
   // 이달 날짜별 운동 타입 (calendar circle color)
+  // HIIT는 log_type이 weight_reps일 수 있어 Exercise.muscle로 판단
   const monthDayColors = Array.from({ length: daysInMonth }, (_, i) => {
     const d = `${calMonth}-${String(i + 1).padStart(2, '0')}`
     const dayLog = logMap[d]
     if (!dayLog?.exercises?.length) return null
-    const types = dayLog.exercises.map(e => e.log_type || 'weight_reps')
-    if (types.some(t => t === 'weight_reps' || t === 'reps_only')) return 'weight'
-    if (types.some(t => t === 'cardio')) return 'cardio'
-    return 'hiit'
+    const cats = dayLog.exercises.map(e => {
+      const ex = allExercises.find(x => x.id === e.exId)
+      if (ex?.muscle === 'hiit') return 'hiit'
+      if (ex?.muscle === 'cardio' || e.log_type === 'cardio') return 'cardio'
+      return 'weight'
+    })
+    if (cats.some(c => c === 'hiit')) return 'hiit'
+    if (cats.some(c => c === 'weight')) return 'weight'
+    return 'cardio'
   })
 
   const prevMonth = () => {
@@ -434,6 +524,8 @@ export default function LogPage({
     setCurrentRoutineId(r.id)
     history.pushState({ filling: true }, '')
     startWorkout(); acquireWakeLock()
+    if (r.format?.type === 'tabata') setTabataState(initTabata(r.format, r.exercises.length))
+    else setTabataState(null)
   }
   const openExFill = (exId: string) => {
     setFillTitle(''); setDraftExes([{ draftId: newDraftId(), exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }]); setModal('fill')
@@ -447,6 +539,8 @@ export default function LogPage({
     setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDraftId(null); setLastCompletedRi(-1)
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
+    if (tabataTimerRef.current) clearInterval(tabataTimerRef.current)
+    setTabataState(null)
     releaseWakeLock()
   }
 
@@ -477,6 +571,17 @@ export default function LogPage({
 
   const save = async () => {
     const entries: LogEntry[] = []
+    if (tabataState) {
+      // Tabata: auto-generate time-based entries (totalRounds × totalSets bouts per exercise)
+      const { workSec, totalRounds, totalSets } = tabataState
+      for (const d of draftExes) {
+        entries.push({
+          exId: d.exId,
+          log_type: 'time',
+          sets: Array.from({ length: totalRounds * totalSets }, () => ({ duration: workSec })),
+        })
+      }
+    } else {
     for (const d of draftExes) {
       const ex = getEx(d.exId)
       const lt: LogType = ex?.log_type || 'weight_reps'
@@ -502,6 +607,7 @@ export default function LogPage({
       }
       if (sets.length) entries.push({ exId: d.exId, log_type: lt, sets })
     }
+    } // end else (non-tabata)
     if (!entries.length) { alert(tr(lang, 'noSets')); return }
     const routineIdSnapshot = currentRoutineId
     const notesSnapshot = draftExes.map(d => ({ exId: d.exId, note: d.exNote.trim() || undefined }))
@@ -654,9 +760,117 @@ export default function LogPage({
   }
 
   // ── Fill 전체화면 ─────────────────────────────────────────────
-  const renderFill = () => (
+  const renderFill = () => {
+    // Tabata timer overlay
+    const tabata = tabataState
+    const tabataPhaseColor = tabata?.phase === 'work' ? '#1D9E75' : tabata?.phase === 'rest' ? '#EF9F27' : '#3b82f6'
+    const tabataPhaseName = tabata?.phase === 'work' ? tr(lang, 'tabataWork') : tabata?.phase === 'rest' ? tr(lang, 'tabataRest') : tr(lang, 'tabataSetRest')
+    const tabataCurEx = tabata ? draftExes[tabata.ex] : null
+    const tabataNextEx = tabata && tabata.phase === 'rest' && tabata.round >= tabata.totalRounds && tabata.ex < tabata.exCount - 1
+      ? draftExes[tabata.ex + 1] : null
+
+    return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {timerPhase === 'resting' && (
+      {/* ── Tabata timer overlay ── */}
+      {tabata && tabata.phase !== 'done' && (
+        <div style={{ position: 'absolute', inset: 0, background: '#0c1a14', zIndex: 30, display: 'flex', flexDirection: 'column' }}>
+          {/* Top bar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', flexShrink: 0 }}>
+            <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px' }}>
+              {tr(lang, 'tabataSetLabel')} {tabata.set}/{tabata.totalSets}
+            </div>
+            <div style={{ color: '#1D9E75', fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em' }}>TABATA</div>
+            <button onClick={() => setShowFinishConfirm(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', padding: '4px 8px' }}>
+              {tr(lang, 'tabataEnd')}
+            </button>
+          </div>
+
+          {/* Main */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            {tabata.phase === 'ready' ? (
+              /* ── Ready screen ── */
+              <>
+                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '24px', letterSpacing: '0.04em' }}>
+                  {tabata.workSec}s / {tabata.restSec}s × {tabata.totalRounds} {tr(lang, 'tabataRoundLabel')}
+                  {tabata.totalSets > 1 ? ` × ${tabata.totalSets} ${tr(lang, 'tabataSetLabel')}` : ''}
+                </div>
+                <div style={{ width: '80%', maxWidth: '320px', marginBottom: '36px' }}>
+                  {draftExes.map((d, i) => {
+                    const ex = getEx(d.exId)
+                    const nm = ex ? exName(ex, lang) : { main: d.exId }
+                    return (
+                      <div key={d.draftId} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: i < draftExes.length - 1 ? '0.5px solid rgba(255,255,255,0.07)' : 'none' }}>
+                        <span style={{ color: '#1D9E75', fontWeight: 700, fontSize: '13px', minWidth: '20px', textAlign: 'right' }}>{i + 1}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px' }}>{nm.main}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <button
+                  onClick={() => setTabataState(s => s ? { ...s, phase: 'work', seconds: s.workSec } : s)}
+                  style={{ padding: '18px 72px', borderRadius: '40px', background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '22px', fontWeight: 700, fontFamily: 'inherit' }}>
+                  {tr(lang, 'tabataStart')}
+                </button>
+              </>
+            ) : (
+              /* ── Active timer ── */
+              <>
+                {/* Phase + exercise name */}
+                <div style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: tabataPhaseColor, marginBottom: '6px' }}>
+                  {tabataPhaseName}
+                </div>
+                {tabata.phase === 'work' && tabataCurEx && (() => {
+                  const ex = getEx(tabataCurEx.exId)
+                  return ex ? <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '17px', marginBottom: '10px', textAlign: 'center', padding: '0 24px' }}>{exName(ex, lang).main}</div> : null
+                })()}
+
+                {/* Countdown */}
+                <div style={{ fontSize: tabata.seconds >= 100 ? '110px' : '140px', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: tabataPhaseColor }}>
+                  {tabata.seconds}
+                </div>
+
+                {/* Next exercise hint */}
+                {tabataNextEx && (() => {
+                  const ex = getEx(tabataNextEx.exId)
+                  return ex ? (
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', marginTop: '12px' }}>
+                      {tr(lang, 'tabataNext')}: {exName(ex, lang).main}
+                    </div>
+                  ) : null
+                })()}
+
+                {/* Progress */}
+                <div style={{ display: 'flex', gap: '28px', marginTop: '28px' }}>
+                  {[
+                    { label: tr(lang, 'tabataExLabel'), val: `${tabata.ex + 1}/${tabata.exCount}` },
+                    { label: tr(lang, 'tabataRoundLabel'), val: `${tabata.round}/${tabata.totalRounds}` },
+                  ].map(({ label, val }) => (
+                    <div key={label} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>{label}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 600, color: 'rgba(255,255,255,0.75)', fontVariantNumeric: 'tabular-nums' }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Controls */}
+                <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
+                  <button
+                    onClick={() => setTabataState(s => s ? { ...s, paused: !s.paused } : s)}
+                    style={{ padding: '14px 28px', borderRadius: '30px', background: tabata.paused ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '16px', fontFamily: 'inherit', fontWeight: 600 }}>
+                    {tabata.paused ? tr(lang, 'tabataResume') : tr(lang, 'tabataPause')}
+                  </button>
+                  <button
+                    onClick={() => setTabataState(s => s ? nextTabataState(s) : s)}
+                    style={{ padding: '14px 20px', borderRadius: '30px', background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)', border: 'none', cursor: 'pointer', fontSize: '16px', fontFamily: 'inherit' }}>
+                    {tr(lang, 'tabataSkip')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+      {timerPhase === 'resting' && !tabata && (
         <div style={{
           position: 'absolute', inset: 0,
           background: '#111', display: 'flex', flexDirection: 'column',
@@ -775,7 +989,15 @@ export default function LogPage({
       </div>
       <div style={{ padding: '14px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '10px', justifyContent: 'flex-end', flexShrink: 0 }}>
         <button className="btn" onClick={closeFill} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'cancel')}</button>
-        <button className="btn btn-p" onClick={() => setShowFinishConfirm(true)} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'save')}</button>
+        {tabata ? (
+          <button className="btn btn-p"
+            onClick={() => setTabataState(s => s && s.phase === 'ready' ? { ...s, phase: 'work', seconds: s.workSec } : s)}
+            style={{ fontSize: '16px', padding: '12px 22px' }}>
+            ▶ {tr(lang, 'tabataStart')}
+          </button>
+        ) : (
+          <button className="btn btn-p" onClick={() => setShowFinishConfirm(true)} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'save')}</button>
+        )}
       </div>
       {showFinishConfirm && (
         <div className="mbg" style={{ zIndex: 300 }} onClick={e => { if (e.target === e.currentTarget) setShowFinishConfirm(false) }}>
@@ -783,8 +1005,11 @@ export default function LogPage({
             <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '8px' }}>{tr(lang, 'confirmFinishWorkout')}</div>
             <div style={{ fontSize: '14px', color: 'var(--tm)', marginBottom: '24px' }}>{tr(lang, 'confirmFinishWorkoutBody')}</div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button className="btn" onClick={() => { setShowFinishConfirm(false); resumeWorkout() }}
-                style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutCancel')}</button>
+              <button className="btn" onClick={() => {
+                setShowFinishConfirm(false)
+                if (tabata) setTabataState(s => s ? { ...s, paused: false } : s)
+                else resumeWorkout()
+              }} style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutCancel')}</button>
               <button className="btn btn-p" onClick={() => { setShowFinishConfirm(false); save() }}
                 style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutOk')}</button>
             </div>
@@ -792,7 +1017,8 @@ export default function LogPage({
         </div>
       )}
     </div>
-  )
+    ) // end return
+  } // end renderFill
 
   // ── Render ────────────────────────────────────────────────────
   const summary = daySummary(selectedLog)
