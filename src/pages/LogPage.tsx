@@ -130,6 +130,7 @@ export default function LogPage({
   const [addExSearch, setAddExSearch] = useState('')
   const [currentRoutineId, setCurrentRoutineId] = useState<string | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
   // ── Screen Wake Lock ─────────────────────────────────────────
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -432,7 +433,7 @@ export default function LogPage({
   const closeFill = () => {
     setModal(null); setDraftExes([]); setFillTitle('')
     setExSearch(''); setRoutineSearch(''); setShowAddExInFill(false); setAddExSearch('')
-    setCurrentRoutineId(null)
+    setCurrentRoutineId(null); setShowFinishConfirm(false)
     setTimerPhase('idle'); setSegStartedAt(null); setAccWorkMs(0); setAccRestMs(0); setTick(0); setCompletedSets(new Set()); setLastCompletedLabel(''); setLastCompletedDraftId(null); setLastCompletedRi(-1)
     phaseRef.current = 'idle'; segStartRef.current = null; accWorkRef.current = 0; accRestRef.current = 0
     if (timerRef.current) clearInterval(timerRef.current)
@@ -764,8 +765,22 @@ export default function LogPage({
       </div>
       <div style={{ padding: '14px 16px', borderTop: '0.5px solid var(--bd)', display: 'flex', gap: '10px', justifyContent: 'flex-end', flexShrink: 0 }}>
         <button className="btn" onClick={closeFill} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'cancel')}</button>
-        <button className="btn btn-p" onClick={save} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'save')}</button>
+        <button className="btn btn-p" onClick={() => setShowFinishConfirm(true)} style={{ fontSize: '16px', padding: '12px 22px' }}>{tr(lang, 'save')}</button>
       </div>
+      {showFinishConfirm && (
+        <div className="mbg" style={{ zIndex: 300 }} onClick={e => { if (e.target === e.currentTarget) setShowFinishConfirm(false) }}>
+          <div className="mo" style={{ maxWidth: '320px', textAlign: 'center' }}>
+            <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '8px' }}>{tr(lang, 'confirmFinishWorkout')}</div>
+            <div style={{ fontSize: '14px', color: 'var(--tm)', marginBottom: '24px' }}>{tr(lang, 'confirmFinishWorkoutBody')}</div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn" onClick={() => setShowFinishConfirm(false)}
+                style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutCancel')}</button>
+              <button className="btn btn-p" onClick={() => { setShowFinishConfirm(false); save() }}
+                style={{ flex: 1, fontSize: '15px', padding: '12px' }}>{tr(lang, 'confirmFinishWorkoutOk')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
