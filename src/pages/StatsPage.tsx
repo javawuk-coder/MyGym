@@ -55,10 +55,11 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
   )
   const workoutDays = filtered.filter(l => l.exercises.length).length
 
-  // Volume chart data (유산소: 60분 = 5000kg 환산)
+  // Volume chart data (유산소/time: 60분 = 5000kg 환산)
   const exChartVol = (exercises: typeof filtered[0]['exercises']) =>
     exercises.reduce((a, e) => {
       if (e.log_type === 'cardio') return a + ((e.time || 0) / 60) * 5000
+      if (e.log_type === 'time') return a + ((e.sets || []).reduce((b, s) => b + (s.duration || 0), 0) / 60) * 5000
       return a + (e.sets || []).reduce((b, s) => b + (s.weight || 0) * (s.reps || 0), 0)
     }, 0)
 
@@ -121,12 +122,14 @@ export default function StatsPage({ logs, allExercises, unit, lang }: Props) {
   const chartMax = Math.max(...chartData.map(d => d.vol), 1)
   const barGap = periodDays === 30 ? '2px' : '4px'
 
-  // Volume by muscle
+  // Volume by muscle (time-based: duration → cardio 환산)
   const mv: Record<string, number> = {}
   all.forEach(e => {
     const x = getEx(e.exId)
-    const v = (e.sets || []).reduce((a, s) => a + (s.weight || 0) * (s.reps || 0), 0)
     const m = x?.muscle || 'custom'
+    const v = e.log_type === 'time'
+      ? ((e.sets || []).reduce((a, s) => a + (s.duration || 0), 0) / 60) * 5000
+      : (e.sets || []).reduce((a, s) => a + (s.weight || 0) * (s.reps || 0), 0)
     mv[m] = (mv[m] || 0) + v
   })
   const maxVol = Math.max(...Object.values(mv), 1)
