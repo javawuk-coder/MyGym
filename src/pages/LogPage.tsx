@@ -269,7 +269,7 @@ export default function LogPage({
   }, [tabataState?.phase, tabataState?.paused]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (tabataState?.phase === 'done') setShowFinishConfirm(true)
+    // 'done' is handled inside the overlay — no separate dialog needed
     // Phase-start beep: signals work/rest/setRest transition
     if (tabataState?.phase === 'work') playBeep(880, 0.18, 1.0, 'square')
     else if (tabataState?.phase === 'rest') playBeep(659, 0.18, 0.9, 'sine')
@@ -788,22 +788,37 @@ export default function LogPage({
     return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* ── Tabata timer overlay ── */}
-      {tabata && tabata.phase !== 'done' && (
+      {tabata && (
         <div style={{ position: 'absolute', inset: 0, background: '#0c1a14', zIndex: 30, display: 'flex', flexDirection: 'column' }}>
           {/* Top bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', flexShrink: 0 }}>
             <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px' }}>
-              {tr(lang, 'tabataSetLabel')} {tabata.set}/{tabata.totalSets}
+              {tabata.phase !== 'done' ? `${tr(lang, 'tabataSetLabel')} ${tabata.set}/${tabata.totalSets}` : ''}
             </div>
             <div style={{ color: '#1D9E75', fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em' }}>TABATA</div>
-            <button onClick={() => setShowFinishConfirm(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', padding: '4px 8px' }}>
-              {tr(lang, 'tabataEnd')}
-            </button>
+            {tabata.phase !== 'done'
+              ? <button onClick={() => setShowFinishConfirm(true)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', padding: '4px 8px' }}>{tr(lang, 'tabataEnd')}</button>
+              : <div style={{ width: '48px' }} />
+            }
           </div>
 
           {/* Main */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            {tabata.phase === 'ready' ? (
+            {tabata.phase === 'done' ? (
+              /* ── Done screen ── */
+              <>
+                <div style={{ fontSize: '72px', marginBottom: '16px', color: '#1D9E75', fontWeight: 700, lineHeight: 1 }}>✓</div>
+                <div style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>{tr(lang, 'tabataDone')}</div>
+                <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px', marginBottom: '40px' }}>
+                  {tabata.totalSets}{tr(lang, 'tabataSetLabel')} · {tabata.exCount}{tr(lang, 'tabataExLabel')} · {tabata.totalRounds}{tr(lang, 'tabataRoundLabel')}
+                </div>
+                <button
+                  onClick={() => save()}
+                  style={{ padding: '16px 56px', borderRadius: '40px', background: '#1D9E75', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '18px', fontWeight: 700, fontFamily: 'inherit' }}>
+                  {tr(lang, 'save')}
+                </button>
+              </>
+            ) : tabata.phase === 'ready' ? (
               /* ── Ready screen ── */
               <>
                 <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '24px', letterSpacing: '0.04em' }}>
