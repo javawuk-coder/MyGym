@@ -197,6 +197,8 @@ export default function LogPage({
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [tabataState, setTabataState] = useState<TabataState | null>(null)
   const tabataTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const exCardRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const [scrollToDraftId, setScrollToDraftId] = useState<string | null>(null)
 
   // ── Screen Wake Lock ─────────────────────────────────────────
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -253,6 +255,12 @@ export default function LogPage({
   useEffect(() => {
     onLoggingChange?.(modal === 'fill')
   }, [modal]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!scrollToDraftId) return
+    exCardRefs.current[scrollToDraftId]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    setScrollToDraftId(null)
+  }, [scrollToDraftId])
 
   // ── Tabata countdown ──────────────────────────────────────────
   useEffect(() => {
@@ -508,23 +516,43 @@ export default function LogPage({
     }))
   const removeDraftEx = (di: number) =>
     setDraftExes(prev => prev.filter((_, i) => i !== di))
-  const moveExUp = (di: number) => setDraftExes(prev => {
-    if (di === 0) return prev
-    const next = [...prev];
-    [next[di - 1], next[di]] = [next[di], next[di - 1]]
-    return next
-  })
-  const moveExDown = (di: number) => setDraftExes(prev => {
-    if (di === prev.length - 1) return prev
-    const next = [...prev];
-    [next[di], next[di + 1]] = [next[di + 1], next[di]]
-    return next
-  })
+  const moveExUp = (di: number) => {
+    if (di === 0) return
+    const movedId = draftExes[di].draftId
+    setDraftExes(prev => {
+      const next = [...prev];
+      [next[di - 1], next[di]] = [next[di], next[di - 1]]
+      return next
+    })
+    setScrollToDraftId(movedId)
+  }
+  const moveExDown = (di: number) => {
+    if (di === draftExes.length - 1) return
+    const movedId = draftExes[di].draftId
+    setDraftExes(prev => {
+      const next = [...prev];
+      [next[di], next[di + 1]] = [next[di + 1], next[di]]
+      return next
+    })
+    setScrollToDraftId(movedId)
+  }
   const updateExNote = (di: number, val: string) =>
     setDraftExes(prev => prev.map((d, i) => i !== di ? d : { ...d, exNote: val }))
 
   const addDraftEx = (exId: string) => {
-    setDraftExes(prev => [...prev, { draftId: newDraftId(), exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }])
+    const newEx: DraftEx = { draftId: newDraftId(), exId, rows: makeRows(3), cardio: { dist: '', time: '', cal: '' }, exNote: '' }
+    setDraftExes(prev => {
+      if (lastCompletedDraftId) {
+        const idx = prev.findIndex(d => d.draftId === lastCompletedDraftId)
+        if (idx >= 0) {
+          const next = [...prev]
+          next.splice(idx + 1, 0, newEx)
+          return next
+        }
+      }
+      return [...prev, newEx]
+    })
+    setScrollToDraftId(newEx.draftId)
     setAddExSearch(''); setShowAddExInFill(false)
   }
 
@@ -684,7 +712,7 @@ export default function LogPage({
     const colsOther = '28px 1fr 52px 36px'
     const nm = ex ? exName(ex, lang) : { main: d.exId }
     return (
-      <div key={di} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '16px', overflow: 'hidden' }}>
+      <div key={di} ref={el => { exCardRefs.current[d.draftId] = el }} style={{ border: '0.5px solid var(--bd)', borderRadius: 'var(--r)', marginBottom: '16px', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--bg2)', borderBottom: '0.5px solid var(--bd)' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
